@@ -1,15 +1,27 @@
 import "dotenv/config";
+import http from "http";
 import express, { Request, Response } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import { Server as SocketServer } from "socket.io";
+import { createAdapter } from "@socket.io/redis-adapter";
 import { PrismaClient } from "@prisma/client";
 import authRoutes from "./routes/authRoutes";
+import chatRoutes from "./routes/chatRoutes";
+import contactRoutes from "./routes/contactRoutes";
+import userRoutes from "./routes/userRoutes";
+import messageRoutes from "./routes/messageRoutes";
+import messageIdRoutes from "./routes/messageIdRoutes";
 import { errorHandler } from "./middleware/errorHandler";
+import { getRedisClients, closeRedis } from "./config/redis";
+import { attachSocketHandlers } from "./socket";
 
 const app = express();
+const server = http.createServer(app);
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 4000;
+const FRONTEND_URL = process.env.FRONTEND_URL || "*";
 
 // Security middleware
 app.use(helmet());
@@ -31,6 +43,11 @@ app.use(limiter);
 
 // API routes
 app.use("/api/auth", authRoutes);
+app.use("/api/chats", messageRoutes); // GET/POST /api/chats/:chatId/messages (before :id)
+app.use("/api/chats", chatRoutes);
+app.use("/api/contacts", contactRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/messages", messageIdRoutes);
 
 // Health check - verifies DB connection
 app.get("/api/health", async (_req: Request, res: Response) => {
@@ -63,15 +80,31 @@ app.get("/", (_req: Request, res: Response) => {
 // Centralized error handler (must be last)
 app.use(errorHandler);
 
+// Socket.io with optional Redis adapter
+const io = new SocketServer(server, {
+  cors: { origin: FRONTEND_URL, credentials: true },
+  path: "/socket.io",
+});
+attachSocketHandlers(io);
+
 // Start server
 async function main() {
   try {
     await prisma.$connect();
     console.log("✓ Database connected successfully");
 
-    app.listen(PORT, () => {
+    try {
+      const { pubClient, subClient } = await getRedisClients();
+      io.adapter(createAdapter(pubClient, subClient));
+      console.log("✓ Redis adapter attached for Socket.io");
+    } catch (redisErr) {
+      console.warn("⚠ Redis not available, Socket.io running in single-instance mode:", redisErr);
+    }
+
+    server.listen(PORT, () => {
       console.log(`✓ Server running on http://localhost:${PORT}`);
       console.log(`  Health check: http://localhost:${PORT}/api/health`);
+      console.log(`  Socket.io: ws://localhost:${PORT}`);
     });
   } catch (error) {
     console.error("Failed to connect to database:", error);
@@ -85,11 +118,10 @@ main().catch((e) => {
 });
 
 // Graceful shutdown
-process.on("SIGINT", async () => {
+async function shutdown() {
   await prisma.$disconnect();
+  await closeRedis();
   process.exit(0);
-});
-process.on("SIGTERM", async () => {
-  await prisma.$disconnect();
-  process.exit(0);
-});
+}
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);
