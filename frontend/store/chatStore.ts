@@ -7,6 +7,8 @@ interface ChatState {
   chats: ChatWithDetails[];
   activeChatId: string | null;
   messagesByChat: Record<string, MessageWithSender[]>;
+  /** Message IDs we've received message_delivered for (client-side delivery status) */
+  deliveredMessageIds: Set<string>;
   rightSidebarOpen: boolean;
   setChats: (chats: ChatWithDetails[]) => void;
   setRightSidebarOpen: (open: boolean) => void;
@@ -17,6 +19,8 @@ interface ChatState {
   appendMessage: (chatId: string, message: MessageWithSender) => void;
   updateChatFromNewMessage: (message: MessageWithSender) => void;
   replaceTempMessage: (chatId: string, tempId: string, message: MessageWithSender) => void;
+  setMessageDelivered: (messageId: string) => void;
+  setMessageRead: (messageId: string, userId: string, readAt: string) => void;
   sendMessageOptimistic: (
     chatId: string,
     tempId: string,
@@ -30,6 +34,7 @@ const initialState = {
   chats: [],
   activeChatId: null,
   messagesByChat: {},
+  deliveredMessageIds: new Set<string>(),
   rightSidebarOpen: false,
 };
 
@@ -109,6 +114,35 @@ export const useChatStore = create<ChatState>((set, get) => ({
       };
     }),
 
+  setMessageDelivered: (messageId) =>
+    set((s) => {
+      if (s.deliveredMessageIds.has(messageId)) return s;
+      const next = new Set(s.deliveredMessageIds);
+      next.add(messageId);
+      return { deliveredMessageIds: next };
+    }),
+
+  setMessageRead: (messageId, userId, readAt) =>
+    set((s) => {
+      const chatId = Object.keys(s.messagesByChat).find((cid) =>
+        (s.messagesByChat[cid] ?? []).some((m) => m.id === messageId)
+      );
+      if (!chatId) return s;
+      const list = s.messagesByChat[chatId] ?? [];
+      const updated = list.map((m) => {
+        if (m.id !== messageId) return m;
+        const hasRead = m.reads.some((r) => r.userId === userId);
+        if (hasRead) return m;
+        return {
+          ...m,
+          reads: [...m.reads, { id: `read-${userId}-${messageId}`, messageId, userId, readAt }],
+        };
+      });
+      return {
+        messagesByChat: { ...s.messagesByChat, [chatId]: updated },
+      };
+    }),
+
   sendMessageOptimistic: (chatId, tempId, payload, sender) => {
     const optimistic: MessageWithSender & { tempId?: string } = {
       id: tempId,
@@ -135,5 +169,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
     return optimistic;
   },
 
-  reset: () => set(initialState),
+  reset: () =>
+    set({
+      ...initialState,
+      deliveredMessageIds: new Set<string>(),
+    }),
 }));

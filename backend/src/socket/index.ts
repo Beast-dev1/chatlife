@@ -3,6 +3,12 @@ import { PrismaClient } from "@prisma/client";
 import { verifyAccessToken } from "../utils/jwt";
 import { createMessageSchema } from "../validators/message";
 import { getChatMemberOrThrow } from "../utils/chatMembership";
+import { getRedisClients } from "../config/redis";
+import {
+  userRoom,
+  getRelevantUserIds,
+  PRESENCE_ONLINE_KEY,
+} from "../utils/presence";
 
 const prisma = new PrismaClient();
 
@@ -34,6 +40,55 @@ export function attachSocketHandlers(io: Server) {
 
   io.on("connection", (socket: Socket) => {
     const userId = (socket.data as { userId: string }).userId;
+
+    // Presence: join user room so we can emit to this user's sockets
+    const userRoomId = userRoom(userId);
+    void socket.join(userRoomId);
+
+    // Set user online (Redis) and notify relevant users
+    void (async () => {
+      try {
+        const { pubClient } = await getRedisClients();
+        await pubClient.sAdd(PRESENCE_ONLINE_KEY, userId);
+      } catch {
+        // Redis not available, skip online set
+      }
+      try {
+        const relevantIds = await getRelevantUserIds(userId);
+        const payload = { userId };
+        for (const id of relevantIds) {
+          io.to(userRoom(id)).emit("user_online", payload);
+        }
+      } catch (err) {
+        console.error("Presence getRelevantUserIds:", err);
+      }
+    })();
+
+    socket.on("disconnect", async () => {
+      try {
+        const { pubClient } = await getRedisClients();
+        await pubClient.sRem(PRESENCE_ONLINE_KEY, userId);
+      } catch {
+        // Redis not available
+      }
+      const lastSeen = new Date();
+      try {
+        await prisma.$executeRaw`
+          UPDATE "User" SET last_seen = ${lastSeen} WHERE id = ${userId}
+        `;
+      } catch (err) {
+        console.error("Presence update lastSeen:", err);
+      }
+      try {
+        const relevantIds = await getRelevantUserIds(userId);
+        const payload = { userId, lastSeen: lastSeen.toISOString() };
+        for (const id of relevantIds) {
+          io.to(userRoom(id)).emit("user_offline", payload);
+        }
+      } catch (err) {
+        console.error("Presence disconnect getRelevantUserIds:", err);
+      }
+    });
 
     socket.on("join_chat", async (chatId: string) => {
       if (!chatId || typeof chatId !== "string") return;
@@ -101,7 +156,8 @@ export function attachSocketHandlers(io: Server) {
 
       const room = roomForChat(chatId);
       io.to(room).emit("new_message", message);
-      socket.to(room).emit("message_delivered", { messageId: message.id, chatId });
+      // Emit to whole room (including sender) so sender can show "delivered"
+      io.to(room).emit("message_delivered", { messageId: message.id, chatId });
     });
 
     socket.on("typing_start", async (chatId: string) => {

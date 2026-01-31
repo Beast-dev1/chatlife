@@ -30,10 +30,18 @@ export default function ChatThreadPage() {
   const setActiveChatId = useChatStore((s) => s.setActiveChatId);
   const setMessages = useChatStore((s) => s.setMessages);
   const messagesByChat = useChatStore((s) => s.messagesByChat);
+  const deliveredMessageIds = useChatStore((s) => s.deliveredMessageIds);
   const toggleRightSidebar = useChatStore((s) => s.toggleRightSidebar);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const displayMessages: MessageWithSender[] = messagesByChat[chatId] ?? [];
+
+  function getMessageStatus(msg: MessageWithSender): "sent" | "delivered" | "read" | undefined {
+    if (msg.senderId !== user?.id) return undefined;
+    if (msg.reads && msg.reads.length > 0) return "read";
+    if (deliveredMessageIds.has(msg.id)) return "delivered";
+    return "sent";
+  }
 
   useEffect(() => {
     setActiveChatId(chatId);
@@ -47,6 +55,18 @@ export default function ChatThreadPage() {
       socket.emit("leave_chat", chatId);
     };
   }, [socket, chatId]);
+
+  // Mark last message as read when viewing chat (if from someone else)
+  const lastMessageId =
+    displayMessages.length > 0 ? displayMessages[displayMessages.length - 1]?.id ?? null;
+  useEffect(() => {
+    if (!socket || !chatId || !user || !lastMessageId) return;
+    const list = useChatStore.getState().messagesByChat[chatId] ?? [];
+    const last = list[list.length - 1];
+    if (!last || last.senderId === user.id) return;
+    if (last.reads?.some((r) => r.userId === user.id)) return;
+    socket.emit("mark_read", { messageId: lastMessageId });
+  }, [socket, chatId, user?.id, lastMessageId]);
 
   useEffect(() => {
     if (!messagesData?.pages?.length || !chatId) return;
@@ -111,6 +131,7 @@ export default function ChatThreadPage() {
             message={msg}
             isOwn={msg.senderId === user.id}
             showSender={chat?.type === "GROUP"}
+            status={getMessageStatus(msg)}
           />
         ))}
         <div ref={bottomRef} />

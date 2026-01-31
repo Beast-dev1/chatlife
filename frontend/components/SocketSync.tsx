@@ -16,6 +16,8 @@ export default function SocketSync() {
   const appendMessage = useChatStore((s) => s.appendMessage);
   const updateChatFromNewMessage = useChatStore((s) => s.updateChatFromNewMessage);
   const replaceTempMessage = useChatStore((s) => s.replaceTempMessage);
+  const setMessageDelivered = useChatStore((s) => s.setMessageDelivered);
+  const setMessageRead = useChatStore((s) => s.setMessageRead);
 
   useEffect(() => {
     if (!socket || !isConnected || !userId) return;
@@ -36,9 +38,32 @@ export default function SocketSync() {
       queryClient.invalidateQueries({ queryKey: messagesQueryKey(chatId) });
     };
 
+    const onMessageDelivered = (payload: { messageId: string; chatId: string }) => {
+      setMessageDelivered(payload.messageId);
+    };
+
+    const onMessageRead = (payload: {
+      messageId: string;
+      chatId: string;
+      userId: string;
+      readAt: string | number | Date;
+    }) => {
+      const readAt =
+        typeof payload.readAt === "string"
+          ? payload.readAt
+          : payload.readAt instanceof Date
+            ? payload.readAt.toISOString()
+            : new Date(payload.readAt).toISOString();
+      setMessageRead(payload.messageId, payload.userId, readAt);
+    };
+
     socket.on("new_message", onNewMessage);
+    socket.on("message_delivered", onMessageDelivered);
+    socket.on("message_read", onMessageRead);
     return () => {
       socket.off("new_message", onNewMessage);
+      socket.off("message_delivered", onMessageDelivered);
+      socket.off("message_read", onMessageRead);
     };
   }, [
     socket,
@@ -47,6 +72,8 @@ export default function SocketSync() {
     appendMessage,
     updateChatFromNewMessage,
     replaceTempMessage,
+    setMessageDelivered,
+    setMessageRead,
     queryClient,
   ]);
 

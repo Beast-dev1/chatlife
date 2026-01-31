@@ -2,14 +2,19 @@
 
 import type { MessageWithSender } from "@/types/chat";
 
+export type MessageStatus = "sent" | "delivered" | "read";
+
 export default function MessageBubble({
   message,
   isOwn,
   showSender,
+  status,
 }: {
   message: MessageWithSender;
   isOwn: boolean;
   showSender?: boolean;
+  /** For own messages: sent / delivered / read */
+  status?: MessageStatus;
 }) {
   const isImage = message.type === "IMAGE" && message.fileUrl;
   const isFile = message.type === "FILE" && message.fileUrl;
@@ -56,12 +61,22 @@ export default function MessageBubble({
         {message.type !== "TEXT" && !isImage && !isFile && message.content && (
           <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
         )}
-        <p className="text-xs opacity-80 mt-1">
-          {new Date(message.createdAt).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-        </p>
+        <div className="flex items-center justify-end gap-2 mt-1">
+          {isOwn && status && (
+            <span
+              className="text-xs opacity-80 capitalize"
+              title={status === "read" ? "Read" : status === "delivered" ? "Delivered" : "Sent"}
+            >
+              {status === "read" ? "Read" : status === "delivered" ? "Delivered" : "Sent"}
+            </span>
+          )}
+          <p className="text-xs opacity-80">
+            {new Date(message.createdAt).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </p>
+        </div>
       </div>
     </div>
   );

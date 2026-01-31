@@ -38,15 +38,16 @@ enum CallStatus {
 }
 
 model User {
-  id         String   @id @default(cuid())
-  email      String   @unique
-  username   String   @unique
+  id         String    @id @default(cuid())
+  email      String    @unique
+  username   String    @unique
   password   String
-  avatarUrl  String?  @map("avatar_url")
-  status     String?  // e.g. "Hey there! I am using Let'sChat"
+  avatarUrl  String?   @map("avatar_url")
+  status     String?   // e.g. "Hey there! I am using Let'sChat"
   bio        String?
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+  lastSeen   DateTime? @map("last_seen")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
 
   sentMessages    Message[]   @relation("MessageSender")
   chatMemberships ChatMember[]
