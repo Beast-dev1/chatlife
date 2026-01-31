@@ -1,37 +1,6 @@
-# Let'sChat
+Let'sChat Implementation Plan
 
-Real-time messaging app. Phase 1 complete.
-
-## Quick Start
-
-```bash
-# Start Postgres & Redis (Docker)
-docker-compose up postgres redis -d
-
-# Backend
-cd backend && npm run dev
-
-# Frontend (new terminal)
-cd frontend && npm run dev
-```
-
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:4000
-- Health: http://localhost:4000/api/health
-
-## Phase 1 Deliverables ✓
-
-- Monorepo (frontend, backend, shared)
-- Prisma schema with User, Chat, Message, Contact, CallLog
-- Auth: register, login, refresh, logout, me, profile
-- JWT (access 15min, refresh 7 days), bcrypt, Zod validation
-- Frontend: Next.js 14, login/register, protected chat layout, profile
-
----
-
-## Implementation Plan (Reference)
-
-End-to-end plan for building the Let'sChat (Messanger) app. Work is split into 6 phases.
+End-to-end plan for building the Let'sChat (Messanger) app from an empty workspace. Work is split into 6 phases with small, testable steps.
 
 
 

@@ -1,0 +1,143 @@
+// Prisma schema for Let'sChat
+// https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ChatType {
+  DIRECT
+  GROUP
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  FILE
+  AUDIO
+  VIDEO
+}
+
+enum ContactStatus {
+  PENDING
+  ACCEPTED
+  BLOCKED
+}
+
+enum CallStatus {
+  INITIATED
+  ACCEPTED
+  REJECTED
+  ENDED
+  MISSED
+}
+
+model User {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  username   String   @unique
+  password   String
+  avatarUrl  String?  @map("avatar_url")
+  status     String?  // e.g. "Hey there! I am using Let'sChat"
+  bio        String?
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  sentMessages    Message[]   @relation("MessageSender")
+  chatMemberships ChatMember[]
+  contacts        Contact[]   @relation("ContactOwner")
+  contactOf       Contact[]   @relation("ContactTarget")
+  callLogsAsCaller CallLog[]  @relation("Caller")
+}
+
+model Chat {
+  id        String   @id @default(cuid())
+  type      ChatType @default(DIRECT)
+  name      String?
+  avatarUrl String?  @map("avatar_url")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  members   ChatMember[]
+  messages  Message[]
+  callLogs  CallLog[]
+
+  @@index([updatedAt])
+}
+
+model ChatMember {
+  id         String   @id @default(cuid())
+  chatId     String   @map("chat_id")
+  userId     String   @map("user_id")
+  role       String   @default("member") // admin | member
+  joinedAt   DateTime @default(now()) @map("joined_at")
+  lastReadAt DateTime? @map("last_read_at")
+
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([chatId, userId])
+  @@index([userId])
+  @@index([chatId])
+}
+
+model Message {
+  id        String      @id @default(cuid())
+  chatId    String      @map("chat_id")
+  senderId  String      @map("sender_id")
+  type      MessageType @default(TEXT)
+  content   String?     @db.Text
+  fileUrl   String?     @map("file_url")
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+
+  chat   Chat         @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  sender User         @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  reads  MessageRead[]
+
+  @@index([chatId, createdAt])
+  @@index([senderId])
+}
+
+model MessageRead {
+  id        String   @id @default(cuid())
+  messageId String   @map("message_id")
+  userId    String   @map("user_id")
+  readAt    DateTime @default(now()) @map("read_at")
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId])
+}
+
+model Contact {
+  id           String        @id @default(cuid())
+  userId       String        @map("user_id")
+  contactUserId String       @map("contact_user_id")
+  status       ContactStatus @default(PENDING)
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  user    User @relation("ContactOwner", fields: [userId], references: [id], onDelete: Cascade)
+  contact User @relation("ContactTarget", fields: [contactUserId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, contactUserId])
+}
+
+model CallLog {
+  id        String     @id @default(cuid())
+  chatId    String     @map("chat_id")
+  callerId  String     @map("caller_id")
+  status    CallStatus
+  startedAt DateTime  @default(now()) @map("started_at")
+  endedAt   DateTime? @map("ended_at")
+  duration  Int?      // seconds
+
+  chat   Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  caller User @relation("Caller", fields: [callerId], references: [id], onDelete: Cascade)
+}

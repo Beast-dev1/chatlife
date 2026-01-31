@@ -1,0 +1,20 @@
+{
+  "name": "letschat",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Let'sChat - Real-time messaging app",
+  "workspaces": [
+    "frontend",
+    "backend",
+    "shared"
+  ],
+  "scripts": {
+    "dev:backend": "npm run dev -w letschat-backend",
+    "dev:frontend": "npm run dev -w letschat-frontend",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "build": "npm run build -w letschat-backend && npm run build -w letschat-frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
