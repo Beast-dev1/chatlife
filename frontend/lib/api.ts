@@ -16,6 +16,10 @@ export function clearAccessToken() {
   accessToken = null;
 }
 
+export function getAccessToken(): string | null {
+  return accessToken;
+}
+
 export function setOnRefreshFailed(callback: () => void) {
   onRefreshFailed = callback;
 }
@@ -84,3 +88,18 @@ export const api = {
   delete: <T>(path: string, refreshToken?: string | null) =>
     request<T>(path, { method: "DELETE" }, refreshToken),
 };
+
+export async function uploadFile(file: File): Promise<{ url: string }> {
+  const token = getAccessToken();
+  if (!token) throw new Error("Not authenticated");
+  const formData = new FormData();
+  formData.append("file", file);
+  const res = await fetch(`${API_URL}/api/upload`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || "Upload failed");
+  return data as { url: string };
+}

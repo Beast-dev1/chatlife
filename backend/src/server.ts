@@ -13,6 +13,8 @@ import contactRoutes from "./routes/contactRoutes";
 import userRoutes from "./routes/userRoutes";
 import messageRoutes from "./routes/messageRoutes";
 import messageIdRoutes from "./routes/messageIdRoutes";
+import uploadRoutes from "./routes/uploadRoutes";
+import path from "path";
 import { errorHandler } from "./middleware/errorHandler";
 import { getRedisClients, closeRedis } from "./config/redis";
 import { attachSocketHandlers } from "./socket";
@@ -39,7 +41,7 @@ const limiter = rateLimit({
   max: 100,
   message: { error: "Too many requests, please try again later." },
 });
-app.use(limiter);
+app.use(limiter as unknown as express.RequestHandler);
 
 // API routes
 app.use("/api/auth", authRoutes);
@@ -48,6 +50,10 @@ app.use("/api/chats", chatRoutes);
 app.use("/api/contacts", contactRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/messages", messageIdRoutes);
+app.use("/api/upload", uploadRoutes);
+
+const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(process.cwd(), "uploads");
+app.use("/uploads", express.static(UPLOAD_DIR));
 
 // Health check - verifies DB connection
 app.get("/api/health", async (_req: Request, res: Response) => {

@@ -3,8 +3,9 @@
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { MessageCircle, LogOut, User } from "lucide-react";
+import { MessageCircle, LogOut, User, Users } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
+import SocketSync from "./SocketSync";
 
 export default function ChatLayout({
   children,
@@ -68,6 +69,17 @@ export default function ChatLayout({
             <span>Chats</span>
           </Link>
           <Link
+            href="/contacts"
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+              pathname === "/contacts"
+                ? "bg-emerald-500/20 text-emerald-400"
+                : "text-slate-300 hover:bg-slate-700/50"
+            }`}
+          >
+            <Users className="w-5 h-5" />
+            <span>Contacts</span>
+          </Link>
+          <Link
             href="/profile"
             className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
               pathname === "/profile"
@@ -103,7 +115,10 @@ export default function ChatLayout({
       </aside>
 
       {/* Main area */}
-      <main className="flex-1 flex flex-col overflow-hidden">{children}</main>
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <SocketSync />
+        {children}
+      </main>
     </div>
   );
 }
