@@ -98,7 +98,7 @@ export default function ChatThreadPage() {
     if (!last || last.senderId === user.id) return;
     if (last.reads?.some((r) => r.userId === user.id)) return;
     socket.emit("mark_read", { messageId: lastMessageId });
-  }, [socket, chatId, user?.id, lastMessageId]);
+  }, [socket, chatId, user, lastMessageId]);
 
   useEffect(() => {
     if (!messagesData?.pages?.length || !chatId) return;

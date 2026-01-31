@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { X, Users, User } from "lucide-react";
 import { useCreateChat } from "@/hooks/useChats";
 import { useContacts, useSearchUsers } from "@/hooks/useContacts";
@@ -115,7 +116,7 @@ export default function CreateChatModal({
                   >
                     <div className="w-9 h-9 rounded-full bg-slate-600 flex items-center justify-center">
                       {u.avatarUrl ? (
-                        <img src={u.avatarUrl} alt="" className="w-full h-full rounded-full object-cover" />
+                        <Image src={u.avatarUrl} alt="" width={36} height={36} className="w-full h-full rounded-full object-cover" unoptimized />
                       ) : (
                         <span className="text-sm text-slate-400">{u.username.slice(0, 1).toUpperCase()}</span>
                       )}

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import type { MessageWithSender } from "@/types/chat";
 
 export type MessageStatus = "sent" | "delivered" | "read";
@@ -38,10 +39,13 @@ export default function MessageBubble({
             rel="noopener noreferrer"
             className="block rounded-lg overflow-hidden"
           >
-            <img
+            <Image
               src={message.fileUrl!}
               alt=""
+              width={400}
+              height={256}
               className="max-w-full max-h-64 object-contain"
+              unoptimized
             />
           </a>
         )}

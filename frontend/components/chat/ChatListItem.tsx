@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePresenceStore } from "@/store/presenceStore";
 import type { ChatWithDetails } from "@/types/chat";
 
@@ -81,7 +82,7 @@ export default function ChatListItem({
     >
       <div className="relative w-12 h-12 rounded-full bg-slate-600 flex-shrink-0 overflow-hidden flex items-center justify-center">
         {avatarUrl ? (
-          <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+          <Image src={avatarUrl} alt="" width={48} height={48} className="w-full h-full object-cover" unoptimized />
         ) : (
           <span className="text-lg font-medium text-slate-400">
             {name.slice(0, 1).toUpperCase()}

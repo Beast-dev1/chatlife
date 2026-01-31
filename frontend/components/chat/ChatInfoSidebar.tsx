@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import {
   X,
   User,
@@ -64,7 +65,7 @@ export default function ChatInfoSidebar({ chatId }: { chatId: string | null }) {
         <div className="flex flex-col items-center text-center mb-6">
           <div className="w-24 h-24 rounded-full bg-slate-600 overflow-hidden flex items-center justify-center mb-3">
             {avatarUrl ? (
-              <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+              <Image src={avatarUrl} alt="" width={96} height={96} className="w-full h-full object-cover" unoptimized />
             ) : (
               <span className="text-3xl font-medium text-slate-400">
                 {name.slice(0, 1).toUpperCase()}

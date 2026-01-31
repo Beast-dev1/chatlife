@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useContacts, useSearchUsers, useAddContact } from "@/hooks/useContacts";
 import type { ContactWithUser, SearchUser } from "@/types/chat";
 
@@ -41,7 +42,7 @@ export default function ContactsPage() {
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-10 h-10 rounded-full bg-slate-600 flex items-center justify-center flex-shrink-0">
                     {u.avatarUrl ? (
-                      <img src={u.avatarUrl} alt="" className="w-full h-full rounded-full object-cover" />
+                      <Image src={u.avatarUrl} alt="" width={40} height={40} className="w-full h-full rounded-full object-cover" unoptimized />
                     ) : (
                       <span className="text-slate-400">{u.username.slice(0, 1).toUpperCase()}</span>
                     )}
@@ -83,7 +84,7 @@ export default function ContactsPage() {
               >
                 <div className="w-10 h-10 rounded-full bg-slate-600 flex items-center justify-center flex-shrink-0">
                   {c.contact.avatarUrl ? (
-                    <img src={c.contact.avatarUrl} alt="" className="w-full h-full rounded-full object-cover" />
+                    <Image src={c.contact.avatarUrl} alt="" width={40} height={40} className="w-full h-full rounded-full object-cover" unoptimized />
                   ) : (
                     <span className="text-slate-400">{c.contact.username.slice(0, 1).toUpperCase()}</span>
                   )}
