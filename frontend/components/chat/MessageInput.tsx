@@ -1,11 +1,14 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Send, Loader2, Smile, Image as ImageIcon } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useChatStore } from "@/store/chatStore";
 import { useSocket } from "@/hooks/useSocket";
 import { uploadFile } from "@/lib/api";
+
+const TYPING_THROTTLE_MS = 1500;
+const TYPING_DEBOUNCE_MS = 2000;
 
 const IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/gif", "image/webp"]);
 
@@ -23,6 +26,34 @@ export default function MessageInput({
   const user = useAuthStore((s) => s.user);
   const { socket } = useSocket();
   const sendMessageOptimistic = useChatStore((s) => s.sendMessageOptimistic);
+  const lastTypingEmitRef = useRef<number>(0);
+  const typingStopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const emitTypingStart = useCallback(() => {
+    if (!socket || !chatId || disabled) return;
+    const now = Date.now();
+    if (now - lastTypingEmitRef.current >= TYPING_THROTTLE_MS) {
+      lastTypingEmitRef.current = now;
+      socket.emit("typing_start", chatId);
+    }
+  }, [socket, chatId, disabled]);
+
+  const emitTypingStop = useCallback(() => {
+    if (!socket || !chatId) return;
+    if (typingStopTimerRef.current) {
+      clearTimeout(typingStopTimerRef.current);
+      typingStopTimerRef.current = null;
+    }
+    socket.emit("typing_stop", chatId);
+  }, [socket, chatId]);
+
+  useEffect(() => {
+    return () => {
+      if (typingStopTimerRef.current) {
+        clearTimeout(typingStopTimerRef.current);
+      }
+    };
+  }, []);
 
   const emitMessage = useCallback(
     (payload: { type: string; content?: string | null; fileUrl?: string | null }) => {
@@ -68,7 +99,29 @@ export default function MessageInput({
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
+    } else {
+      emitTypingStart();
+      if (typingStopTimerRef.current) {
+        clearTimeout(typingStopTimerRef.current);
+        typingStopTimerRef.current = null;
+      }
+      typingStopTimerRef.current = setTimeout(() => {
+        emitTypingStop();
+        typingStopTimerRef.current = null;
+      }, TYPING_DEBOUNCE_MS);
     }
+  };
+
+  const handleFocus = () => {
+    emitTypingStart();
+  };
+
+  const handleBlur = () => {
+    if (typingStopTimerRef.current) {
+      clearTimeout(typingStopTimerRef.current);
+      typingStopTimerRef.current = null;
+    }
+    emitTypingStop();
   };
 
   const handleFileClick = () => {
@@ -123,6 +176,8 @@ export default function MessageInput({
         value={text}
         onChange={(e) => setText(e.target.value)}
         onKeyDown={handleKeyDown}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
         placeholder="Aa"
         rows={1}
         disabled={disabled}

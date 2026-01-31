@@ -8,6 +8,7 @@ import { useSocket } from "@/hooks/useSocket";
 import { useChat } from "@/hooks/useChats";
 import { useMessages } from "@/hooks/useMessages";
 import { useChatStore } from "@/store/chatStore";
+import { usePresenceStore } from "@/store/presenceStore";
 import MessageBubble from "@/components/chat/MessageBubble";
 import MessageInput from "@/components/chat/MessageInput";
 import type { ChatWithDetails } from "@/types/chat";
@@ -18,6 +19,17 @@ function getChatTitle(chat: ChatWithDetails | undefined, currentUserId: string):
   if (chat.name) return chat.name;
   const other = chat.members?.find((m) => m.userId !== currentUserId);
   return other?.user?.username ?? "Chat";
+}
+
+function formatLastSeen(iso: string): string {
+  const d = new Date(iso);
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  if (diffMs < 60000) return "Last seen just now";
+  if (diffMs < 3600000) return `Last seen ${Math.floor(diffMs / 60000)}m ago`;
+  if (diffMs < 86400000) return `Last seen ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+  if (diffMs < 172800000) return "Last seen yesterday";
+  return `Last seen ${d.toLocaleDateString()}`;
 }
 
 export default function ChatThreadPage() {
@@ -32,7 +44,27 @@ export default function ChatThreadPage() {
   const messagesByChat = useChatStore((s) => s.messagesByChat);
   const deliveredMessageIds = useChatStore((s) => s.deliveredMessageIds);
   const toggleRightSidebar = useChatStore((s) => s.toggleRightSidebar);
+  const isOnline = usePresenceStore((s) => s.isOnline);
+  const getLastSeen = usePresenceStore((s) => s.getLastSeen);
+  const getTypingUserIds = usePresenceStore((s) => s.getTypingUserIds);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  const otherMember = chat?.members?.find((m) => m.userId !== user?.id);
+  const otherUserId = otherMember?.userId;
+  const isOtherOnline = otherUserId ? isOnline(otherUserId) : false;
+  const otherLastSeen = otherUserId ? getLastSeen(otherUserId) : undefined;
+  const typingUserIds = getTypingUserIds(chatId);
+  const typingNames = typingUserIds
+    .map((id) => chat?.members?.find((m) => m.userId === id)?.user?.username ?? "Someone")
+    .filter(Boolean);
+  const typingLabel =
+    typingNames.length === 0
+      ? null
+      : typingNames.length === 1
+        ? `${typingNames[0]} is typing…`
+        : typingNames.length === 2
+          ? `${typingNames[0]} and ${typingNames[1]} are typing…`
+          : "Several people are typing…";
 
   const displayMessages: MessageWithSender[] = messagesByChat[chatId] ?? [];
 
@@ -58,7 +90,7 @@ export default function ChatThreadPage() {
 
   // Mark last message as read when viewing chat (if from someone else)
   const lastMessageId =
-    displayMessages.length > 0 ? displayMessages[displayMessages.length - 1]?.id ?? null;
+    displayMessages.length > 0 ? (displayMessages[displayMessages.length - 1]?.id ?? null) : null;
   useEffect(() => {
     if (!socket || !chatId || !user || !lastMessageId) return;
     const list = useChatStore.getState().messagesByChat[chatId] ?? [];
@@ -88,8 +120,28 @@ export default function ChatThreadPage() {
       <header className="flex items-center gap-3 px-4 py-3 border-b border-slate-700/50 bg-slate-800/80">
         <div className="flex-1 min-w-0">
           <h1 className="font-semibold text-white truncate">{title}</h1>
-          <p className="text-xs text-slate-500">
-            {isConnected ? "Online" : "Connecting…"}
+          <p className="text-xs text-slate-400 min-h-[1.25rem]">
+            {typingLabel ? (
+              <span className="text-emerald-400 italic">{typingLabel}</span>
+            ) : chat?.type === "DIRECT" && otherUserId ? (
+              isConnected ? (
+                isOtherOnline ? (
+                  <span className="text-emerald-400">Online</span>
+                ) : otherLastSeen ? (
+                  formatLastSeen(otherLastSeen)
+                ) : (
+                  "Connecting…"
+                )
+              ) : (
+                "Connecting…"
+              )
+            ) : chat?.type === "GROUP" ? (
+              isConnected
+                ? `${chat.members.length} members`
+                : "Connecting…"
+            ) : (
+              isConnected ? "Online" : "Connecting…"
+            )}
           </p>
         </div>
         <div className="flex items-center gap-1">

@@ -9,6 +9,8 @@ import { useChatStore } from "@/store/chatStore";
 import SocketSync from "./SocketSync";
 import ChatListSidebar from "./chat/ChatListSidebar";
 import ChatInfoSidebar from "./chat/ChatInfoSidebar";
+import NewMessageToastContainer from "./chat/NewMessageToast";
+import NotificationPermission from "./NotificationPermission";
 
 export default function ChatLayout({
   children,
@@ -59,8 +61,10 @@ export default function ChatLayout({
       <div className="h-screen flex bg-slate-900">
         <ChatListSidebar />
         <main className="flex-1 flex flex-col overflow-hidden min-w-0">
+          <NotificationPermission />
           <SocketSync />
           {children}
+          <NewMessageToastContainer />
         </main>
         {rightSidebarOpen && activeChatId && (
           <ChatInfoSidebar chatId={activeChatId} />
@@ -139,8 +143,10 @@ export default function ChatLayout({
       </aside>
 
       <main className="flex-1 flex flex-col overflow-hidden">
+        <NotificationPermission />
         <SocketSync />
         {children}
+        <NewMessageToastContainer />
       </main>
     </div>
   );

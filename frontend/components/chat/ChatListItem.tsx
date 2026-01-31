@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePresenceStore } from "@/store/presenceStore";
 import type { ChatWithDetails } from "@/types/chat";
 
 function getDisplayName(chat: ChatWithDetails, currentUserId: string): string {
@@ -34,6 +35,17 @@ function lastMessageTime(chat: ChatWithDetails): string {
   return t.toLocaleDateString([], { month: "short", day: "numeric" });
 }
 
+function formatLastSeenShort(iso: string): string {
+  const d = new Date(iso);
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  if (diffMs < 60000) return "just now";
+  if (diffMs < 3600000) return `${Math.floor(diffMs / 60000)}m ago`;
+  if (diffMs < 86400000) return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  if (diffMs < 172800000) return "yesterday";
+  return d.toLocaleDateString([], { month: "short", day: "numeric" });
+}
+
 export default function ChatListItem({
   chat,
   currentUserId,
@@ -49,6 +61,12 @@ export default function ChatListItem({
   const avatarUrl = getAvatarUrl(chat, currentUserId);
   const preview = lastMessagePreview(chat);
   const time = lastMessageTime(chat);
+  const isOnline = usePresenceStore((s) => s.isOnline);
+  const getLastSeen = usePresenceStore((s) => s.getLastSeen);
+  const otherMember = chat.type === "DIRECT" ? chat.members.find((m) => m.userId !== currentUserId) : null;
+  const otherUserId = otherMember?.userId;
+  const otherOnline = otherUserId ? isOnline(otherUserId) : false;
+  const otherLastSeen = otherUserId ? getLastSeen(otherUserId) : undefined;
 
   return (
     <Link
@@ -61,13 +79,21 @@ export default function ChatListItem({
             : "hover:bg-slate-700/50 text-slate-200"
       }`}
     >
-      <div className="w-12 h-12 rounded-full bg-slate-600 flex-shrink-0 overflow-hidden flex items-center justify-center">
+      <div className="relative w-12 h-12 rounded-full bg-slate-600 flex-shrink-0 overflow-hidden flex items-center justify-center">
         {avatarUrl ? (
           <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
         ) : (
           <span className="text-lg font-medium text-slate-400">
             {name.slice(0, 1).toUpperCase()}
           </span>
+        )}
+        {chat.type === "DIRECT" && otherUserId && (
+          <span
+            className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-slate-800 ${
+              otherOnline ? "bg-emerald-500" : "bg-slate-500"
+            }`}
+            title={otherOnline ? "Online" : otherLastSeen ? `Last seen ${formatLastSeenShort(otherLastSeen)}` : "Offline"}
+          />
         )}
       </div>
       <div className="flex-1 min-w-0">

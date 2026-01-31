@@ -78,6 +78,7 @@ export default function ChatListSidebar() {
   if (!user) return null;
 
   const filteredChats = chats ? filterChats(chats, user.id, tab, searchQuery) : [];
+  const unreadCount = chats ? chats.filter((c) => isChatUnread(c, user.id)).length : 0;
 
   return (
     <aside className="w-80 min-w-[280px] max-w-[360px] bg-slate-800/80 border-r border-slate-700/50 flex flex-col">
@@ -161,7 +162,14 @@ export default function ChatListSidebar() {
 
       {/* New chat button */}
       <div className="px-3 py-2 flex items-center justify-between">
-        <span className="text-sm font-medium text-slate-300">Chats</span>
+        <span className="text-sm font-medium text-slate-300 flex items-center gap-2">
+          Chats
+          {unreadCount > 0 && (
+            <span className="min-w-[1.25rem] h-5 px-1.5 rounded-full bg-emerald-500/80 text-white text-xs font-medium flex items-center justify-center">
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+          )}
+        </span>
         <button
           type="button"
           onClick={() => setShowCreate(true)}
