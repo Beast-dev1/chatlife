@@ -7,7 +7,10 @@ interface ChatState {
   chats: ChatWithDetails[];
   activeChatId: string | null;
   messagesByChat: Record<string, MessageWithSender[]>;
+  rightSidebarOpen: boolean;
   setChats: (chats: ChatWithDetails[]) => void;
+  setRightSidebarOpen: (open: boolean) => void;
+  toggleRightSidebar: () => void;
   setActiveChatId: (id: string | null) => void;
   setMessages: (chatId: string, messages: MessageWithSender[]) => void;
   prependMessage: (chatId: string, message: MessageWithSender) => void;
@@ -27,6 +30,7 @@ const initialState = {
   chats: [],
   activeChatId: null,
   messagesByChat: {},
+  rightSidebarOpen: false,
 };
 
 export const useChatStore = create<ChatState>((set, get) => ({
@@ -35,6 +39,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
   setChats: (chats) => set({ chats }),
 
   setActiveChatId: (id) => set({ activeChatId: id }),
+
+  setRightSidebarOpen: (open) => set({ rightSidebarOpen: open }),
+  toggleRightSidebar: () => set((s) => ({ rightSidebarOpen: !s.rightSidebarOpen })),
 
   setMessages: (chatId, messages) =>
     set((s) => ({

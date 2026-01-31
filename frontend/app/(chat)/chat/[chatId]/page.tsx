@@ -2,8 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
+import { Video, Phone, Info } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useSocket } from "@/hooks/useSocket";
 import { useChat } from "@/hooks/useChats";
@@ -31,6 +30,7 @@ export default function ChatThreadPage() {
   const setActiveChatId = useChatStore((s) => s.setActiveChatId);
   const setMessages = useChatStore((s) => s.setMessages);
   const messagesByChat = useChatStore((s) => s.messagesByChat);
+  const toggleRightSidebar = useChatStore((s) => s.toggleRightSidebar);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const displayMessages: MessageWithSender[] = messagesByChat[chatId] ?? [];
@@ -66,18 +66,35 @@ export default function ChatThreadPage() {
   return (
     <div className="flex flex-col h-full bg-slate-900">
       <header className="flex items-center gap-3 px-4 py-3 border-b border-slate-700/50 bg-slate-800/80">
-        <Link
-          href="/chat"
-          className="p-2 rounded-lg text-slate-400 hover:bg-slate-700/50 hover:text-white"
-          aria-label="Back to chats"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Link>
         <div className="flex-1 min-w-0">
           <h1 className="font-semibold text-white truncate">{title}</h1>
           <p className="text-xs text-slate-500">
             {isConnected ? "Online" : "Connecting…"}
           </p>
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            className="p-2 rounded-lg text-slate-400 hover:bg-slate-700/50 hover:text-white"
+            aria-label="Video call"
+          >
+            <Video className="w-5 h-5" />
+          </button>
+          <button
+            type="button"
+            className="p-2 rounded-lg text-slate-400 hover:bg-slate-700/50 hover:text-white"
+            aria-label="Audio call"
+          >
+            <Phone className="w-5 h-5" />
+          </button>
+          <button
+            type="button"
+            onClick={toggleRightSidebar}
+            className="p-2 rounded-lg text-slate-400 hover:bg-slate-700/50 hover:text-white"
+            aria-label="Chat info"
+          >
+            <Info className="w-5 h-5" />
+          </button>
         </div>
       </header>
 

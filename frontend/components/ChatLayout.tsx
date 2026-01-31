@@ -5,7 +5,10 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { MessageCircle, LogOut, User, Users } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
+import { useChatStore } from "@/store/chatStore";
 import SocketSync from "./SocketSync";
+import ChatListSidebar from "./chat/ChatListSidebar";
+import ChatInfoSidebar from "./chat/ChatInfoSidebar";
 
 export default function ChatLayout({
   children,
@@ -15,6 +18,11 @@ export default function ChatLayout({
   const router = useRouter();
   const pathname = usePathname();
   const { user, isInitialized, init, logout } = useAuthStore();
+  const rightSidebarOpen = useChatStore((s) => s.rightSidebarOpen);
+
+  const isChatRoute = pathname.startsWith("/chat");
+  const chatIdMatch = pathname.match(/^\/chat\/([^/]+)$/);
+  const activeChatId = chatIdMatch ? chatIdMatch[1] : null;
 
   useEffect(() => {
     init();
@@ -45,9 +53,25 @@ export default function ChatLayout({
     return null;
   }
 
+  // 3-column layout for chat routes
+  if (isChatRoute) {
+    return (
+      <div className="h-screen flex bg-slate-900">
+        <ChatListSidebar />
+        <main className="flex-1 flex flex-col overflow-hidden min-w-0">
+          <SocketSync />
+          {children}
+        </main>
+        {rightSidebarOpen && activeChatId && (
+          <ChatInfoSidebar chatId={activeChatId} />
+        )}
+      </div>
+    );
+  }
+
+  // Original sidebar + main for contacts, profile
   return (
     <div className="h-screen flex bg-slate-900">
-      {/* Sidebar */}
       <aside className="w-72 bg-slate-800/80 border-r border-slate-700/50 flex flex-col">
         <div className="p-4 border-b border-slate-700/50 flex items-center gap-3">
           <div className="p-2 bg-emerald-500/20 rounded-xl">
@@ -114,7 +138,6 @@ export default function ChatLayout({
         </div>
       </aside>
 
-      {/* Main area */}
       <main className="flex-1 flex flex-col overflow-hidden">
         <SocketSync />
         {children}

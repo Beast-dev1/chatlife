@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import { Send, Paperclip, Loader2 } from "lucide-react";
+import { Send, Loader2, Smile, Image as ImageIcon } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useChatStore } from "@/store/chatStore";
 import { useSocket } from "@/hooks/useSocket";
@@ -86,6 +86,13 @@ export default function MessageInput({
     <div className="flex items-end gap-2 p-3 bg-slate-800/50 border-t border-slate-700/50">
       <button
         type="button"
+        className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 disabled:opacity-50"
+        aria-label="Voice message"
+      >
+        <span className="text-lg">🎤</span>
+      </button>
+      <button
+        type="button"
         onClick={handleFileClick}
         disabled={disabled || uploading}
         className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 disabled:opacity-50"
@@ -94,19 +101,40 @@ export default function MessageInput({
         {uploading ? (
           <Loader2 className="w-5 h-5 animate-spin" />
         ) : (
-          <Paperclip className="w-5 h-5" />
+          <ImageIcon className="w-5 h-5" />
         )}
+      </button>
+      <button
+        type="button"
+        className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 disabled:opacity-50"
+        aria-label="Sticker"
+      >
+        <span className="text-lg">😊</span>
+      </button>
+      <button
+        type="button"
+        className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 disabled:opacity-50"
+        aria-label="GIF"
+      >
+        <span className="text-xs font-medium text-slate-400">GIF</span>
       </button>
       <textarea
         ref={inputRef}
         value={text}
         onChange={(e) => setText(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="Type a message..."
+        placeholder="Aa"
         rows={1}
         disabled={disabled}
         className="flex-1 resize-none rounded-xl bg-slate-700/50 border border-slate-600 px-4 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 min-h-[44px] max-h-32 disabled:opacity-50"
       />
+      <button
+        type="button"
+        className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 disabled:opacity-50"
+        aria-label="Emoji"
+      >
+        <Smile className="w-5 h-5" />
+      </button>
       <button
         type="button"
         onClick={sendMessage}

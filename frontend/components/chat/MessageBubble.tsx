@@ -19,12 +19,12 @@ export default function MessageBubble({
       <div
         className={`max-w-[75%] rounded-2xl px-4 py-2 ${
           isOwn
-            ? "bg-emerald-600 text-white rounded-br-md"
+            ? "bg-purple-600 text-white rounded-br-md"
             : "bg-slate-700 text-slate-100 rounded-bl-md"
         }`}
       >
         {showSender && !isOwn && (
-          <p className="text-xs font-medium text-emerald-400 mb-0.5">{message.sender.username}</p>
+          <p className="text-xs font-medium text-purple-400 mb-0.5">{message.sender.username}</p>
         )}
         {isImage && (
           <a

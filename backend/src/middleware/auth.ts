@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from "express";
-import { verifyAccessToken } from "../utils/jwt";
 import { PrismaClient } from "@prisma/client";
+import { NextFunction, Request, Response } from "express";
+import { verifyAccessToken } from "../utils/jwt";
 
 const prisma = new PrismaClient();
 
