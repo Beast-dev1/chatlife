@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { MessageCircle, Search, Pencil, MoreHorizontal, User, Users, LogOut } from "lucide-react";
+import { MessageCircle, Search, Pencil, MoreHorizontal, User, Users, LogOut, Phone } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useChats } from "@/hooks/useChats";
 import ChatListItem from "./ChatListItem";
@@ -91,6 +91,13 @@ export default function ChatListSidebar() {
           <span className="font-semibold text-white">Let&apos;sChat</span>
         </Link>
         <div className="flex items-center gap-1">
+          <Link
+            href="/calls"
+            className="p-2 rounded-lg text-slate-400 hover:bg-slate-700/50 hover:text-white"
+            aria-label="Calls"
+          >
+            <Phone className="w-5 h-5" />
+          </Link>
           <Link
             href="/contacts"
             className="p-2 rounded-lg text-slate-400 hover:bg-slate-700/50 hover:text-white"

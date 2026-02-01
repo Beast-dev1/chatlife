@@ -8,6 +8,7 @@ import { useSocket } from "@/hooks/useSocket";
 import { useChat } from "@/hooks/useChats";
 import { useMessages } from "@/hooks/useMessages";
 import { useChatStore } from "@/store/chatStore";
+import { useCallStore } from "@/store/callStore";
 import { usePresenceStore } from "@/store/presenceStore";
 import MessageBubble from "@/components/chat/MessageBubble";
 import MessageInput from "@/components/chat/MessageInput";
@@ -44,6 +45,8 @@ export default function ChatThreadPage() {
   const messagesByChat = useChatStore((s) => s.messagesByChat);
   const deliveredMessageIds = useChatStore((s) => s.deliveredMessageIds);
   const toggleRightSidebar = useChatStore((s) => s.toggleRightSidebar);
+  const activeCall = useCallStore((s) => s.activeCall);
+  const incomingCall = useCallStore((s) => s.incomingCall);
   const isOnline = usePresenceStore((s) => s.isOnline);
   const getLastSeen = usePresenceStore((s) => s.getLastSeen);
   const getTypingUserIds = usePresenceStore((s) => s.getTypingUserIds);
@@ -111,6 +114,18 @@ export default function ChatThreadPage() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [displayMessages.length]);
 
+  const canCall =
+    chat?.type === "DIRECT" &&
+    otherUserId &&
+    isConnected &&
+    !activeCall &&
+    !incomingCall;
+
+  const handleStartCall = (callType: "video" | "audio") => {
+    if (!socket || !chatId || !canCall) return;
+    socket.emit("call_initiate", { chatId, callType });
+  };
+
   if (!user) return null;
 
   const title = getChatTitle(chat, user.id);
@@ -147,14 +162,18 @@ export default function ChatThreadPage() {
         <div className="flex items-center gap-1">
           <button
             type="button"
-            className="p-2 rounded-lg text-slate-400 hover:bg-slate-700/50 hover:text-white"
+            disabled={!canCall}
+            onClick={() => handleStartCall("video")}
+            className="p-2 rounded-lg text-slate-400 hover:bg-slate-700/50 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Video call"
           >
             <Video className="w-5 h-5" />
           </button>
           <button
             type="button"
-            className="p-2 rounded-lg text-slate-400 hover:bg-slate-700/50 hover:text-white"
+            disabled={!canCall}
+            onClick={() => handleStartCall("audio")}
+            className="p-2 rounded-lg text-slate-400 hover:bg-slate-700/50 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Audio call"
           >
             <Phone className="w-5 h-5" />

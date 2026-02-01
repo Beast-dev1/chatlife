@@ -7,6 +7,7 @@ import { MessageCircle, LogOut, User, Users } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useChatStore } from "@/store/chatStore";
 import SocketSync from "./SocketSync";
+import CallProvider from "./chat/CallProvider";
 import ChatListSidebar from "./chat/ChatListSidebar";
 import ChatInfoSidebar from "./chat/ChatInfoSidebar";
 import NewMessageToastContainer from "./chat/NewMessageToast";
@@ -63,6 +64,7 @@ export default function ChatLayout({
         <main className="flex-1 flex flex-col overflow-hidden min-w-0">
           <NotificationPermission />
           <SocketSync />
+          <CallProvider />
           {children}
           <NewMessageToastContainer />
         </main>
@@ -145,6 +147,7 @@ export default function ChatLayout({
       <main className="flex-1 flex flex-col overflow-hidden">
         <NotificationPermission />
         <SocketSync />
+        <CallProvider />
         {children}
         <NewMessageToastContainer />
       </main>

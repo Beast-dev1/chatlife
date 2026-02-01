@@ -259,14 +259,20 @@ export function attachSocketHandlers(io: Server) {
           status: "INITIATED",
         },
       });
+      const callTypePayload = callType === "video" ? "video" : "audio";
       io.to(userRoom(calleeId)).emit("incoming_call", {
         callId: callLog.id,
         chatId,
         callerId: userId,
         caller: { id: caller.id, username: caller.username, avatarUrl: caller.avatarUrl },
-        callType: callType === "video" ? "video" : "audio",
+        callType: callTypePayload,
       });
-      socket.emit("call_initiated", { callId: callLog.id, calleeId });
+      socket.emit("call_initiated", {
+        callId: callLog.id,
+        chatId,
+        calleeId,
+        callType: callTypePayload,
+      });
     });
 
     socket.on("call_accept", async (payload: unknown) => {
