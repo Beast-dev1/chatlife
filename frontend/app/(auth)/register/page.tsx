@@ -62,7 +62,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-screen w-full">
+    <div className="flex h-full w-full overflow-hidden">
       <div className="w-full hidden md:inline-block">
         <img
           className="h-full w-full object-cover"
@@ -71,7 +71,7 @@ export default function RegisterPage() {
         />
       </div>
 
-      <div className="w-full flex flex-col items-center justify-center bg-white overflow-y-auto py-8">
+      <div className="w-full flex flex-col items-center justify-center bg-white overflow-hidden py-8">
         {error && (
           <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm max-w-md w-full md:w-96">
             {error}
