@@ -8,7 +8,6 @@ import { useCalls } from "@/hooks/useCalls";
 import CallLogCard, {
   type CallLogCardData,
   type CallLogStatus,
-  type CallLogType,
 } from "@/components/chat/CallLogCard";
 import type { CallLogItem } from "@/types/call";
 
@@ -74,27 +73,19 @@ export default function CallsPage() {
             <p className="text-xs mt-1">Start a call from a chat to see history here.</p>
           </div>
         )}
-        {calls.length > 0 && (
+        {items.length > 0 && (
           <div className="space-y-2">
-            {calls.map((call) => {
-              const page = data?.pages.find((p) => p.calls.some((c) => c.id === call.id));
-              const fullCall = page?.calls.find((c) => c.id === call.id);
-              return (
-                <div
-                  key={call.id}
-                  className="rounded-xl bg-slate-800/60 border border-slate-700/50 overflow-hidden"
-                >
-                  <CallLogCard
-                    callLog={call}
-                    onCallBack={
-                      fullCall
-                        ? () => router.push(`/chat/${fullCall.chatId}`)
-                        : undefined
-                    }
-                  />
-                </div>
-              );
-            })}
+            {items.map(({ card, chatId }) => (
+              <div
+                key={card.id}
+                className="rounded-xl bg-slate-800/60 border border-slate-700/50 overflow-hidden"
+              >
+                <CallLogCard
+                  callLog={card}
+                  onCallBack={() => router.push(`/chat/${chatId}`)}
+                />
+              </div>
+            ))}
             {hasNextPage && (
               <div className="flex justify-center py-4">
                 <button

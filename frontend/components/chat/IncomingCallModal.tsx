@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
+import Image from "next/image";
 import { Video, Phone } from "lucide-react";
 import { useCallStore, type IncomingCallPayload } from "@/store/callStore";
 import type { Socket } from "socket.io-client";
@@ -41,12 +42,14 @@ export default function IncomingCallModal({
           Incoming {callType === "video" ? "video" : "audio"} call
         </p>
         <div className="flex flex-col items-center gap-4">
-          <div className="w-20 h-20 rounded-full bg-slate-700 flex items-center justify-center overflow-hidden">
+          <div className="w-20 h-20 rounded-full bg-slate-700 flex items-center justify-center overflow-hidden relative">
             {caller.avatarUrl ? (
-              <img
+              <Image
                 src={caller.avatarUrl}
                 alt=""
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
+                unoptimized
               />
             ) : (
               <span className="text-2xl font-semibold text-slate-400">

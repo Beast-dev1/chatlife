@@ -23,7 +23,7 @@ export default function ChatLayout({
   const { user, isInitialized, init, logout } = useAuthStore();
   const rightSidebarOpen = useChatStore((s) => s.rightSidebarOpen);
 
-  const isChatRoute = pathname.startsWith("/chat");
+  const isChatRoute = pathname.startsWith("/chat") || pathname === "/calls";
   const chatIdMatch = pathname.match(/^\/chat\/([^/]+)$/);
   const activeChatId = chatIdMatch ? chatIdMatch[1] : null;
 
