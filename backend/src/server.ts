@@ -14,6 +14,7 @@ import userRoutes from "./routes/userRoutes";
 import messageRoutes from "./routes/messageRoutes";
 import messageIdRoutes from "./routes/messageIdRoutes";
 import uploadRoutes from "./routes/uploadRoutes";
+import callRoutes from "./routes/callRoutes";
 import path from "path";
 import { errorHandler } from "./middleware/errorHandler";
 import { getRedisClients, closeRedis } from "./config/redis";
@@ -51,6 +52,7 @@ app.use("/api/contacts", contactRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/messages", messageIdRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/calls", callRoutes);
 
 const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(process.cwd(), "uploads");
 app.use("/uploads", express.static(UPLOAD_DIR));

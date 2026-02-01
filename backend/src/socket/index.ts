@@ -219,5 +219,206 @@ export function attachSocketHandlers(io: Server) {
         readAt: new Date(),
       });
     });
+
+    // --- Call signaling ---
+    socket.on("call_initiate", async (payload: unknown) => {
+      const data = payload as { chatId?: string; callType?: "video" | "audio" };
+      const chatId = data?.chatId;
+      const callType = data?.callType ?? "audio";
+      if (!chatId || typeof chatId !== "string") {
+        socket.emit("error", { message: "chatId required" });
+        return;
+      }
+      try {
+        await getChatMemberOrThrow(chatId, userId);
+      } catch {
+        socket.emit("error", { message: "Not a member of this chat" });
+        return;
+      }
+      const otherMembers = await prisma.chatMember.findMany({
+        where: { chatId, userId: { not: userId } },
+        take: 1,
+        include: { user: { select: { id: true } } },
+      });
+      const calleeId = otherMembers[0]?.userId ?? null;
+      if (!calleeId) {
+        socket.emit("error", { message: "No other member to call in this chat" });
+        return;
+      }
+      const caller = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true, username: true, avatarUrl: true },
+      });
+      if (!caller) return;
+      const callLog = await prisma.callLog.create({
+        data: {
+          chatId,
+          callerId: userId,
+          calleeId,
+          callType: callType === "video" ? "VIDEO" : "AUDIO",
+          status: "INITIATED",
+        },
+      });
+      io.to(userRoom(calleeId)).emit("incoming_call", {
+        callId: callLog.id,
+        chatId,
+        callerId: userId,
+        caller: { id: caller.id, username: caller.username, avatarUrl: caller.avatarUrl },
+        callType: callType === "video" ? "video" : "audio",
+      });
+      socket.emit("call_initiated", { callId: callLog.id, calleeId });
+    });
+
+    socket.on("call_accept", async (payload: unknown) => {
+      const data = payload as { callId?: string };
+      const callId = data?.callId;
+      if (!callId || typeof callId !== "string") {
+        socket.emit("error", { message: "callId required" });
+        return;
+      }
+      const call = await prisma.callLog.findUnique({
+        where: { id: callId },
+        select: { id: true, callerId: true, calleeId: true, status: true },
+      });
+      if (!call || call.calleeId !== userId) {
+        socket.emit("error", { message: "Call not found or you are not the callee" });
+        return;
+      }
+      if (call.status !== "INITIATED") {
+        socket.emit("error", { message: "Call is no longer available" });
+        return;
+      }
+      await prisma.callLog.update({
+        where: { id: callId },
+        data: { status: "ACCEPTED" },
+      });
+      io.to(userRoom(call.callerId)).emit("call_accepted", { callId, calleeId: userId });
+    });
+
+    socket.on("call_reject", async (payload: unknown) => {
+      const data = payload as { callId?: string };
+      const callId = data?.callId;
+      if (!callId || typeof callId !== "string") {
+        socket.emit("error", { message: "callId required" });
+        return;
+      }
+      const call = await prisma.callLog.findUnique({
+        where: { id: callId },
+        select: { callerId: true, calleeId: true, status: true },
+      });
+      if (!call || call.calleeId !== userId) {
+        socket.emit("error", { message: "Call not found or you are not the callee" });
+        return;
+      }
+      if (call.status !== "INITIATED") return;
+      await prisma.callLog.update({
+        where: { id: callId },
+        data: { status: "REJECTED" },
+      });
+      io.to(userRoom(call.callerId)).emit("call_rejected", { callId });
+    });
+
+    socket.on("call_end", async (payload: unknown) => {
+      const data = payload as { callId?: string };
+      const callId = data?.callId;
+      if (!callId || typeof callId !== "string") {
+        socket.emit("error", { message: "callId required" });
+        return;
+      }
+      const call = await prisma.callLog.findUnique({
+        where: { id: callId },
+        select: { callerId: true, calleeId: true, status: true, startedAt: true },
+      });
+      if (!call) {
+        socket.emit("error", { message: "Call not found" });
+        return;
+      }
+      const isCaller = call.callerId === userId;
+      const isCallee = call.calleeId === userId;
+      if (!isCaller && !isCallee) {
+        socket.emit("error", { message: "You are not a participant in this call" });
+        return;
+      }
+      const otherUserId = isCaller ? call.calleeId : call.callerId;
+      const now = new Date();
+      if (call.status === "ACCEPTED") {
+        const duration = Math.floor((now.getTime() - call.startedAt.getTime()) / 1000);
+        await prisma.callLog.update({
+          where: { id: callId },
+          data: { status: "ENDED", endedAt: now, duration },
+        });
+      } else if (call.status === "INITIATED") {
+        await prisma.callLog.update({
+          where: { id: callId },
+          data: { status: "MISSED", endedAt: now },
+        });
+      } else {
+        return;
+      }
+      if (otherUserId) {
+        io.to(userRoom(otherUserId)).emit("call_ended", { callId });
+      }
+    });
+
+    function isCallParticipant(call: { callerId: string; calleeId: string | null }, uid: string) {
+      return call.callerId === uid || call.calleeId === uid;
+    }
+    function getOtherParticipant(call: { callerId: string; calleeId: string | null }, uid: string) {
+      return call.callerId === uid ? call.calleeId : call.callerId;
+    }
+
+    socket.on("call_offer", async (payload: unknown) => {
+      const data = payload as { callId?: string; targetUserId?: string; sdp?: unknown };
+      const { callId, targetUserId, sdp } = data ?? {};
+      if (!callId || !targetUserId || !sdp) {
+        socket.emit("error", { message: "callId, targetUserId and sdp required" });
+        return;
+      }
+      const call = await prisma.callLog.findUnique({
+        where: { id: callId },
+        select: { callerId: true, calleeId: true },
+      });
+      if (!call || !isCallParticipant(call, userId) || getOtherParticipant(call, userId) !== targetUserId) {
+        socket.emit("error", { message: "Invalid call or target" });
+        return;
+      }
+      io.to(userRoom(targetUserId)).emit("call_offer", { callId, fromUserId: userId, sdp });
+    });
+
+    socket.on("call_answer", async (payload: unknown) => {
+      const data = payload as { callId?: string; targetUserId?: string; sdp?: unknown };
+      const { callId, targetUserId, sdp } = data ?? {};
+      if (!callId || !targetUserId || !sdp) {
+        socket.emit("error", { message: "callId, targetUserId and sdp required" });
+        return;
+      }
+      const call = await prisma.callLog.findUnique({
+        where: { id: callId },
+        select: { callerId: true, calleeId: true },
+      });
+      if (!call || !isCallParticipant(call, userId) || getOtherParticipant(call, userId) !== targetUserId) {
+        socket.emit("error", { message: "Invalid call or target" });
+        return;
+      }
+      io.to(userRoom(targetUserId)).emit("call_answer", { callId, fromUserId: userId, sdp });
+    });
+
+    socket.on("ice_candidate", async (payload: unknown) => {
+      const data = payload as { callId?: string; targetUserId?: string; candidate?: unknown };
+      const { callId, targetUserId, candidate } = data ?? {};
+      if (!callId || !targetUserId) {
+        socket.emit("error", { message: "callId and targetUserId required" });
+        return;
+      }
+      const call = await prisma.callLog.findUnique({
+        where: { id: callId },
+        select: { callerId: true, calleeId: true },
+      });
+      if (!call || !isCallParticipant(call, userId) || getOtherParticipant(call, userId) !== targetUserId) {
+        socket.emit("error", { message: "Invalid call or target" });
+        return;
+      }
+      io.to(userRoom(targetUserId)).emit("ice_candidate", { callId, fromUserId: userId, candidate });
+    });
   });
 }

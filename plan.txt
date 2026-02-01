@@ -234,29 +234,15 @@ Goal: Typing, presence, read receipts, and notifications.
 
 3.1 Typing and presence (backend)
 
-
-
-
-
 On typing_start/typing_stop, broadcast to chat room (exclude sender).
 
-
-
 On socket connect: set user online (e.g. Redis or DB); on disconnect: set offline and last_seen.
-
-
 
 Emit user_online/user_offline to relevant users (e.g. contacts or shared chats); optionally last_seen in user payload.
 
 3.2 Read receipts and delivery status
 
-
-
-
-
 On mark_read, update MessageRead and chat member last_read_at; broadcast message_read to room.
-
-
 
 When saving message, determine “delivered” (recipients in room or stored); emit message_delivered where applicable.
 
@@ -266,31 +252,17 @@ Frontend: show sent/delivered/read per message; update on socket events.
 
 3.3 Frontend typing and presence UI
 
-
-
-
-
 In chat header or list: show “online”/“last seen”; show “typing…” when user_typing received.
-
-
 
 Throttle/debounce typing_start/typing_stop from input focus/blur and keypress.
 
 3.4 Browser and in-app notifications
 
-
-
-
-
 Request notification permission; show browser notification on new_message when tab in background or app unfocused.
-
-
 
 In-app: notification badge (unread count), optional toast for new message; respect user settings (enable/disable).
 
 Phase 3 deliverables: Typing indicators, online/offline and last seen, read/delivery status, and basic notifications.
-
-
 
 Phase 4: Audio/Video Calling (Weeks 6–7)
 
@@ -298,17 +270,9 @@ Goal: WebRTC-based audio/video calls with signaling over Socket.io.
 
 4.1 Call signaling (backend)
 
-
-
-
-
 Socket events: call_initiate (caller → server → receiver incoming_call), call_accept, call_reject, call_end; relay call_offer, call_answer, ice_candidate between peers.
 
-
-
 REST: GET /api/calls, POST /api/calls, PUT /api/calls/:id for call history and status (initiated, accepted, rejected, ended, missed).
-
-
 
 Create/update CallLog on initiate, accept, reject, end; compute duration on end.
 
@@ -325,10 +289,6 @@ Create frontend/hooks/useWebRTC.ts: create peer connection (STUN from env); hand
 Create frontend/lib/webrtc.ts: helpers for creating offer/answer and adding ICE candidates.
 
 4.3 Call UI and flow
-
-
-
-
 
 Components: Incoming call modal (accept/reject); active call bar (mute, video toggle, end); optional screen share.
 
