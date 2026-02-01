@@ -62,7 +62,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex h-full w-full">
+    <div className="flex min-h-screen w-full">
       <div className="w-full hidden md:inline-block">
         <img
           className="h-full w-full object-cover"
