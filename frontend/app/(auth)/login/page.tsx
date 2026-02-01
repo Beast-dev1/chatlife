@@ -6,11 +6,10 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { MessageCircle } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 
 const schema = z.object({
-  email: z.string().email("Invalid email"),
+  email: z.string().email("Invalid email address"),
   password: z.string().min(1, "Password is required"),
 });
 
@@ -19,7 +18,9 @@ type FormData = z.infer<typeof schema>;
 export default function LoginPage() {
   const router = useRouter();
   const login = useAuthStore((s) => s.login);
+  const isLoading = useAuthStore((s) => s.isLoading);
   const [error, setError] = useState<string | null>(null);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const {
     register,
@@ -41,69 +42,131 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 shadow-2xl p-8">
-      <div className="flex items-center gap-3 mb-8">
-        <div className="p-2 bg-emerald-500/20 rounded-xl">
-          <MessageCircle className="w-8 h-8 text-emerald-400" />
-        </div>
-        <h1 className="text-2xl font-bold text-white">Let&apos;sChat</h1>
+    <div className="flex h-full w-full">
+      <div className="w-full hidden md:inline-block">
+        <img
+          className="h-full w-full object-cover"
+          src="/loginandsignupimg.png"
+          alt="Grandparents video calling their grandson studying abroad"
+        />
       </div>
 
-      <h2 className="text-lg font-semibold text-slate-200 mb-6">Sign in</h2>
-
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      <div className="w-full flex flex-col items-center justify-center bg-white">
         {error && (
-          <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm max-w-md w-full md:w-96">
             {error}
           </div>
         )}
 
-        <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1.5">
-            Email
-          </label>
-          <input
-            {...register("email")}
-            type="email"
-            autoComplete="email"
-            className="w-full px-4 py-3 rounded-lg bg-slate-900/80 border border-slate-600/50 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500"
-            placeholder="you@example.com"
-          />
-          {errors.email && (
-            <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
-          )}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1.5">
-            Password
-          </label>
-          <input
-            {...register("password")}
-            type="password"
-            autoComplete="current-password"
-            className="w-full px-4 py-3 rounded-lg bg-slate-900/80 border border-slate-600/50 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500"
-            placeholder="••••••••"
-          />
-          {errors.password && (
-            <p className="mt-1 text-sm text-red-400">{errors.password.message}</p>
-          )}
-        </div>
-
-        <button
-          type="submit"
-          className="w-full py-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium transition-colors"
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="md:w-96 w-80 flex flex-col items-center justify-center"
         >
-          Sign in
-        </button>
-      </form>
+          <h2 className="text-4xl text-gray-900 font-medium">Sign in</h2>
+          <p className="text-sm text-gray-500/90 mt-3">
+            Welcome back! Please sign in to continue
+          </p>
 
-      <p className="mt-6 text-center text-slate-400 text-sm">
-        Don&apos;t have an account?{" "}
-        <Link href="/register" className="text-emerald-400 hover:underline">
-          Sign up
-        </Link>
-      </p>
+          <div className="flex items-center gap-4 w-full my-6">
+            <div className="w-full h-px bg-gray-300"></div>
+            <p className="text-nowrap text-sm text-gray-500 font-medium">
+              Sign in with email
+            </p>
+            <div className="w-full h-px bg-gray-300"></div>
+          </div>
+
+          <div className="flex items-center w-full bg-transparent border border-gray-300/60 h-12 rounded-full overflow-hidden pl-6 gap-2 focus-within:border-indigo-500 transition-colors">
+            <svg
+              width="16"
+              height="11"
+              viewBox="0 0 16 11"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M0 .55.571 0H15.43l.57.55v9.9l-.571.55H.57L0 10.45zm1.143 1.138V9.9h13.714V1.69l-6.503 4.8h-.697zM13.749 1.1H2.25L8 5.356z"
+                fill="#6B7280"
+              />
+            </svg>
+            <input
+              {...register("email")}
+              type="email"
+              placeholder="Email id"
+              className="bg-transparent text-gray-500/80 placeholder-gray-500/80 outline-none text-sm w-full h-full"
+              required
+            />
+          </div>
+          {errors.email && (
+            <p className="mt-1 text-sm text-red-600 w-full text-left md:w-96">
+              {errors.email.message}
+            </p>
+          )}
+
+          <div className="flex items-center mt-6 w-full bg-transparent border border-gray-300/60 h-12 rounded-full overflow-hidden pl-6 gap-2 focus-within:border-indigo-500 transition-colors">
+            <svg
+              width="13"
+              height="17"
+              viewBox="0 0 13 17"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M13 8.5c0-.938-.729-1.7-1.625-1.7h-.812V4.25C10.563 1.907 8.74 0 6.5 0S2.438 1.907 2.438 4.25V6.8h-.813C.729 6.8 0 7.562 0 8.5v6.8c0 .938.729 1.7 1.625 1.7h9.75c.896 0 1.625-.762 1.625-1.7zM4.063 4.25c0-1.406 1.093-2.55 2.437-2.55s2.438 1.144 2.438 2.55V6.8H4.061z"
+                fill="#6B7280"
+              />
+            </svg>
+            <input
+              {...register("password")}
+              type="password"
+              placeholder="Password"
+              className="bg-transparent text-gray-500/80 placeholder-gray-500/80 outline-none text-sm w-full h-full"
+              required
+            />
+          </div>
+          {errors.password && (
+            <p className="mt-1 text-sm text-red-600 w-full text-left md:w-96">
+              {errors.password.message}
+            </p>
+          )}
+
+          <div className="w-full flex items-center justify-between mt-8 text-gray-500/80">
+            <div className="flex items-center gap-2">
+              <input
+                className="h-5 w-5"
+                type="checkbox"
+                id="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              />
+              <label className="text-sm cursor-pointer" htmlFor="checkbox">
+                Remember me
+              </label>
+            </div>
+            <Link
+              className="text-sm underline hover:text-indigo-500 transition-colors"
+              href="#"
+            >
+              Forgot password?
+            </Link>
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="mt-8 w-full h-11 rounded-full text-white bg-indigo-500 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? "Signing in..." : "Sign in"}
+          </button>
+          <p className="text-gray-500/90 text-sm mt-4">
+            Don&apos;t have an account?{" "}
+            <Link className="text-indigo-400 hover:underline" href="/register">
+              Sign up
+            </Link>
+          </p>
+        </form>
+      </div>
     </div>
   );
 }
