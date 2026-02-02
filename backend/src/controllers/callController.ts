@@ -25,6 +25,22 @@ export async function getCallLogAndRequireParticipant(callId: string, userId: st
   return call;
 }
 
+export async function getCall(req: AuthRequest, res: Response) {
+  if (!req.user) throw new AppError("Unauthorized", 401);
+  const callId = req.params.id;
+  await getCallLogAndRequireParticipant(callId, req.user.id);
+  const call = await prisma.callLog.findUnique({
+    where: { id: callId },
+    include: {
+      chat: { select: { id: true, type: true, name: true } },
+      caller: { select: { id: true, username: true, avatarUrl: true } },
+      callee: { select: { id: true, username: true, avatarUrl: true } },
+    },
+  });
+  if (!call) throw new AppError("Call not found", 404);
+  res.json(call);
+}
+
 export async function listCalls(req: AuthRequest, res: Response) {
   if (!req.user) throw new AppError("Unauthorized", 401);
   const parsed = listCallsQuerySchema.safeParse(req.query);

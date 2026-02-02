@@ -317,9 +317,10 @@ export function attachSocketHandlers(io: Server) {
         return;
       }
       if (call.status !== "INITIATED") return;
+      const now = new Date();
       await prisma.callLog.update({
         where: { id: callId },
-        data: { status: "REJECTED" },
+        data: { status: "REJECTED", endedAt: now },
       });
       io.to(userRoom(call.callerId)).emit("call_rejected", { callId });
     });
