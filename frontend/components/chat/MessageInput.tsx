@@ -137,14 +137,14 @@ export default function MessageInput({
   };
 
   return (
-    <div className="flex items-end gap-2.5 p-4 bg-white/80 backdrop-blur-sm border-t border-slate-100 rounded-b-2xl">
+    <div className="flex items-end gap-2.5 px-4 py-3 bg-slate-50/90 backdrop-blur-md border-t border-slate-200/70 rounded-b-2xl">
       <motion.button
         type="button"
         onClick={handleFileClick}
         disabled={disabled || uploading}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-50 transition-colors duration-200"
+        className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-200/80 hover:text-slate-700 disabled:opacity-50 transition-colors duration-200"
         aria-label="Attach file"
       >
         {uploading ? (
@@ -160,16 +160,16 @@ export default function MessageInput({
         onKeyDown={handleKeyDown}
         onFocus={handleFocus}
         onBlur={handleBlur}
-        placeholder="Type here..."
+        placeholder="Type a message…"
         rows={1}
         disabled={disabled}
-        className="flex-1 resize-none rounded-xl bg-slate-100/80 border border-slate-200/80 px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500/25 focus:border-primary-400/50 min-h-[44px] max-h-32 disabled:opacity-50 transition-all duration-200"
+        className="flex-1 resize-none rounded-xl bg-white border border-slate-200/80 px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400/50 min-h-[44px] max-h-32 disabled:opacity-50 transition-all duration-200 shadow-inner"
       />
       <motion.button
         type="button"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-50 transition-colors duration-200"
+        className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-200/80 hover:text-slate-700 disabled:opacity-50 transition-colors duration-200"
         aria-label="Emoji"
       >
         <Smile className="w-5 h-5" />

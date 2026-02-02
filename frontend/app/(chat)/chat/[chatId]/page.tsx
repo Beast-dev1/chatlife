@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 import { useParams } from "next/navigation";
-import { Video, Phone, Info } from "lucide-react";
+import { Video, Phone, Info, MessageCircle } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useSocket } from "@/hooks/useSocket";
 import { useChat } from "@/hooks/useChats";
@@ -133,19 +134,33 @@ export default function ChatThreadPage() {
   if (!user) return null;
 
   const title = getChatTitle(chat, user.id);
+  const otherAvatar = otherMember?.user?.avatarUrl ?? null;
 
   return (
-    <div className="flex flex-col h-full bg-white/95 backdrop-blur-sm rounded-2xl overflow-hidden">
-      <header className="flex items-center gap-3 px-4 py-3.5 border-b border-slate-100/80 bg-white/80 backdrop-blur-sm">
+    <div className="flex flex-col h-full bg-white rounded-2xl overflow-hidden shadow-soft border border-slate-200/60">
+      {/* Header */}
+      <header className="flex items-center gap-3 px-5 py-3.5 border-b border-slate-200/70 bg-slate-50/80 backdrop-blur-md shrink-0">
+        <div className="w-11 h-11 rounded-full bg-slate-200/80 flex-shrink-0 overflow-hidden ring-2 ring-white shadow-inner flex items-center justify-center">
+          {otherAvatar ? (
+            <Image src={otherAvatar} alt="" width={44} height={44} className="w-full h-full object-cover" unoptimized />
+          ) : (
+            <span className="text-base font-semibold text-slate-500">
+              {title.slice(0, 1).toUpperCase()}
+            </span>
+          )}
+        </div>
         <div className="flex-1 min-w-0">
-          <h1 className="font-semibold text-slate-800 truncate">{title}</h1>
-          <p className="text-xs text-slate-500 min-h-[1.25rem]">
+          <h1 className="font-semibold text-slate-800 truncate text-lg tracking-tight">{title}</h1>
+          <p className="text-xs text-slate-500 min-h-[1.25rem] mt-0.5">
             {typingLabel ? (
               <span className="text-primary-500 font-medium italic">{typingLabel}</span>
             ) : chat?.type === "DIRECT" && otherUserId ? (
               isConnected ? (
                 isOtherOnline ? (
-                  <span className="text-green-500 font-semibold">• Active Now</span>
+                  <span className="inline-flex items-center gap-1.5 text-emerald-600 font-medium">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Active now
+                  </span>
                 ) : otherLastSeen ? (
                   formatLastSeen(otherLastSeen)
                 ) : (
@@ -159,16 +174,16 @@ export default function ChatThreadPage() {
                 ? `${chat.members.length} members`
                 : "Connecting…"
             ) : (
-              isConnected ? "Active Now" : "Connecting…"
+              isConnected ? "Active now" : "Connecting…"
             )}
           </p>
         </div>
-        <div className="flex items-center gap-0.5">
+        <div className="flex items-center gap-1">
           <button
             type="button"
             disabled={!canCall}
             onClick={() => handleStartCall("video")}
-            className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+            className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-200/80 hover:text-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
             aria-label="Video call"
           >
             <Video className="w-5 h-5" />
@@ -177,7 +192,7 @@ export default function ChatThreadPage() {
             type="button"
             disabled={!canCall}
             onClick={() => handleStartCall("audio")}
-            className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+            className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-200/80 hover:text-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
             aria-label="Audio call"
           >
             <Phone className="w-5 h-5" />
@@ -185,7 +200,7 @@ export default function ChatThreadPage() {
           <button
             type="button"
             onClick={toggleRightSidebar}
-            className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors duration-200"
+            className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-200/80 hover:text-slate-800 transition-all duration-200"
             aria-label="Chat info"
           >
             <Info className="w-5 h-5" />
@@ -193,22 +208,30 @@ export default function ChatThreadPage() {
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-0 bg-gradient-to-b from-slate-50/60 to-white/50">
+      {/* Messages area */}
+      <div className="flex-1 overflow-y-auto px-4 py-5 flex flex-col gap-0 min-h-0 bg-[linear-gradient(180deg,_#f8fafc_0%,_#f1f5f9_30%,_#eef2f7_100%)]">
         {messagesLoading && displayMessages.length === 0 && (
-          <div className="flex justify-center py-12">
+          <div className="flex flex-col items-center justify-center py-16 gap-4">
             <div className="flex gap-1.5">
               {[0, 1, 2].map((i) => (
                 <span
                   key={i}
-                  className="w-2 h-2 rounded-full bg-primary-400 animate-bounce"
-                  style={{ animationDelay: `${i * 0.1}s` }}
+                  className="w-2.5 h-2.5 rounded-full bg-primary-400 animate-bounce"
+                  style={{ animationDelay: `${i * 0.12}s` }}
                 />
               ))}
             </div>
+            <p className="text-sm text-slate-500">Loading messages…</p>
           </div>
         )}
         {!messagesLoading && displayMessages.length === 0 && (
-          <div className="flex justify-center py-12 text-slate-500 font-medium">No messages yet. Say hi!</div>
+          <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-slate-200/70 flex items-center justify-center">
+              <MessageCircle className="w-7 h-7 text-slate-400" />
+            </div>
+            <p className="text-slate-600 font-medium">No messages yet</p>
+            <p className="text-sm text-slate-500 max-w-[220px]">Send a message to start the conversation.</p>
+          </div>
         )}
         {displayMessages.map((msg) => (
           <MessageBubble

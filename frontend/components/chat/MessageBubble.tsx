@@ -34,10 +34,10 @@ export default function MessageBubble({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
-      className={`flex gap-2 mb-3 ${isOwn ? "justify-end flex-row-reverse" : "justify-start"}`}
+      className={`flex gap-2.5 mb-3 ${isOwn ? "justify-end flex-row-reverse" : "justify-start"}`}
     >
       {showAvatar && (
-        <div className="w-9 h-9 rounded-full bg-slate-200 flex-shrink-0 overflow-hidden flex items-center justify-center ring-2 ring-white shadow-inner">
+        <div className="w-9 h-9 rounded-full bg-slate-200/90 flex-shrink-0 overflow-hidden flex items-center justify-center ring-2 ring-white/80 shadow-inner">
           {avatarUrl ? (
             <Image src={avatarUrl} alt="" width={36} height={36} className="w-full h-full object-cover" unoptimized />
           ) : (
@@ -47,12 +47,12 @@ export default function MessageBubble({
           )}
         </div>
       )}
-      <div className={`flex flex-col items-${isOwn ? "end" : "start"} max-w-[75%]`}>
+      <div className={`flex flex-col items-${isOwn ? "end" : "start"} max-w-[78%]`}>
         <div
           className={`rounded-2xl px-4 py-2.5 transition-shadow duration-200 ${
             isOwn
-              ? "bg-gradient-to-br from-green-500 to-green-600 text-white rounded-br-md shadow-soft hover:shadow-glow-green"
-              : "bg-white text-slate-800 rounded-bl-md border border-slate-200/80 shadow-soft"
+              ? "bg-gradient-to-br from-primary-500 to-primary-600 text-white rounded-br-md shadow-soft hover:shadow-glow"
+              : "bg-white text-slate-800 rounded-bl-md border border-slate-200/70 shadow-soft"
           }`}
         >
           {showSender && !isOwn && message.sender && (

@@ -6,10 +6,10 @@
 :root {
   --background: #f1f5f9;
   --foreground: #1e293b;
-  --chat-sent: #22c55e;
+  --chat-sent: #6366f1;
   --chat-received: #f1f5f9;
-  --accent: #f97316;
-  --accent-soft: #fff7ed;
+  --accent: #6366f1;
+  --accent-soft: #eef2ff;
   --block-btn: #fce7f3;
   --block-btn-text: #be185d;
   --surface: #ffffff;
@@ -56,6 +56,6 @@ body {
 
 /* Selection */
 ::selection {
-  background: rgba(249, 115, 22, 0.2);
+  background: rgba(99, 102, 241, 0.2);
   color: inherit;
 }
