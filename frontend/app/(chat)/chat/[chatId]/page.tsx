@@ -78,6 +78,10 @@ export default function ChatThreadPage() {
     return "sent";
   }
 
+  function getAvatarForMessage(msg: MessageWithSender): string | null {
+    return msg.sender?.avatarUrl ?? null;
+  }
+
   useEffect(() => {
     setActiveChatId(chatId);
     return () => setActiveChatId(null);
@@ -131,17 +135,17 @@ export default function ChatThreadPage() {
   const title = getChatTitle(chat, user.id);
 
   return (
-    <div className="flex flex-col h-full bg-slate-900">
-      <header className="flex items-center gap-3 px-4 py-3 border-b border-slate-700/50 bg-slate-800/80">
+    <div className="flex flex-col h-full bg-white/95 backdrop-blur-sm rounded-2xl overflow-hidden">
+      <header className="flex items-center gap-3 px-4 py-3.5 border-b border-slate-100/80 bg-white/80 backdrop-blur-sm">
         <div className="flex-1 min-w-0">
-          <h1 className="font-semibold text-white truncate">{title}</h1>
-          <p className="text-xs text-slate-400 min-h-[1.25rem]">
+          <h1 className="font-semibold text-slate-800 truncate">{title}</h1>
+          <p className="text-xs text-slate-500 min-h-[1.25rem]">
             {typingLabel ? (
-              <span className="text-emerald-400 italic">{typingLabel}</span>
+              <span className="text-primary-500 font-medium italic">{typingLabel}</span>
             ) : chat?.type === "DIRECT" && otherUserId ? (
               isConnected ? (
                 isOtherOnline ? (
-                  <span className="text-emerald-400">Online</span>
+                  <span className="text-green-500 font-semibold">• Active Now</span>
                 ) : otherLastSeen ? (
                   formatLastSeen(otherLastSeen)
                 ) : (
@@ -155,16 +159,16 @@ export default function ChatThreadPage() {
                 ? `${chat.members.length} members`
                 : "Connecting…"
             ) : (
-              isConnected ? "Online" : "Connecting…"
+              isConnected ? "Active Now" : "Connecting…"
             )}
           </p>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5">
           <button
             type="button"
             disabled={!canCall}
             onClick={() => handleStartCall("video")}
-            className="p-2 rounded-lg text-slate-400 hover:bg-slate-700/50 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
             aria-label="Video call"
           >
             <Video className="w-5 h-5" />
@@ -173,7 +177,7 @@ export default function ChatThreadPage() {
             type="button"
             disabled={!canCall}
             onClick={() => handleStartCall("audio")}
-            className="p-2 rounded-lg text-slate-400 hover:bg-slate-700/50 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
             aria-label="Audio call"
           >
             <Phone className="w-5 h-5" />
@@ -181,7 +185,7 @@ export default function ChatThreadPage() {
           <button
             type="button"
             onClick={toggleRightSidebar}
-            className="p-2 rounded-lg text-slate-400 hover:bg-slate-700/50 hover:text-white"
+            className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors duration-200"
             aria-label="Chat info"
           >
             <Info className="w-5 h-5" />
@@ -189,12 +193,22 @@ export default function ChatThreadPage() {
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-1">
+      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-0 bg-gradient-to-b from-slate-50/60 to-white/50">
         {messagesLoading && displayMessages.length === 0 && (
-          <div className="flex justify-center py-8 text-slate-500">Loading messages…</div>
+          <div className="flex justify-center py-12">
+            <div className="flex gap-1.5">
+              {[0, 1, 2].map((i) => (
+                <span
+                  key={i}
+                  className="w-2 h-2 rounded-full bg-primary-400 animate-bounce"
+                  style={{ animationDelay: `${i * 0.1}s` }}
+                />
+              ))}
+            </div>
+          </div>
         )}
         {!messagesLoading && displayMessages.length === 0 && (
-          <div className="flex justify-center py-8 text-slate-500">No messages yet. Say hi!</div>
+          <div className="flex justify-center py-12 text-slate-500 font-medium">No messages yet. Say hi!</div>
         )}
         {displayMessages.map((msg) => (
           <MessageBubble
@@ -203,6 +217,8 @@ export default function ChatThreadPage() {
             isOwn={msg.senderId === user.id}
             showSender={chat?.type === "GROUP"}
             status={getMessageStatus(msg)}
+            showAvatar
+            avatarUrl={getAvatarForMessage(msg)}
           />
         ))}
         <div ref={bottomRef} />

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Send, Loader2, Smile, Image as ImageIcon } from "lucide-react";
+import { motion } from "framer-motion";
+import { Send, Loader2, Smile, Paperclip } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useChatStore } from "@/store/chatStore";
 import { useSocket } from "@/hooks/useSocket";
@@ -136,41 +137,22 @@ export default function MessageInput({
   };
 
   return (
-    <div className="flex items-end gap-2 p-3 bg-slate-800/50 border-t border-slate-700/50">
-      <button
-        type="button"
-        className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 disabled:opacity-50"
-        aria-label="Voice message"
-      >
-        <span className="text-lg">🎤</span>
-      </button>
-      <button
+    <div className="flex items-end gap-2.5 p-4 bg-white/80 backdrop-blur-sm border-t border-slate-100 rounded-b-2xl">
+      <motion.button
         type="button"
         onClick={handleFileClick}
         disabled={disabled || uploading}
-        className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 disabled:opacity-50"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-50 transition-colors duration-200"
         aria-label="Attach file"
       >
         {uploading ? (
           <Loader2 className="w-5 h-5 animate-spin" />
         ) : (
-          <ImageIcon className="w-5 h-5" />
+          <Paperclip className="w-5 h-5" />
         )}
-      </button>
-      <button
-        type="button"
-        className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 disabled:opacity-50"
-        aria-label="Sticker"
-      >
-        <span className="text-lg">😊</span>
-      </button>
-      <button
-        type="button"
-        className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 disabled:opacity-50"
-        aria-label="GIF"
-      >
-        <span className="text-xs font-medium text-slate-400">GIF</span>
-      </button>
+      </motion.button>
       <textarea
         ref={inputRef}
         value={text}
@@ -178,27 +160,31 @@ export default function MessageInput({
         onKeyDown={handleKeyDown}
         onFocus={handleFocus}
         onBlur={handleBlur}
-        placeholder="Aa"
+        placeholder="Type here..."
         rows={1}
         disabled={disabled}
-        className="flex-1 resize-none rounded-xl bg-slate-700/50 border border-slate-600 px-4 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 min-h-[44px] max-h-32 disabled:opacity-50"
+        className="flex-1 resize-none rounded-xl bg-slate-100/80 border border-slate-200/80 px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500/25 focus:border-primary-400/50 min-h-[44px] max-h-32 disabled:opacity-50 transition-all duration-200"
       />
-      <button
+      <motion.button
         type="button"
-        className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 disabled:opacity-50"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-50 transition-colors duration-200"
         aria-label="Emoji"
       >
         <Smile className="w-5 h-5" />
-      </button>
-      <button
+      </motion.button>
+      <motion.button
         type="button"
         onClick={sendMessage}
         disabled={!text.trim() || disabled}
-        className="p-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white"
+        whileHover={text.trim() && !disabled ? { scale: 1.06 } : {}}
+        whileTap={text.trim() && !disabled ? { scale: 0.96 } : {}}
+        className="p-3 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 disabled:opacity-50 disabled:cursor-not-allowed text-white shadow-soft hover:shadow-glow transition-shadow duration-200"
         aria-label="Send"
       >
         <Send className="w-5 h-5" />
-      </button>
+      </motion.button>
     </div>
   );
 }

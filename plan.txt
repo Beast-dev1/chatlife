@@ -358,13 +358,7 @@ Keyboard shortcuts (e.g. send on Enter); focus management; ARIA where needed; er
 
 5.5 Performance and bundle
 
-
-
-
-
 Lazy-load heavy components (e.g. call UI, media viewer); optimize images (Next.js Image); ensure message list virtualized if very long.
-
-
 
 Check bundle size (e.g. &lt; 500KB gzipped); code-split routes and large deps.
 

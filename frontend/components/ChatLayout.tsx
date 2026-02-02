@@ -46,8 +46,11 @@ export default function ChatLayout({
 
   if (!isInitialized) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900">
-        <div className="animate-pulse text-slate-400">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center app-shell">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-primary-500/20 animate-pulse" />
+          <span className="text-sm font-medium text-slate-500">Loading...</span>
+        </div>
       </div>
     );
   }
@@ -56,12 +59,12 @@ export default function ChatLayout({
     return null;
   }
 
-  // 3-column layout for chat routes
+  // 3-column layout for chat routes (modern: gradient bg, soft shadows)
   if (isChatRoute) {
     return (
-      <div className="h-screen flex bg-slate-900">
+      <div className="h-screen flex app-shell">
         <ChatListSidebar />
-        <main className="flex-1 flex flex-col overflow-hidden min-w-0">
+        <main className="flex-1 flex flex-col overflow-hidden min-w-0 bg-white/90 backdrop-blur-sm rounded-l-2xl shadow-soft border border-slate-200/60">
           <NotificationPermission />
           <SocketSync />
           <CallProvider />
@@ -75,24 +78,24 @@ export default function ChatLayout({
     );
   }
 
-  // Original sidebar + main for contacts, profile
+  // Original sidebar + main for contacts, profile (modern theme)
   return (
-    <div className="h-screen flex bg-slate-900">
-      <aside className="w-72 bg-slate-800/80 border-r border-slate-700/50 flex flex-col">
-        <div className="p-4 border-b border-slate-700/50 flex items-center gap-3">
-          <div className="p-2 bg-emerald-500/20 rounded-xl">
-            <MessageCircle className="w-6 h-6 text-emerald-400" />
+    <div className="h-screen flex app-shell">
+      <aside className="w-72 bg-white/90 backdrop-blur-sm border-r border-slate-200/60 flex flex-col rounded-r-2xl shadow-soft">
+        <div className="p-4 border-b border-slate-100 flex items-center gap-3">
+          <div className="p-2.5 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl shadow-sm">
+            <MessageCircle className="w-5 h-5 text-white" />
           </div>
-          <span className="font-semibold text-white">Let&apos;sChat</span>
+          <span className="font-semibold text-slate-800">Let&apos;sChat</span>
         </div>
 
         <nav className="flex-1 p-2 overflow-y-auto">
           <Link
             href="/chat"
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
               pathname === "/chat"
-                ? "bg-emerald-500/20 text-emerald-400"
-                : "text-slate-300 hover:bg-slate-700/50"
+                ? "bg-primary-500 text-white shadow-sm"
+                : "text-slate-600 hover:bg-slate-100/80"
             }`}
           >
             <MessageCircle className="w-5 h-5" />
@@ -100,10 +103,10 @@ export default function ChatLayout({
           </Link>
           <Link
             href="/contacts"
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
               pathname === "/contacts"
-                ? "bg-emerald-500/20 text-emerald-400"
-                : "text-slate-300 hover:bg-slate-700/50"
+                ? "bg-primary-500 text-white shadow-sm"
+                : "text-slate-600 hover:bg-slate-100/80"
             }`}
           >
             <Users className="w-5 h-5" />
@@ -111,10 +114,10 @@ export default function ChatLayout({
           </Link>
           <Link
             href="/profile"
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
               pathname === "/profile"
-                ? "bg-emerald-500/20 text-emerald-400"
-                : "text-slate-300 hover:bg-slate-700/50"
+                ? "bg-primary-500 text-white shadow-sm"
+                : "text-slate-600 hover:bg-slate-100/80"
             }`}
           >
             <User className="w-5 h-5" />
@@ -122,21 +125,21 @@ export default function ChatLayout({
           </Link>
         </nav>
 
-        <div className="p-2 border-t border-slate-700/50">
-          <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-slate-700/30 mb-2">
-            <div className="w-9 h-9 rounded-full bg-emerald-500/30 flex items-center justify-center">
-              <User className="w-5 h-5 text-emerald-400" />
+        <div className="p-2 border-t border-slate-100">
+          <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-slate-50/80 mb-2">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center ring-2 ring-white shadow-inner">
+              <User className="w-5 h-5 text-primary-600" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">
+              <p className="text-sm font-medium text-slate-800 truncate">
                 {user.username}
               </p>
-              <p className="text-xs text-slate-400 truncate">{user.email}</p>
+              <p className="text-xs text-slate-500 truncate">{user.email}</p>
             </div>
           </div>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-rose-50 hover:text-rose-600 transition-all duration-200"
           >
             <LogOut className="w-5 h-5" />
             <span>Log out</span>
@@ -144,7 +147,7 @@ export default function ChatLayout({
         </div>
       </aside>
 
-      <main className="flex-1 flex flex-col overflow-hidden">
+      <main className="flex-1 flex flex-col overflow-hidden bg-white/90 backdrop-blur-sm rounded-2xl shadow-soft border border-slate-200/60">
         <NotificationPermission />
         <SocketSync />
         <CallProvider />

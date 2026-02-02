@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { usePresenceStore } from "@/store/presenceStore";
 import type { ChatWithDetails } from "@/types/chat";
 
@@ -36,27 +37,20 @@ function lastMessageTime(chat: ChatWithDetails): string {
   return t.toLocaleDateString([], { month: "short", day: "numeric" });
 }
 
-function formatLastSeenShort(iso: string): string {
-  const d = new Date(iso);
-  const now = new Date();
-  const diffMs = now.getTime() - d.getTime();
-  if (diffMs < 60000) return "just now";
-  if (diffMs < 3600000) return `${Math.floor(diffMs / 60000)}m ago`;
-  if (diffMs < 86400000) return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  if (diffMs < 172800000) return "yesterday";
-  return d.toLocaleDateString([], { month: "short", day: "numeric" });
-}
-
 export default function ChatListItem({
   chat,
   currentUserId,
   isActive,
   isUnread = false,
+  unreadCount = 0,
+  index = 0,
 }: {
   chat: ChatWithDetails;
   currentUserId: string;
   isActive: boolean;
   isUnread?: boolean;
+  unreadCount?: number;
+  index?: number;
 }) {
   const name = getDisplayName(chat, currentUserId);
   const avatarUrl = getAvatarUrl(chat, currentUserId);
@@ -70,50 +64,70 @@ export default function ChatListItem({
   const otherLastSeen = otherUserId ? getLastSeen(otherUserId) : undefined;
 
   return (
-    <Link
-      href={`/chat/${chat.id}`}
-      className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-colors ${
-        isActive
-          ? "bg-emerald-500/20 text-emerald-50"
-          : isUnread
-            ? "bg-slate-700/40 hover:bg-slate-700/60 text-slate-200"
-            : "hover:bg-slate-700/50 text-slate-200"
-      }`}
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2, delay: index * 0.03 }}
     >
-      <div className="relative w-12 h-12 rounded-full bg-slate-600 flex-shrink-0 overflow-hidden flex items-center justify-center">
-        {avatarUrl ? (
-          <Image src={avatarUrl} alt="" width={48} height={48} className="w-full h-full object-cover" unoptimized />
-        ) : (
-          <span className="text-lg font-medium text-slate-400">
-            {name.slice(0, 1).toUpperCase()}
-          </span>
-        )}
-        {chat.type === "DIRECT" && otherUserId && (
-          <span
-            className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-slate-800 ${
-              otherOnline ? "bg-emerald-500" : "bg-slate-500"
-            }`}
-            title={otherOnline ? "Online" : otherLastSeen ? `Last seen ${formatLastSeenShort(otherLastSeen)}` : "Offline"}
-          />
-        )}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between gap-2">
-          <span
-            className={`truncate ${isUnread ? "font-semibold text-white" : "font-medium"}`}
-          >
-            {name}
-          </span>
-          <span className="text-xs text-slate-500 flex-shrink-0">{time}</span>
+      <Link
+        href={`/chat/${chat.id}`}
+        className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 ${
+          isActive
+            ? "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-soft"
+            : isUnread
+              ? "bg-slate-50 hover:bg-slate-100 text-slate-800"
+              : "hover:bg-slate-50 text-slate-800"
+        }`}
+      >
+        <div className="relative w-12 h-12 rounded-full bg-slate-200 flex-shrink-0 overflow-hidden flex items-center justify-center ring-2 ring-white/50">
+          {avatarUrl ? (
+            <Image src={avatarUrl} alt="" width={48} height={48} className="w-full h-full object-cover" unoptimized />
+          ) : (
+            <span className={`text-lg font-semibold ${isActive ? "text-white" : "text-slate-500"}`}>
+              {name.slice(0, 1).toUpperCase()}
+            </span>
+          )}
+          {chat.type === "DIRECT" && otherUserId && (
+            <span
+              className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 ${isActive ? "border-primary-500" : "border-white"} ${
+                otherOnline ? "bg-green-500" : "bg-slate-400"
+              }`}
+              title={otherOnline ? "Online" : otherLastSeen ? `Last seen ${otherLastSeen}` : "Offline"}
+            />
+          )}
         </div>
-        <p
-          className={`text-sm truncate ${
-            isUnread ? "text-slate-300 font-medium" : "text-slate-500"
-          }`}
-        >
-          {preview}
-        </p>
-      </div>
-    </Link>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between gap-2">
+            <span
+              className={`truncate font-semibold uppercase tracking-wide text-sm ${
+                isActive ? "text-white" : isUnread ? "text-slate-900" : "text-slate-700"
+              }`}
+            >
+              {name}
+            </span>
+            <span className={`text-xs flex-shrink-0 ${isActive ? "text-white/90" : "text-slate-500"}`}>
+              {time}
+            </span>
+          </div>
+          <p
+            className={`text-sm truncate ${
+              isActive ? "text-white/90" : isUnread ? "text-slate-600 font-medium" : "text-slate-500"
+            }`}
+          >
+            {preview}
+          </p>
+        </div>
+        {isUnread && unreadCount > 0 && !isActive && (
+          <span className="min-w-[1.25rem] h-5 px-1.5 rounded-full bg-primary-500 text-white text-xs font-semibold flex items-center justify-center flex-shrink-0 shadow-sm">
+            {unreadCount > 99 ? "99+" : unreadCount}
+          </span>
+        )}
+        {isActive && isUnread && unreadCount > 0 && (
+          <span className="min-w-[1.25rem] h-5 px-1.5 rounded-full bg-white/25 text-white text-xs font-semibold flex items-center justify-center flex-shrink-0">
+            {unreadCount > 99 ? "99+" : unreadCount}
+          </span>
+        )}
+      </Link>
+    </motion.div>
   );
 }
