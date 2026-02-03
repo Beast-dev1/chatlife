@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useEffect } from "react";
-import { Phone, Mic, MicOff, Video, VideoOff } from "lucide-react";
+import { Phone, Mic, MicOff, Video, VideoOff, Monitor, MonitorOff } from "lucide-react";
 import { useCallStore, type ActiveCallPayload } from "@/store/callStore";
 import { useWebRTC } from "@/hooks/useWebRTC";
 import { useSocket } from "@/hooks/useSocket";
@@ -17,11 +17,14 @@ export default function ActiveCallBar({ activeCall }: { activeCall: ActiveCallPa
     remoteStream,
     isMuted,
     isVideoDisabled,
+    isScreenSharing,
     connectionState,
     mute,
     unmute,
     enableVideo,
     disableVideo,
+    startScreenShare,
+    stopScreenShare,
     endCall,
   } = useWebRTC({
     socket,
@@ -110,6 +113,18 @@ export default function ActiveCallBar({ activeCall }: { activeCall: ActiveCallPa
               aria-label={isVideoDisabled ? "Enable video" : "Disable video"}
             >
               {isVideoDisabled ? <VideoOff className="w-5 h-5" /> : <Video className="w-5 h-5" />}
+            </button>
+          )}
+          {isVideo && (
+            <button
+              type="button"
+              onClick={isScreenSharing ? stopScreenShare : startScreenShare}
+              className={`p-3 rounded-full transition-colors ${
+                isScreenSharing ? "bg-emerald-500/20 text-emerald-400" : "bg-slate-700 text-slate-300 hover:bg-slate-600"
+              }`}
+              aria-label={isScreenSharing ? "Stop sharing screen" : "Share screen"}
+            >
+              {isScreenSharing ? <MonitorOff className="w-5 h-5" /> : <Monitor className="w-5 h-5" />}
             </button>
           )}
           <button

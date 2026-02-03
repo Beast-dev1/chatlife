@@ -13,6 +13,7 @@ import type { CallLogItem } from "@/types/call";
 
 function mapCallToCardData(call: CallLogItem, currentUserId: string): CallLogCardData {
   const isOwnCall = call.callerId === currentUserId;
+  const otherParty = isOwnCall ? call.callee : call.caller;
   let status: CallLogStatus = "completed";
   if (call.status === "MISSED") {
     status = "missed";
@@ -30,6 +31,7 @@ function mapCallToCardData(call: CallLogItem, currentUserId: string): CallLogCar
     createdAt: call.startedAt,
     callerId: call.callerId,
     isOwnCall,
+    otherPartyName: otherParty?.username ?? "Unknown",
   };
 }
 
@@ -74,14 +76,15 @@ export default function CallsPage() {
           </div>
         )}
         {items.length > 0 && (
-          <div className="space-y-2">
+          <div className="space-y-1">
             {items.map(({ card, chatId }) => (
               <div
                 key={card.id}
-                className="rounded-xl bg-slate-800/60 border border-slate-700/50 overflow-hidden"
+                className="rounded-xl bg-slate-800/60 border border-slate-700/50 overflow-hidden hover:bg-slate-800/80 transition-colors"
               >
                 <CallLogCard
                   callLog={card}
+                  layout="row"
                   onCallBack={() => router.push(`/chat/${chatId}`)}
                 />
               </div>

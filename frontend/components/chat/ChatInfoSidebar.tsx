@@ -10,8 +10,10 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { useChat } from "@/hooks/useChats";
+import { useSocket } from "@/hooks/useSocket";
 import { useAuthStore } from "@/store/authStore";
 import { useChatStore } from "@/store/chatStore";
+import { useCallStore } from "@/store/callStore";
 import { usePresenceStore } from "@/store/presenceStore";
 import type { ChatWithDetails } from "@/types/chat";
 
@@ -43,7 +45,10 @@ function formatJoinedDate(iso: string): string {
 export default function ChatInfoSidebar({ chatId }: { chatId: string | null }) {
   const user = useAuthStore((s) => s.user);
   const { data: chat } = useChat(chatId);
+  const { socket, isConnected } = useSocket();
   const setRightSidebarOpen = useChatStore((s) => s.setRightSidebarOpen);
+  const activeCall = useCallStore((s) => s.activeCall);
+  const incomingCall = useCallStore((s) => s.incomingCall);
   const isOnline = usePresenceStore((s) => s.isOnline);
 
   if (!chatId || !user) return null;
@@ -55,11 +60,23 @@ export default function ChatInfoSidebar({ chatId }: { chatId: string | null }) {
   const activeNow = otherUserId ? isOnline(otherUserId) : false;
   const joinedAt = otherMember?.joinedAt ?? user.createdAt;
 
+  const canCall =
+    chat?.type === "DIRECT" &&
+    !!otherUserId &&
+    isConnected &&
+    !activeCall &&
+    !incomingCall;
+
+  const handleStartCall = (callType: "audio" | "video") => {
+    if (!socket || !chatId || !canCall) return;
+    socket.emit("call_initiate", { chatId, callType });
+  };
+
   const actions = [
-    { icon: Phone, label: "Call" },
-    { icon: Mail, label: "Email" },
-    { icon: Video, label: "Video" },
-    { icon: MoreHorizontal, label: "More" },
+    { icon: Phone, label: "Call", onClick: () => handleStartCall("audio") },
+    { icon: Mail, label: "Email", onClick: undefined },
+    { icon: Video, label: "Video", onClick: () => handleStartCall("video") },
+    { icon: MoreHorizontal, label: "More", onClick: undefined },
   ];
 
   const details = [
@@ -131,7 +148,7 @@ export default function ChatInfoSidebar({ chatId }: { chatId: string | null }) {
 
         {/* Action icons */}
         <div className="flex justify-center gap-3 mb-8">
-          {actions.map(({ icon: Icon, label }, i) => (
+          {actions.map(({ icon: Icon, label, onClick }, i) => (
             <motion.button
               key={label}
               type="button"
@@ -140,7 +157,15 @@ export default function ChatInfoSidebar({ chatId }: { chatId: string | null }) {
               transition={{ delay: 0.08 + i * 0.03 }}
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.95 }}
-              className="flex flex-col items-center gap-1.5 text-slate-600 hover:text-slate-800 transition-colors"
+              onClick={onClick}
+              disabled={onClick ? !canCall : false}
+              className={`flex flex-col items-center gap-1.5 transition-colors ${
+                onClick && canCall
+                  ? "text-slate-600 hover:text-slate-800 cursor-pointer"
+                  : onClick
+                    ? "text-slate-400 cursor-not-allowed"
+                    : "text-slate-600 hover:text-slate-800"
+              }`}
             >
               <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition-colors duration-200">
                 <Icon className="w-5 h-5" />

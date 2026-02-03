@@ -39,14 +39,18 @@ export function useWebRTC({
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoDisabled, setIsVideoDisabled] = useState(callType === "audio");
+  const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [connectionState, setConnectionState] =
     useState<WebRTCConnectionState>("new");
 
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const remoteStreamRef = useRef<MediaStream | null>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
+  const screenStreamRef = useRef<MediaStream | null>(null);
 
   const cleanup = useCallback(() => {
+    screenStreamRef.current?.getTracks().forEach((t) => t.stop());
+    screenStreamRef.current = null;
     if (pcRef.current) {
       pcRef.current.close();
       pcRef.current = null;
@@ -86,6 +90,49 @@ export function useWebRTC({
     });
     setIsVideoDisabled(true);
   }, [localStream]);
+
+  const startScreenShare = useCallback(async () => {
+    const pc = pcRef.current;
+    const localStream = localStreamRef.current;
+    if (!pc || !localStream) return;
+    const videoSender = pc.getSenders().find((s) => s.track?.kind === "video");
+    if (!videoSender) return; // only for video calls
+    try {
+      const screenStream = await navigator.mediaDevices.getDisplayMedia({
+        video: true,
+        audio: false,
+      });
+      screenStreamRef.current = screenStream;
+      const screenTrack = screenStream.getVideoTracks()[0];
+      if (screenTrack) {
+        screenTrack.onended = () => {
+          stopScreenShare();
+        };
+        await videoSender.replaceTrack(screenTrack);
+        setIsScreenSharing(true);
+      }
+    } catch (err) {
+      console.warn("startScreenShare failed:", err);
+    }
+  }, []);
+
+  const stopScreenShare = useCallback(async () => {
+    const pc = pcRef.current;
+    const localStream = localStreamRef.current;
+    const screenStream = screenStreamRef.current;
+    if (screenStream) {
+      screenStream.getTracks().forEach((t) => t.stop());
+      screenStreamRef.current = null;
+    }
+    setIsScreenSharing(false);
+    if (pc && localStream) {
+      const cameraTrack = localStream.getVideoTracks()[0];
+      const videoSender = pc.getSenders().find((s) => s.track?.kind === "video");
+      if (cameraTrack && videoSender) {
+        await videoSender.replaceTrack(cameraTrack);
+      }
+    }
+  }, []);
 
   const endCall = useCallback(() => {
     if (socket && callId) {
@@ -259,11 +306,14 @@ export function useWebRTC({
     remoteStream,
     isMuted,
     isVideoDisabled,
+    isScreenSharing,
     connectionState,
     mute,
     unmute,
     enableVideo,
     disableVideo,
+    startScreenShare,
+    stopScreenShare,
     endCall,
   };
 }
