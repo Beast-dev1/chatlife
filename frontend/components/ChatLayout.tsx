@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { MessageCircle, LogOut, User, Users } from "lucide-react";
+import { MessageCircle, LogOut, User, Users, Settings } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useChatStore } from "@/store/chatStore";
 import SocketSync from "./SocketSync";
@@ -122,6 +122,17 @@ export default function ChatLayout({
           >
             <User className="w-5 h-5" />
             <span>Profile</span>
+          </Link>
+          <Link
+            href="/settings"
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
+              pathname === "/settings"
+                ? "bg-primary-500 text-white shadow-sm"
+                : "text-slate-600 hover:bg-slate-100/80"
+            }`}
+          >
+            <Settings className="w-5 h-5" />
+            <span>Settings</span>
           </Link>
         </nav>
 
