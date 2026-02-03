@@ -1,13 +1,17 @@
 /**
  * WebRTC helpers for peer connection, offer/answer, and ICE.
  * Used by useWebRTC; all functions are stateless.
+ * STUN server: set NEXT_PUBLIC_STUN_URL in .env.local (e.g. stun:stun.l.google.com:19302).
  */
 
 const DEFAULT_STUN = "stun:stun.l.google.com:19302";
 
 export function getDefaultIceServers(): RTCIceServer[] {
-  const url = typeof process !== "undefined" && process.env.NEXT_PUBLIC_STUN_URL;
-  if (url && typeof url === "string" && url.trim()) {
+  const url =
+    typeof process !== "undefined" && process.env
+      ? process.env.NEXT_PUBLIC_STUN_URL
+      : undefined;
+  if (typeof url === "string" && url.trim()) {
     return [{ urls: url.trim() }];
   }
   return [{ urls: DEFAULT_STUN }];

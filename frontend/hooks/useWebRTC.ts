@@ -170,6 +170,15 @@ export function useWebRTC({
 
     void setup();
 
+    const iceCandidateQueue: RTCIceCandidateInit[] = [];
+
+    const flushIceCandidates = async (currentPc: RTCPeerConnection) => {
+      while (iceCandidateQueue.length > 0) {
+        const candidate = iceCandidateQueue.shift();
+        if (candidate) await addIceCandidate(currentPc, candidate);
+      }
+    };
+
     const onCallOffer = async (payload: {
       callId: string;
       fromUserId: string;
@@ -186,6 +195,7 @@ export function useWebRTC({
             sdp: answer,
           });
         }
+        await flushIceCandidates(currentPc);
       } catch (err) {
         console.error("useWebRTC createAnswer:", err);
       }
@@ -200,19 +210,26 @@ export function useWebRTC({
       if (payload.callId !== callId || payload.fromUserId !== remoteUserId || !currentPc) return;
       try {
         await currentPc.setRemoteDescription(new RTCSessionDescription(payload.sdp));
+        await flushIceCandidates(currentPc);
       } catch (err) {
         console.error("useWebRTC setRemoteDescription answer:", err);
       }
     };
 
-    const onIceCandidate = (payload: {
+    const onIceCandidate = async (payload: {
       callId: string;
       fromUserId: string;
       candidate: RTCIceCandidateInit | null;
     }) => {
       const currentPc = pcRef.current;
       if (payload.callId !== callId || payload.fromUserId !== remoteUserId || !currentPc) return;
-      void addIceCandidate(currentPc, payload.candidate);
+      if (payload.candidate == null) return;
+      const remoteDesc = currentPc.remoteDescription;
+      if (remoteDesc) {
+        await addIceCandidate(currentPc, payload.candidate);
+      } else {
+        iceCandidateQueue.push(payload.candidate);
+      }
     };
 
     socket.on("call_offer", onCallOffer);
