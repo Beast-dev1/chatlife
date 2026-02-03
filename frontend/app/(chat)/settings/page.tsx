@@ -166,7 +166,7 @@ export default function SettingsPage() {
 
   return (
     <div className="flex flex-col h-full bg-gradient-to-b from-slate-50/40 to-white/60 rounded-2xl overflow-y-auto">
-      <div className="flex-1 max-w-2xl mx-auto w-full px-4 py-6 sm:px-6 pb-10">
+      <div className="flex-1 w-full px-4 py-6 sm:px-6 pb-10">
         <motion.header
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
