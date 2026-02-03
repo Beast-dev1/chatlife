@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { usePathname, useRouter } from "next/navigation";
-import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, Search, Pencil, MoreHorizontal, User, Users, LogOut, Settings } from "lucide-react";
-import { useAuthStore } from "@/store/authStore";
 import { useChats } from "@/hooks/useChats";
+import { useAuthStore } from "@/store/authStore";
+import type { ChatWithDetails } from "@/types/chat";
+import { AnimatePresence, motion } from "framer-motion";
+import { LogOut, MessageCircle, MoreHorizontal, Pencil, Search, Settings, User, Users } from "lucide-react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import ChatListItem from "./ChatListItem";
 import CreateChatModal from "./CreateChatModal";
-import type { ChatWithDetails } from "@/types/chat";
 
 function isChatUnread(chat: ChatWithDetails, currentUserId: string): boolean {
   const lastMsg = chat.messages?.[0];
@@ -83,7 +83,7 @@ export default function ChatListSidebar() {
           <div className="p-2.5 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl shadow-sm group-hover:shadow-glow transition-shadow duration-300">
             <MessageCircle className="w-5 h-5 text-white" />
           </div>
-          <span className="font-semibold text-slate-800">SKS Funding</span>
+          <span className="font-semibold text-slate-800">Let's Chat</span>
         </Link>
         <div className="flex items-center gap-0.5">
           <div className="relative" ref={menuRef}>
