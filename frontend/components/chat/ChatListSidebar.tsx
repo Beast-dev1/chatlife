@@ -4,14 +4,12 @@ import { useState, useRef, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, Search, Pencil, MoreHorizontal, User, Users, LogOut, Phone } from "lucide-react";
+import { MessageCircle, Search, Pencil, MoreHorizontal, User, Users, LogOut, Settings } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useChats } from "@/hooks/useChats";
 import ChatListItem from "./ChatListItem";
 import CreateChatModal from "./CreateChatModal";
 import type { ChatWithDetails } from "@/types/chat";
-
-type TabType = "email" | "chat";
 
 function isChatUnread(chat: ChatWithDetails, currentUserId: string): boolean {
   const lastMsg = chat.messages?.[0];
@@ -45,7 +43,6 @@ export default function ChatListSidebar() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const { data: chats, isLoading, error } = useChats();
-  const [tab, setTab] = useState<TabType>("chat");
   const [searchQuery, setSearchQuery] = useState("");
   const [showCreate, setShowCreate] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -89,27 +86,6 @@ export default function ChatListSidebar() {
           <span className="font-semibold text-slate-800">SKS Funding</span>
         </Link>
         <div className="flex items-center gap-0.5">
-          <Link
-            href="/calls"
-            className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors duration-200"
-            aria-label="Calls"
-          >
-            <Phone className="w-5 h-5" />
-          </Link>
-          <Link
-            href="/contacts"
-            className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors duration-200"
-            aria-label="Contacts"
-          >
-            <Users className="w-5 h-5" />
-          </Link>
-          <Link
-            href="/profile"
-            className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors duration-200"
-            aria-label="Profile"
-          >
-            <User className="w-5 h-5" />
-          </Link>
           <div className="relative" ref={menuRef}>
             <button
               type="button"
@@ -144,6 +120,14 @@ export default function ChatListSidebar() {
                     <Users className="w-4 h-4 text-slate-400" />
                     Contacts
                   </Link>
+                  <Link
+                    href="/settings"
+                    onClick={() => setShowMenu(false)}
+                    className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    <Settings className="w-4 h-4 text-slate-400" />
+                    Settings
+                  </Link>
                   <button
                     type="button"
                     onClick={handleLogout}
@@ -173,105 +157,64 @@ export default function ChatListSidebar() {
         </div>
       </div>
 
-      {/* Tabs: EMAIL | CHAT (Chat active = orange pill) */}
-      <div className="px-3 pt-2.5 flex gap-0">
-        <button
+      {/* New chat button */}
+      <div className="px-3 py-2 flex items-center justify-end">
+        <motion.button
           type="button"
-          onClick={() => setTab("email")}
-          className={`px-4 py-2.5 text-sm font-semibold rounded-l-xl transition-all duration-200 ${
-            tab === "email"
-              ? "bg-primary-500 text-white shadow-sm"
-              : "bg-slate-50 text-slate-500 border border-r-0 border-slate-200/80 hover:bg-slate-100"
-          }`}
+          onClick={() => setShowCreate(true)}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.98 }}
+          className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors duration-200"
+          aria-label="New chat"
         >
-          EMAIL
-        </button>
-        <button
-          type="button"
-          onClick={() => setTab("chat")}
-          className={`px-4 py-2.5 text-sm font-semibold rounded-r-xl transition-all duration-200 ${
-            tab === "chat"
-              ? "bg-primary-500 text-white shadow-sm"
-              : "bg-slate-50 text-slate-500 border border-slate-200/80 hover:bg-slate-100"
-          }`}
-        >
-          CHAT
-        </button>
+          <Pencil className="w-4 h-4" />
+        </motion.button>
       </div>
 
-      {/* New chat button (when Chat tab) */}
-      {tab === "chat" && (
-        <div className="px-3 py-2 flex items-center justify-end">
-          <motion.button
-            type="button"
-            onClick={() => setShowCreate(true)}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.98 }}
-            className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors duration-200"
-            aria-label="New chat"
-          >
-            <Pencil className="w-4 h-4" />
-          </motion.button>
-        </div>
-      )}
-
-      {/* Chat list (when Chat tab) / Email placeholder */}
+      {/* Chat list */}
       <div className="flex-1 overflow-y-auto p-2 scrollbar-thin">
-        {tab === "email" && (
+        {isLoading && (
+          <div className="flex items-center justify-center py-12">
+            <div className="flex gap-1.5">
+              {[0, 1, 2].map((i) => (
+                <motion.div
+                  key={i}
+                  className="w-2 h-2 rounded-full bg-primary-400"
+                  animate={{ y: [0, -6, 0] }}
+                  transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.1 }}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+        {error && (
+          <div className="flex items-center justify-center py-12 text-rose-500 text-sm">
+            Failed to load chats
+          </div>
+        )}
+        {chats && filteredChats.length === 0 && !isLoading && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="flex flex-col items-center justify-center py-12 text-slate-400 text-sm text-center px-4"
+            className="flex flex-col items-center justify-center py-12 text-slate-500 text-sm text-center px-4"
           >
-            No emails yet.
+            {searchQuery.trim() ? "No chats match your search" : "No chats yet. Start a new chat!"}
           </motion.div>
         )}
-        {tab === "chat" && (
-          <>
-            {isLoading && (
-              <div className="flex items-center justify-center py-12">
-                <div className="flex gap-1.5">
-                  {[0, 1, 2].map((i) => (
-                    <motion.div
-                      key={i}
-                      className="w-2 h-2 rounded-full bg-primary-400"
-                      animate={{ y: [0, -6, 0] }}
-                      transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.1 }}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-            {error && (
-              <div className="flex items-center justify-center py-12 text-rose-500 text-sm">
-                Failed to load chats
-              </div>
-            )}
-            {chats && filteredChats.length === 0 && !isLoading && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex flex-col items-center justify-center py-12 text-slate-500 text-sm text-center px-4"
-              >
-                {searchQuery.trim() ? "No chats match your search" : "No chats yet. Start a new chat!"}
-              </motion.div>
-            )}
-            {filteredChats.length > 0 && (
-              <div className="space-y-1">
-                {filteredChats.map((chat, i) => (
-                  <ChatListItem
-                    key={chat.id}
-                    chat={chat}
-                    currentUserId={user.id}
-                    isActive={pathname === `/chat/${chat.id}`}
-                    isUnread={isChatUnread(chat, user.id)}
-                    unreadCount={unreadCounts.get(chat.id) ?? 0}
-                    index={i}
-                  />
-                ))}
-              </div>
-            )}
-          </>
+        {filteredChats.length > 0 && (
+          <div className="space-y-1">
+            {filteredChats.map((chat, i) => (
+              <ChatListItem
+                key={chat.id}
+                chat={chat}
+                currentUserId={user.id}
+                isActive={pathname === `/chat/${chat.id}`}
+                isUnread={isChatUnread(chat, user.id)}
+                unreadCount={unreadCounts.get(chat.id) ?? 0}
+                index={i}
+              />
+            ))}
+          </div>
         )}
       </div>
 
