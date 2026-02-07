@@ -53,12 +53,10 @@ function DirectChatPanel({
   chatId,
   chat,
   user,
-  setRightSidebarOpen,
 }: {
   chatId: string;
   chat: ChatWithDetails | undefined;
   user: { id: string; username: string; avatarUrl?: string | null };
-  setRightSidebarOpen: (open: boolean) => void;
 }) {
   const { socket, isConnected } = useSocket();
   const activeCall = useCallStore((s) => s.activeCall);
@@ -525,12 +523,7 @@ export default function ChatInfoSidebar({ chatId }: { chatId: string | null }) {
           setRightSidebarOpen={setRightSidebarOpen}
         />
       ) : (
-        <DirectChatPanel
-          chatId={chatId}
-          chat={chat}
-          user={user}
-          setRightSidebarOpen={setRightSidebarOpen}
-        />
+        <DirectChatPanel chatId={chatId} chat={chat} user={user} />
       )}
 
       <div className="p-2 border-t border-slate-100 flex justify-end shrink-0">
