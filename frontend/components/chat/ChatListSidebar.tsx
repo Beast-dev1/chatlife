@@ -83,7 +83,7 @@ export default function ChatListSidebar() {
           <div className="p-2.5 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl shadow-sm group-hover:shadow-glow transition-shadow duration-300">
             <MessageCircle className="w-5 h-5 text-white" />
           </div>
-          <span className="font-semibold text-slate-800">Let's Chat</span>
+          <span className="font-semibold text-slate-800">Let&apos;s Chat</span>
         </Link>
         <div className="flex items-center gap-0.5">
           <div className="relative" ref={menuRef}>

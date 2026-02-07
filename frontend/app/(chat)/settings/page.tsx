@@ -20,7 +20,6 @@ import {
 import { useSettingsStore } from "@/store/settingsStore";
 import type { Theme, LastSeenVisibility, ProfileVisibility, MediaAutoDownload, ImageQuality, FontSize, ChatDensity } from "@/store/settingsStore";
 import { useAuthStore } from "@/store/authStore";
-import { useRouter } from "next/navigation";
 
 function SectionCard({
   title,
@@ -109,7 +108,6 @@ function SelectRow<T extends string>({
 }
 
 export default function SettingsPage() {
-  const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const {
     notificationsEnabled,

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -51,11 +52,14 @@ export default function LoginPage() {
 
   return (
     <div className="flex h-full w-full overflow-hidden">
-      <div className="w-full hidden md:inline-block">
-        <img
-          className="h-full w-full object-cover"
+      <div className="relative w-full h-full hidden md:block min-h-0">
+        <Image
+          className="object-cover"
           src="/loginandsignupimg.png"
           alt="Grandparents video calling their grandson studying abroad"
+          fill
+          sizes="(max-width: 768px) 0px, 50vw"
+          priority
         />
       </div>
 
