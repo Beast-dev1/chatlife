@@ -39,6 +39,13 @@ export interface Chat {
   updatedAt: Date;
 }
 
+export interface MessageReplyTo {
+  id: string;
+  content: string | null;
+  senderId: string;
+  sender: { id: string; username: string };
+}
+
 export interface Message {
   id: string;
   chatId: string;
@@ -46,6 +53,8 @@ export interface Message {
   type: MessageType;
   content?: string | null;
   fileUrl?: string | null;
+  replyToId?: string | null;
+  replyTo?: MessageReplyTo | null;
   createdAt: Date;
   updatedAt: Date;
 }

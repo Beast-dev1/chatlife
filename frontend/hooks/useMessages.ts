@@ -1,11 +1,29 @@
 "use client";
 
 import { useQuery, useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { useDeferredValue } from "react";
 import { api } from "@/lib/api";
 import type { MessagesResponse, MessageWithSender } from "@/types/chat";
 
 export function messagesQueryKey(chatId: string) {
   return ["messages", chatId];
+}
+
+export function messageSearchQueryKey(q: string, chatId: string | null) {
+  return ["messages", "search", q, chatId];
+}
+
+export function useMessageSearch(query: string, chatId: string | null) {
+  const deferredQ = useDeferredValue(query.trim());
+  return useQuery({
+    queryKey: messageSearchQueryKey(deferredQ, chatId),
+    queryFn: async () => {
+      const params = new URLSearchParams({ q: deferredQ });
+      if (chatId) params.set("chatId", chatId);
+      return api.get<MessagesResponse>(`/api/messages/search?${params.toString()}`);
+    },
+    enabled: deferredQ.length >= 1,
+  });
 }
 
 export function useMessages(chatId: string | null) {

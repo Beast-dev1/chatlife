@@ -48,6 +48,13 @@ export interface MessageReadItem {
   readAt: string;
 }
 
+export interface MessageReplyTo {
+  id: string;
+  content: string | null;
+  senderId: string;
+  sender: { id: string; username: string };
+}
+
 export interface MessageWithSender {
   id: string;
   chatId: string;
@@ -55,6 +62,8 @@ export interface MessageWithSender {
   type: MessageType;
   content: string | null;
   fileUrl: string | null;
+  replyToId?: string | null;
+  replyTo?: MessageReplyTo | null;
   createdAt: string;
   updatedAt: string;
   sender: UserBrief;

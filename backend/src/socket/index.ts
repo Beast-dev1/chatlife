@@ -110,8 +110,8 @@ export function attachSocketHandlers(io: Server) {
     });
 
     socket.on("send_message", async (payload: unknown) => {
-      const data = payload as { chatId?: string; type?: string; content?: string; fileUrl?: string };
-      const { chatId } = data ?? {};
+      const data = payload as { chatId?: string; type?: string; content?: string; fileUrl?: string; replyToId?: string };
+      const { chatId, replyToId } = data ?? {};
       if (!chatId || typeof chatId !== "string") {
         socket.emit("error", { message: "chatId required" });
         return;
@@ -127,10 +127,22 @@ export function attachSocketHandlers(io: Server) {
         type: data.type ?? "TEXT",
         content: data.content ?? null,
         fileUrl: data.fileUrl ?? null,
+        replyToId: replyToId ?? null,
       });
       if (!parsed.success) {
         socket.emit("error", { message: "Invalid message payload" });
         return;
+      }
+
+      if (parsed.data.replyToId) {
+        const replyToMsg = await prisma.message.findUnique({
+          where: { id: parsed.data.replyToId },
+          select: { id: true, chatId: true },
+        });
+        if (!replyToMsg || replyToMsg.chatId !== chatId) {
+          socket.emit("error", { message: "Reply target message not found or in different chat" });
+          return;
+        }
       }
 
       const message = await prisma.message.create({
@@ -140,12 +152,21 @@ export function attachSocketHandlers(io: Server) {
           type: parsed.data.type as "TEXT" | "IMAGE" | "FILE" | "AUDIO" | "VIDEO",
           content: parsed.data.content ?? null,
           fileUrl: parsed.data.fileUrl ?? null,
+          replyToId: parsed.data.replyToId ?? undefined,
         },
         include: {
           sender: {
             select: { id: true, username: true, avatarUrl: true },
           },
           reads: true,
+          replyTo: {
+            select: {
+              id: true,
+              content: true,
+              senderId: true,
+              sender: { select: { id: true, username: true } },
+            },
+          },
         },
       });
 

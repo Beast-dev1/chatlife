@@ -21,6 +21,8 @@ export default function SocketSync() {
   const replaceTempMessage = useChatStore((s) => s.replaceTempMessage);
   const setMessageDelivered = useChatStore((s) => s.setMessageDelivered);
   const setMessageRead = useChatStore((s) => s.setMessageRead);
+  const updateMessageInChat = useChatStore((s) => s.updateMessageInChat);
+  const removeMessageFromChat = useChatStore((s) => s.removeMessageFromChat);
   const setUserOnline = usePresenceStore((s) => s.setUserOnline);
   const setUserOffline = usePresenceStore((s) => s.setUserOffline);
   const setUserTyping = usePresenceStore((s) => s.setUserTyping);
@@ -110,6 +112,21 @@ export default function SocketSync() {
       setMessageRead(payload.messageId, payload.userId, readAt);
     };
 
+    const onMessageUpdated = (message: MessageWithSender) => {
+      updateMessageInChat(message.chatId, message.id, message);
+      queryClient.invalidateQueries({ queryKey: messagesQueryKey(message.chatId) });
+    };
+
+    const onMessageDeleted = (payload: { messageId: string; chatId: string }) => {
+      removeMessageFromChat(payload.chatId, payload.messageId);
+      queryClient.invalidateQueries({ queryKey: messagesQueryKey(payload.chatId) });
+    };
+
+    const onMessageDeletedForMe = (payload: { messageId: string; chatId: string }) => {
+      removeMessageFromChat(payload.chatId, payload.messageId);
+      queryClient.invalidateQueries({ queryKey: messagesQueryKey(payload.chatId) });
+    };
+
     socket.on("user_online", onUserOnline);
     socket.on("user_offline", onUserOffline);
     socket.on("user_typing", onUserTyping);
@@ -117,6 +134,9 @@ export default function SocketSync() {
     socket.on("new_message", onNewMessage);
     socket.on("message_delivered", onMessageDelivered);
     socket.on("message_read", onMessageRead);
+    socket.on("message_updated", onMessageUpdated);
+    socket.on("message_deleted", onMessageDeleted);
+    socket.on("message_deleted_for_me", onMessageDeletedForMe);
     return () => {
       socket.off("user_online", onUserOnline);
       socket.off("user_offline", onUserOffline);
@@ -125,6 +145,9 @@ export default function SocketSync() {
       socket.off("new_message", onNewMessage);
       socket.off("message_delivered", onMessageDelivered);
       socket.off("message_read", onMessageRead);
+      socket.off("message_updated", onMessageUpdated);
+      socket.off("message_deleted", onMessageDeleted);
+      socket.off("message_deleted_for_me", onMessageDeletedForMe);
     };
   }, [
     socket,
@@ -135,6 +158,8 @@ export default function SocketSync() {
     replaceTempMessage,
     setMessageDelivered,
     setMessageRead,
+    updateMessageInChat,
+    removeMessageFromChat,
     setUserOnline,
     setUserOffline,
     setUserTyping,

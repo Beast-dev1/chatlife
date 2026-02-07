@@ -61,6 +61,7 @@ model User {
   callLogsAsCaller     CallLog[]             @relation("Caller")
   callLogsAsCallee     CallLog[]             @relation("Callee")
   passwordResetTokens  PasswordResetToken[]
+  messageDeletions     MessageDeletion[]
 }
 
 model PasswordResetToken {
@@ -108,21 +109,38 @@ model ChatMember {
 }
 
 model Message {
-  id        String      @id @default(cuid())
-  chatId    String      @map("chat_id")
-  senderId  String      @map("sender_id")
-  type      MessageType @default(TEXT)
-  content   String?     @db.Text
-  fileUrl   String?     @map("file_url")
-  createdAt DateTime    @default(now()) @map("created_at")
-  updatedAt DateTime    @updatedAt @map("updated_at")
+  id         String      @id @default(cuid())
+  chatId     String      @map("chat_id")
+  senderId   String      @map("sender_id")
+  replyToId  String?     @map("reply_to_id")
+  type       MessageType @default(TEXT)
+  content    String?     @db.Text
+  fileUrl    String?     @map("file_url")
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
 
-  chat   Chat         @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  sender User         @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
-  reads  MessageRead[]
+  chat    Chat         @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  sender  User         @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  replyTo Message?    @relation("MessageReplies", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies Message[]   @relation("MessageReplies")
+  reads   MessageRead[]
+  deletions MessageDeletion[]
 
   @@index([chatId, createdAt])
   @@index([senderId])
+}
+
+model MessageDeletion {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  messageId String   @map("message_id")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, messageId])
+  @@index([userId])
+  @@index([messageId])
 }
 
 model MessageRead {

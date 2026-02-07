@@ -93,6 +93,7 @@ const io = new SocketServer(server, {
   cors: { origin: FRONTEND_URL, credentials: true },
   path: "/socket.io",
 });
+app.set("io", io);
 attachSocketHandlers(io);
 
 // Start server

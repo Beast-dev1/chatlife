@@ -21,6 +21,8 @@ interface ChatState {
   replaceTempMessage: (chatId: string, tempId: string, message: MessageWithSender) => void;
   setMessageDelivered: (messageId: string) => void;
   setMessageRead: (messageId: string, userId: string, readAt: string) => void;
+  updateMessageInChat: (chatId: string, messageId: string, payload: Partial<MessageWithSender>) => void;
+  removeMessageFromChat: (chatId: string, messageId: string) => void;
   sendMessageOptimistic: (
     chatId: string,
     tempId: string,
@@ -141,6 +143,20 @@ export const useChatStore = create<ChatState>((set, get) => ({
       return {
         messagesByChat: { ...s.messagesByChat, [chatId]: updated },
       };
+    }),
+
+  updateMessageInChat: (chatId, messageId, payload) =>
+    set((s) => {
+      const list = s.messagesByChat[chatId] ?? [];
+      const updated = list.map((m) => (m.id === messageId ? { ...m, ...payload } : m));
+      return { messagesByChat: { ...s.messagesByChat, [chatId]: updated } };
+    }),
+
+  removeMessageFromChat: (chatId, messageId) =>
+    set((s) => {
+      const list = s.messagesByChat[chatId] ?? [];
+      const next = list.filter((m) => m.id !== messageId);
+      return { messagesByChat: { ...s.messagesByChat, [chatId]: next } };
     }),
 
   sendMessageOptimistic: (chatId, tempId, payload, sender) => {

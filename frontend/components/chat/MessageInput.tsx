@@ -2,11 +2,12 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Send, Loader2, Smile, Paperclip } from "lucide-react";
+import { Send, Loader2, Smile, Paperclip, X } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useChatStore } from "@/store/chatStore";
 import { useSocket } from "@/hooks/useSocket";
 import { uploadFile } from "@/lib/api";
+import type { MessageWithSender } from "@/types/chat";
 
 const TYPING_THROTTLE_MS = 1500;
 const TYPING_DEBOUNCE_MS = 2000;
@@ -16,10 +17,14 @@ const IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/gif", "image/webp
 export default function MessageInput({
   chatId,
   disabled,
+  replyingTo,
+  onCancelReply,
 }: {
   chatId: string;
   onFileSelect?: (file: File) => void;
   disabled?: boolean;
+  replyingTo?: MessageWithSender | null;
+  onCancelReply?: () => void;
 }) {
   const [text, setText] = useState("");
   const [uploading, setUploading] = useState(false);
@@ -57,7 +62,7 @@ export default function MessageInput({
   }, []);
 
   const emitMessage = useCallback(
-    (payload: { type: string; content?: string | null; fileUrl?: string | null }) => {
+    (payload: { type: string; content?: string | null; fileUrl?: string | null; replyToId?: string | null }) => {
       if (!user || !socket) return;
       const sender = {
         id: user.id,
@@ -74,9 +79,11 @@ export default function MessageInput({
   const sendMessage = useCallback(() => {
     const trimmed = text.trim();
     if (!trimmed || !user || !socket || disabled) return;
-    emitMessage({ type: "TEXT", content: trimmed });
+    const replyToId = replyingTo?.id ?? null;
+    emitMessage({ type: "TEXT", content: trimmed, replyToId });
     setText("");
-  }, [text, user, socket, disabled, emitMessage]);
+    onCancelReply?.();
+  }, [text, user, socket, disabled, replyingTo, emitMessage, onCancelReply]);
 
   const handleFileSelect = useCallback(
     async (file: File) => {
@@ -86,14 +93,16 @@ export default function MessageInput({
         const { url } = await uploadFile(file);
         const type = IMAGE_TYPES.has(file.type) ? "IMAGE" : "FILE";
         const content = type === "FILE" ? file.name : null;
-        emitMessage({ type, fileUrl: url, content });
+        const replyToId = replyingTo?.id ?? null;
+        emitMessage({ type, fileUrl: url, content, replyToId });
+        onCancelReply?.();
       } catch {
         // error could be shown via toast
       } finally {
         setUploading(false);
       }
     },
-    [user, socket, disabled, uploading, emitMessage]
+    [user, socket, disabled, uploading, replyingTo, emitMessage, onCancelReply]
   );
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -136,8 +145,32 @@ export default function MessageInput({
     input.click();
   };
 
+  const replyPreview =
+    replyingTo?.type === "TEXT"
+      ? (replyingTo.content ?? "").slice(0, 50) + ((replyingTo.content?.length ?? 0) > 50 ? "…" : "")
+      : replyingTo?.type === "IMAGE"
+        ? "Photo"
+        : "File";
+
   return (
-    <div className="flex items-end gap-2.5 px-4 py-3 bg-slate-50/90 backdrop-blur-md border-t border-slate-200/70 rounded-b-2xl">
+    <div className="flex flex-col gap-1 px-4 py-3 bg-slate-50/90 backdrop-blur-md border-t border-slate-200/70 rounded-b-2xl">
+      {replyingTo && (
+        <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-slate-200/60 border border-slate-200/80">
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-medium text-slate-600">Replying to {replyingTo.sender.username}</p>
+            <p className="text-xs text-slate-500 truncate">{replyPreview}</p>
+          </div>
+          <button
+            type="button"
+            onClick={onCancelReply}
+            className="p-1 rounded text-slate-500 hover:bg-slate-300/80"
+            aria-label="Cancel reply"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+      <div className="flex items-end gap-2.5">
       <motion.button
         type="button"
         onClick={handleFileClick}
@@ -185,6 +218,7 @@ export default function MessageInput({
       >
         <Send className="w-5 h-5" />
       </motion.button>
+      </div>
     </div>
   );
 }

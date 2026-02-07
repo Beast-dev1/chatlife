@@ -1,18 +1,20 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import { Video, Phone, Info, MessageCircle } from "lucide-react";
+import { Video, Phone, Info, MessageCircle, Search, X } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useSocket } from "@/hooks/useSocket";
 import { useChat } from "@/hooks/useChats";
-import { useMessages } from "@/hooks/useMessages";
+import { useMessages, useMessageSearch } from "@/hooks/useMessages";
 import { useChatStore } from "@/store/chatStore";
 import { useCallStore } from "@/store/callStore";
 import { usePresenceStore } from "@/store/presenceStore";
+import { api } from "@/lib/api";
 import MessageBubble from "@/components/chat/MessageBubble";
 import MessageInput from "@/components/chat/MessageInput";
+import ForwardModal from "@/components/chat/ForwardModal";
 import type { ChatWithDetails } from "@/types/chat";
 import type { MessageWithSender } from "@/types/chat";
 
@@ -43,6 +45,7 @@ export default function ChatThreadPage() {
   const { data: messagesData, isLoading: messagesLoading } = useMessages(chatId);
   const setActiveChatId = useChatStore((s) => s.setActiveChatId);
   const setMessages = useChatStore((s) => s.setMessages);
+  const updateMessageInChat = useChatStore((s) => s.updateMessageInChat);
   const messagesByChat = useChatStore((s) => s.messagesByChat);
   const deliveredMessageIds = useChatStore((s) => s.deliveredMessageIds);
   const toggleRightSidebar = useChatStore((s) => s.toggleRightSidebar);
@@ -52,6 +55,14 @@ export default function ChatThreadPage() {
   const getLastSeen = usePresenceStore((s) => s.getLastSeen);
   const getTypingUserIds = usePresenceStore((s) => s.getTypingUserIds);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const messageRefsMap = useRef<Record<string, HTMLDivElement | null>>({});
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [highlightMessageId, setHighlightMessageId] = useState<string | null>(null);
+  const [replyingTo, setReplyingTo] = useState<MessageWithSender | null>(null);
+  const [forwardMessage, setForwardMessage] = useState<MessageWithSender | null>(null);
+  const { data: searchData, isFetching: searchFetching } = useMessageSearch(searchQuery, chatId);
+  const searchResults = searchData?.messages ?? [];
 
   const otherMember = chat?.members?.find((m) => m.userId !== user?.id);
   const otherUserId = otherMember?.userId;
@@ -119,6 +130,59 @@ export default function ChatThreadPage() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [displayMessages.length]);
 
+  useEffect(() => {
+    if (!highlightMessageId) return;
+    const el = messageRefsMap.current[highlightMessageId];
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      const t = setTimeout(() => setHighlightMessageId(null), 2000);
+      return () => clearTimeout(t);
+    }
+  }, [highlightMessageId]);
+
+  const setMessageRef = useCallback((id: string, el: HTMLDivElement | null) => {
+    messageRefsMap.current[id] = el;
+  }, []);
+
+  const handleEditMessage = useCallback(
+    async (message: MessageWithSender, newContent: string) => {
+      try {
+        const updated = await api.put<MessageWithSender>(`/api/messages/${message.id}`, { content: newContent });
+        updateMessageInChat(message.chatId, message.id, updated);
+      } catch {
+        // error could be shown via toast
+      }
+    },
+    [updateMessageInChat]
+  );
+
+  const removeMessageFromChat = useChatStore((s) => s.removeMessageFromChat);
+
+  const handleDeleteForMe = useCallback(
+    async (message: MessageWithSender) => {
+      try {
+        await api.delete(`/api/messages/${message.id}?scope=me`);
+        removeMessageFromChat(message.chatId, message.id);
+      } catch {
+        // error could be shown via toast
+      }
+    },
+    [removeMessageFromChat]
+  );
+
+  const handleDeleteForEveryone = useCallback(
+    async (message: MessageWithSender) => {
+      if (!confirm("Delete this message for everyone? This cannot be undone.")) return;
+      try {
+        await api.delete(`/api/messages/${message.id}?scope=everyone`);
+        removeMessageFromChat(message.chatId, message.id);
+      } catch {
+        // error could be shown via toast
+      }
+    },
+    [removeMessageFromChat]
+  );
+
   const canCall =
     chat?.type === "DIRECT" &&
     otherUserId &&
@@ -179,6 +243,35 @@ export default function ChatThreadPage() {
           </p>
         </div>
         <div className="flex items-center gap-1">
+          {searchOpen ? (
+            <div className="flex items-center gap-1 flex-1 max-w-[200px]">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search messages…"
+                className="flex-1 min-w-0 rounded-lg border border-slate-200 px-2.5 py-1.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-primary-400"
+                autoFocus
+              />
+              <button
+                type="button"
+                onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
+                className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-200/80"
+                aria-label="Close search"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-200/80 hover:text-slate-800 transition-all duration-200"
+              aria-label="Search messages"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+          )}
           <button
             type="button"
             disabled={!canCall}
@@ -208,6 +301,40 @@ export default function ChatThreadPage() {
         </div>
       </header>
 
+      {/* Search results dropdown */}
+      {searchOpen && searchQuery.trim().length >= 1 && (
+        <div className="shrink-0 border-b border-slate-200/70 bg-white max-h-48 overflow-y-auto">
+          {searchFetching ? (
+            <p className="px-4 py-3 text-sm text-slate-500">Searching…</p>
+          ) : searchResults.length === 0 ? (
+            <p className="px-4 py-3 text-sm text-slate-500">No results</p>
+          ) : (
+            <ul className="py-1">
+              {searchResults.map((msg) => (
+                <li key={msg.id}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setHighlightMessageId(msg.id);
+                      setSearchOpen(false);
+                      setSearchQuery("");
+                    }}
+                    className="w-full text-left px-4 py-2 hover:bg-slate-100 flex flex-col gap-0.5"
+                  >
+                    <span className="text-xs text-slate-500">
+                      {msg.sender.username} · {new Date(msg.createdAt).toLocaleString()}
+                    </span>
+                    <span className="text-sm text-slate-800 truncate">
+                      {msg.type === "TEXT" ? (msg.content ?? "") : msg.type === "IMAGE" ? "📷 Photo" : "📎 File"}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+
       {/* Messages area */}
       <div className="flex-1 overflow-y-auto px-4 py-5 flex flex-col gap-0 min-h-0 bg-[linear-gradient(180deg,_#f8fafc_0%,_#f1f5f9_30%,_#eef2f7_100%)]">
         {messagesLoading && displayMessages.length === 0 && (
@@ -234,20 +361,44 @@ export default function ChatThreadPage() {
           </div>
         )}
         {displayMessages.map((msg) => (
-          <MessageBubble
+          <div
             key={msg.id}
-            message={msg}
-            isOwn={msg.senderId === user.id}
-            showSender={chat?.type === "GROUP"}
-            status={getMessageStatus(msg)}
-            showAvatar
-            avatarUrl={getAvatarForMessage(msg)}
-          />
+            ref={(el) => setMessageRef(msg.id, el)}
+            className={highlightMessageId === msg.id ? "ring-2 ring-primary-400 ring-inset rounded-2xl animate-pulse" : ""}
+          >
+            <MessageBubble
+              message={msg}
+              isOwn={msg.senderId === user.id}
+              showSender={chat?.type === "GROUP"}
+              status={getMessageStatus(msg)}
+              showAvatar
+              avatarUrl={getAvatarForMessage(msg)}
+              onReply={(m) => setReplyingTo(m)}
+              onEdit={handleEditMessage}
+              onForward={(m) => setForwardMessage(m)}
+              onDeleteForMe={handleDeleteForMe}
+              onDeleteForEveryone={handleDeleteForEveryone}
+            />
+          </div>
         ))}
         <div ref={bottomRef} />
       </div>
 
-      <MessageInput chatId={chatId} disabled={!isConnected} />
+      <MessageInput
+        chatId={chatId}
+        disabled={!isConnected}
+        replyingTo={replyingTo}
+        onCancelReply={() => setReplyingTo(null)}
+      />
+
+      {forwardMessage && user && (
+        <ForwardModal
+          message={forwardMessage}
+          currentChatId={chatId}
+          currentUserId={user.id}
+          onClose={() => setForwardMessage(null)}
+        />
+      )}
     </div>
   );
 }
