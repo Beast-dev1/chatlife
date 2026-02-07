@@ -26,7 +26,7 @@ interface ChatState {
   sendMessageOptimistic: (
     chatId: string,
     tempId: string,
-    payload: { type: string; content?: string | null; fileUrl?: string | null },
+    payload: { type: string; content?: string | null; fileUrl?: string | null; replyToId?: string | null; replyTo?: MessageWithSender["replyTo"] },
     sender: { id: string; username: string; avatarUrl: string | null }
   ) => MessageWithSender;
   reset: () => void;
@@ -167,6 +167,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
       type: (payload.type as MessageWithSender["type"]) || "TEXT",
       content: payload.content ?? null,
       fileUrl: payload.fileUrl ?? null,
+      replyToId: payload.replyToId ?? null,
+      replyTo: payload.replyTo ?? null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       sender,

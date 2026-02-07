@@ -70,7 +70,15 @@ export default function MessageInput({
         avatarUrl: user.avatarUrl ?? null,
       };
       const tempId = `temp-${Date.now()}`;
-      sendMessageOptimistic(chatId, tempId, payload, sender);
+      const replyTo = replyingTo
+        ? {
+            id: replyingTo.id,
+            content: replyingTo.content,
+            senderId: replyingTo.senderId,
+            sender: replyingTo.sender,
+          }
+        : undefined;
+      sendMessageOptimistic(chatId, tempId, { ...payload, replyToId: payload.replyToId ?? undefined, replyTo }, sender);
       socket.emit("send_message", { chatId, ...payload });
     },
     [chatId, user, socket, sendMessageOptimistic]
