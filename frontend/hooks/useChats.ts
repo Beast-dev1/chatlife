@@ -32,6 +32,53 @@ export function useChat(chatId: string | null) {
   });
 }
 
+export function useUpdateChat(chatId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: { name?: string | null; avatarUrl?: string | null }) =>
+      api.put<ChatWithDetails>(`/api/chats/${chatId}`, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: CHATS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ["chat", chatId] });
+    },
+  });
+}
+
+export function useAddMember(chatId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: { userId: string; role?: "admin" | "member" }) =>
+      api.post<ChatWithDetails["members"][0]>(`/api/chats/${chatId}/members`, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: CHATS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ["chat", chatId] });
+    },
+  });
+}
+
+export function useRemoveMember(chatId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (userId: string) =>
+      api.delete(`/api/chats/${chatId}/members/${userId}`),
+    onSuccess: (_, userId) => {
+      queryClient.invalidateQueries({ queryKey: CHATS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ["chat", chatId] });
+    },
+  });
+}
+
+export function useDeleteChat(chatId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => api.delete(`/api/chats/${chatId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: CHATS_QUERY_KEY });
+      queryClient.removeQueries({ queryKey: ["chat", chatId] });
+    },
+  });
+}
+
 export function chatsQueryKey() {
   return CHATS_QUERY_KEY;
 }

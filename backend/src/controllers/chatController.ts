@@ -116,6 +116,12 @@ export async function updateChat(req: AuthRequest, res: Response) {
   const chatId = req.params.id;
   await requireChatMember(chatId, req.user.id);
 
+  const existing = await prisma.chat.findUnique({ where: { id: chatId }, select: { type: true } });
+  if (!existing) throw new AppError("Chat not found", 404);
+  if (existing.type === "GROUP") {
+    await requireChatAdmin(chatId, req.user.id);
+  }
+
   const parsed = updateChatSchema.safeParse(req.body);
   if (!parsed.success) throw parsed.error;
 
