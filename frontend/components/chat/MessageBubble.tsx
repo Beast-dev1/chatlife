@@ -16,6 +16,10 @@ export default function MessageBubble({
   showAvatar = true,
   avatarUrl,
   onReply,
+  onEdit,
+  onForward,
+  onDeleteForMe,
+  onDeleteForEveryone,
 }: {
   message: MessageWithSender;
   isOwn: boolean;

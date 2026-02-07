@@ -147,14 +147,12 @@ export function attachSocketHandlers(io: Server) {
 
       const created = await prisma.message.create({
         data: {
-          chatId,
-          senderId: userId,
+          chat: { connect: { id: chatId } },
+          sender: { connect: { id: userId } },
           type: parsed.data.type as "TEXT" | "IMAGE" | "FILE" | "AUDIO" | "VIDEO",
           content: parsed.data.content ?? null,
           fileUrl: parsed.data.fileUrl ?? null,
-          ...(parsed.data.replyToId
-            ? { replyTo: { connect: { id: parsed.data.replyToId } } }
-            : {}),
+          ...(parsed.data.replyToId && { replyTo: { connect: { id: parsed.data.replyToId } } }),
         },
       });
       const message = await prisma.message.findUniqueOrThrow({

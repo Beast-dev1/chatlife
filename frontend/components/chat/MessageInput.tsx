@@ -81,7 +81,7 @@ export default function MessageInput({
       sendMessageOptimistic(chatId, tempId, { ...payload, replyToId: payload.replyToId ?? undefined, replyTo }, sender);
       socket.emit("send_message", { chatId, ...payload });
     },
-    [chatId, user, socket, sendMessageOptimistic]
+    [chatId, user, socket, sendMessageOptimistic, replyingTo]
   );
 
   const sendMessage = useCallback(() => {

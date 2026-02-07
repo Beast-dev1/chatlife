@@ -167,7 +167,7 @@ export async function createMessage(req: AuthRequest, res: Response) {
       type: data.type,
       content: data.content ?? null,
       fileUrl: data.fileUrl ?? null,
-      ...(data.replyToId ? { replyTo: { connect: { id: data.replyToId } } } : {}),
+      replyToId: data.replyToId ?? undefined,
     },
     include: {
       sender: {
