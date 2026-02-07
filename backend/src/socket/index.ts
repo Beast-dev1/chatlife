@@ -145,19 +145,22 @@ export function attachSocketHandlers(io: Server) {
         }
       }
 
-      const message = await prisma.message.create({
+      const created = await prisma.message.create({
         data: {
           chatId,
           senderId: userId,
           type: parsed.data.type as "TEXT" | "IMAGE" | "FILE" | "AUDIO" | "VIDEO",
           content: parsed.data.content ?? null,
           fileUrl: parsed.data.fileUrl ?? null,
-          replyToId: parsed.data.replyToId ?? undefined,
+          ...(parsed.data.replyToId
+            ? { replyTo: { connect: { id: parsed.data.replyToId } } }
+            : {}),
         },
+      });
+      const message = await prisma.message.findUniqueOrThrow({
+        where: { id: created.id },
         include: {
-          sender: {
-            select: { id: true, username: true, avatarUrl: true },
-          },
+          sender: { select: { id: true, username: true, avatarUrl: true } },
           reads: true,
           replyTo: {
             select: {
@@ -167,7 +170,7 @@ export function attachSocketHandlers(io: Server) {
               sender: { select: { id: true, username: true } },
             },
           },
-        },
+        } as Parameters<typeof prisma.message.findUniqueOrThrow>[0]["include"],
       });
 
       await prisma.chat.update({
