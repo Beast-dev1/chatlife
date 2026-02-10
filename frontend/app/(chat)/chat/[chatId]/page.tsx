@@ -29,9 +29,13 @@ function formatLastSeen(iso: string): string {
   const d = new Date(iso);
   const now = new Date();
   const diffMs = now.getTime() - d.getTime();
+  const mins = Math.floor(diffMs / 60000);
+  const hours = Math.floor(diffMs / 3600000);
   if (diffMs < 60000) return "Last seen just now";
-  if (diffMs < 3600000) return `Last seen ${Math.floor(diffMs / 60000)}m ago`;
-  if (diffMs < 86400000) return `Last seen ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+  if (mins === 1) return "Last seen 1 min ago";
+  if (diffMs < 3600000) return `Last seen ${mins} min ago`;
+  if (hours === 1) return "Last seen 1 hr ago";
+  if (diffMs < 86400000) return `Last seen ${hours} hr ago`;
   if (diffMs < 172800000) return "Last seen yesterday";
   return `Last seen ${d.toLocaleDateString()}`;
 }
@@ -224,6 +228,22 @@ export default function ChatThreadPage() {
         </div>
         <div className="flex-1 min-w-0">
           <h1 className="font-semibold text-slate-800 truncate text-lg tracking-tight">{title}</h1>
+          <p className="text-xs text-slate-500 min-h-[1.25rem] mt-0.5">
+            {typingLabel ? (
+              <span className="text-primary-500 font-medium italic">{typingLabel}</span>
+            ) : chat?.type === "DIRECT" && otherUserId && isConnected ? (
+              isOtherOnline ? (
+                <span className="inline-flex items-center gap-1.5 text-emerald-600 font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Online
+                </span>
+              ) : otherLastSeen ? (
+                formatLastSeen(otherLastSeen)
+              ) : null
+            ) : chat?.type === "GROUP" && isConnected ? (
+              `${chat.members.length} members`
+            ) : null}
+          </p>
         </div>
         <div className="flex items-center gap-1">
           {searchOpen ? (
