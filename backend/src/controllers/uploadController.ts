@@ -49,7 +49,12 @@ export async function uploadFile(req: AuthRequest, res: Response) {
     throw new AppError(`File too large. Max ${maxMB}MB for ${isImage ? "images" : "files"}.`, 400);
   }
 
-  const baseUrl = process.env.API_URL || `http://localhost:${process.env.PORT || 4000}`;
-  const url = `${baseUrl}/uploads/${file.filename}`;
+  // Return a path relative to the frontend origin so images load via the same origin
+  // (frontend proxies /uploads/* to this backend). This avoids broken images when
+  // the receiver is on another device and cannot reach API_URL (e.g. localhost:4000).
+  // If you serve uploads from a CDN or public API URL instead, set API_URL and
+  // use that to build a full URL here.
+  const baseUrl = process.env.API_URL?.replace(/\/$/, "");
+  const url = baseUrl ? `${baseUrl}/uploads/${file.filename}` : `/uploads/${file.filename}`;
   res.json({ url });
 }

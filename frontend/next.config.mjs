@@ -8,6 +8,12 @@ try {
 }
 
 const nextConfig = {
+  async rewrites() {
+    return [
+      // Proxy /uploads/* to the backend so image URLs work for all clients (same-origin requests)
+      { source: "/uploads/:path*", destination: `${apiUrl}/uploads/:path*` },
+    ];
+  },
   images: {
     remotePatterns: [
       {

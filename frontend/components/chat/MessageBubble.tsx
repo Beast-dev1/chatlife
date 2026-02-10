@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { MoreHorizontal, Reply, Pencil, Check, X, Forward, Trash2 } from "lucide-react";
+import { uploadDisplayUrl } from "@/lib/utils";
 import type { MessageWithSender } from "@/types/chat";
 
 export type MessageStatus = "sent" | "delivered" | "read";
@@ -224,7 +225,7 @@ export default function MessageBubble({
               aria-label="Open image"
             >
               <Image
-                src={message.fileUrl!}
+                src={uploadDisplayUrl(message.fileUrl)!}
                 alt=""
                 width={400}
                 height={256}
@@ -241,7 +242,7 @@ export default function MessageBubble({
               aria-label="Open video"
             >
               <video
-                src={message.fileUrl!}
+                src={uploadDisplayUrl(message.fileUrl)!}
                 muted
                 playsInline
                 className="max-w-full max-h-64 w-full object-contain rounded-lg bg-slate-900"
@@ -251,7 +252,7 @@ export default function MessageBubble({
           )}
           {isFile && (
             <a
-              href={message.fileUrl!}
+              href={uploadDisplayUrl(message.fileUrl)!}
               target="_blank"
               rel="noopener noreferrer"
               className={`text-sm underline break-all ${isOwn ? "text-white" : "text-slate-700"}`}

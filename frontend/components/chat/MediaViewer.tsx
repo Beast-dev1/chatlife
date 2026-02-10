@@ -10,6 +10,7 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import { uploadDisplayUrl } from "@/lib/utils";
 import type { MessageWithSender } from "@/types/chat";
 import { Download, X } from "lucide-react";
 
@@ -48,7 +49,7 @@ export default function MediaViewer({
   const handleDownload = useCallback(() => {
     if (!currentMessage?.fileUrl) return;
     const link = document.createElement("a");
-    link.href = currentMessage.fileUrl;
+    link.href = uploadDisplayUrl(currentMessage.fileUrl);
     link.download =
       currentMessage.content ||
       (currentMessage.type === "IMAGE"
@@ -111,7 +112,7 @@ export default function MediaViewer({
                 {msg.type === "IMAGE" && msg.fileUrl ? (
                   <div className="relative w-full h-full min-h-[200px]">
                     <Image
-                      src={msg.fileUrl}
+                      src={uploadDisplayUrl(msg.fileUrl)}
                       alt=""
                       fill
                       className="object-contain rounded-lg"
@@ -120,7 +121,7 @@ export default function MediaViewer({
                   </div>
                 ) : msg.type === "VIDEO" && msg.fileUrl ? (
                   <video
-                    src={msg.fileUrl}
+                    src={uploadDisplayUrl(msg.fileUrl)}
                     controls
                     className="max-w-full max-h-full rounded-lg"
                     playsInline
