@@ -224,32 +224,6 @@ export default function ChatThreadPage() {
         </div>
         <div className="flex-1 min-w-0">
           <h1 className="font-semibold text-slate-800 truncate text-lg tracking-tight">{title}</h1>
-          <p className="text-xs text-slate-500 min-h-[1.25rem] mt-0.5">
-            {typingLabel ? (
-              <span className="text-primary-500 font-medium italic">{typingLabel}</span>
-            ) : chat?.type === "DIRECT" && otherUserId ? (
-              isConnected ? (
-                isOtherOnline ? (
-                  <span className="inline-flex items-center gap-1.5 text-emerald-600 font-medium">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    Active now
-                  </span>
-                ) : otherLastSeen ? (
-                  formatLastSeen(otherLastSeen)
-                ) : (
-                  "Connecting…"
-                )
-              ) : (
-                "Connecting…"
-              )
-            ) : chat?.type === "GROUP" ? (
-              isConnected
-                ? `${chat.members.length} members`
-                : "Connecting…"
-            ) : (
-              isConnected ? "Active now" : "Connecting…"
-            )}
-          </p>
         </div>
         <div className="flex items-center gap-1">
           {searchOpen ? (
