@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useSocket } from "@/hooks/useSocket";
 import { useCallStore } from "@/store/callStore";
 import IncomingCallModal from "./IncomingCallModal";
@@ -8,6 +9,7 @@ import ActiveCallBar from "./ActiveCallBar";
 
 export default function CallProvider() {
   const { socket } = useSocket();
+  const queryClient = useQueryClient();
   const incomingCall = useCallStore((s) => s.incomingCall);
   const activeCall = useCallStore((s) => s.activeCall);
   const setIncomingCall = useCallStore((s) => s.setIncomingCall);
@@ -57,13 +59,19 @@ export default function CallProvider() {
       // Nothing to do if we already have activeCall.
     };
 
-    const onCallRejected = () => {
+    const onCallRejected = (payload: { callId?: string; chatId?: string }) => {
       clearActiveCall();
       clearIncomingCall();
+      if (payload?.chatId) {
+        queryClient.invalidateQueries({ queryKey: ["calls", payload.chatId] });
+      }
     };
 
-    const onCallEnded = () => {
+    const onCallEnded = (payload: { callId?: string; chatId?: string }) => {
       clearAll();
+      if (payload?.chatId) {
+        queryClient.invalidateQueries({ queryKey: ["calls", payload.chatId] });
+      }
     };
 
     socket.on("incoming_call", onIncomingCall);
@@ -81,6 +89,7 @@ export default function CallProvider() {
     };
   }, [
     socket,
+    queryClient,
     setIncomingCall,
     setActiveCall,
     clearActiveCall,

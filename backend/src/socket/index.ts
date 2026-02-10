@@ -344,7 +344,7 @@ export function attachSocketHandlers(io: Server) {
       }
       const call = await prisma.callLog.findUnique({
         where: { id: callId },
-        select: { callerId: true, calleeId: true, status: true },
+        select: { callerId: true, calleeId: true, status: true, chatId: true },
       });
       if (!call || call.calleeId !== userId) {
         socket.emit("error", { message: "Call not found or you are not the callee" });
@@ -356,7 +356,7 @@ export function attachSocketHandlers(io: Server) {
         where: { id: callId },
         data: { status: "REJECTED", endedAt: now },
       });
-      io.to(userRoom(call.callerId)).emit("call_rejected", { callId });
+      io.to(userRoom(call.callerId)).emit("call_rejected", { callId, chatId: call.chatId });
     });
 
     socket.on("call_end", async (payload: unknown) => {
@@ -368,7 +368,7 @@ export function attachSocketHandlers(io: Server) {
       }
       const call = await prisma.callLog.findUnique({
         where: { id: callId },
-        select: { callerId: true, calleeId: true, status: true, startedAt: true },
+        select: { callerId: true, calleeId: true, status: true, startedAt: true, chatId: true },
       });
       if (!call) {
         socket.emit("error", { message: "Call not found" });
@@ -397,7 +397,7 @@ export function attachSocketHandlers(io: Server) {
         return;
       }
       if (otherUserId) {
-        io.to(userRoom(otherUserId)).emit("call_ended", { callId });
+        io.to(userRoom(otherUserId)).emit("call_ended", { callId, chatId: call.chatId });
       }
     });
 

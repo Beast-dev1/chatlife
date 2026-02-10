@@ -1,9 +1,11 @@
 "use client";
 
+import CallEntryBubble from "@/components/chat/CallEntryBubble";
 import ForwardModal from "@/components/chat/ForwardModal";
 import MediaViewer from "@/components/chat/MediaViewer";
 import MessageBubble from "@/components/chat/MessageBubble";
 import MessageInput from "@/components/chat/MessageInput";
+import { useCalls } from "@/hooks/useCalls";
 import { useChat } from "@/hooks/useChats";
 import { useMessages, useMessageSearch } from "@/hooks/useMessages";
 import { useSocket } from "@/hooks/useSocket";
@@ -12,11 +14,16 @@ import { useAuthStore } from "@/store/authStore";
 import { useCallStore } from "@/store/callStore";
 import { useChatStore } from "@/store/chatStore";
 import { usePresenceStore } from "@/store/presenceStore";
+import type { CallLogItem } from "@/types/call";
 import type { ChatWithDetails, MessageWithSender } from "@/types/chat";
 import { Info, MessageCircle, Phone, Search, Video, X } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+type ChatTimelineEntry =
+  | { type: "message"; id: string; timestamp: string; data: MessageWithSender }
+  | { type: "call"; id: string; timestamp: string; data: CallLogItem };
 
 function getChatTitle(chat: ChatWithDetails | undefined, currentUserId: string): string {
   if (!chat) return "Chat";
@@ -47,6 +54,7 @@ export default function ChatThreadPage() {
   const { socket, isConnected } = useSocket();
   const { data: chat } = useChat(chatId);
   const { data: messagesData, isLoading: messagesLoading } = useMessages(chatId);
+  const { data: callsData } = useCalls(chatId);
   const setActiveChatId = useChatStore((s) => s.setActiveChatId);
   const setMessages = useChatStore((s) => s.setMessages);
   const updateMessageInChat = useChatStore((s) => s.updateMessageInChat);
@@ -87,6 +95,27 @@ export default function ChatThreadPage() {
           : "Several people are typing…";
 
   const displayMessages: MessageWithSender[] = messagesByChat[chatId] ?? [];
+  const callsForChat: CallLogItem[] = useMemo(() => {
+    const list = callsData?.pages?.flatMap((p) => p.calls) ?? [];
+    return [...list].reverse();
+  }, [callsData?.pages]);
+  const displayEntries: ChatTimelineEntry[] = useMemo(() => {
+    const messageEntries: ChatTimelineEntry[] = displayMessages.map((m) => ({
+      type: "message" as const,
+      id: m.id,
+      timestamp: m.createdAt,
+      data: m,
+    }));
+    const callEntries: ChatTimelineEntry[] = callsForChat.map((c) => ({
+      type: "call" as const,
+      id: `call-${c.id}`,
+      timestamp: c.startedAt,
+      data: c,
+    }));
+    return [...messageEntries, ...callEntries].sort(
+      (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+    );
+  }, [displayMessages, callsForChat]);
   const mediaMessages = displayMessages.filter(
     (m) => (m.type === "IMAGE" || m.type === "VIDEO") && m.fileUrl
   );
@@ -141,7 +170,7 @@ export default function ChatThreadPage() {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [displayMessages.length]);
+  }, [displayEntries.length]);
 
   useEffect(() => {
     if (!highlightMessageId) return;
@@ -362,7 +391,7 @@ export default function ChatThreadPage() {
             <p className="text-sm text-slate-500">Loading messages…</p>
           </div>
         )}
-        {!messagesLoading && displayMessages.length === 0 && (
+        {!messagesLoading && displayEntries.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
             <div className="w-14 h-14 rounded-2xl bg-slate-200/70 flex items-center justify-center">
               <MessageCircle className="w-7 h-7 text-slate-400" />
@@ -371,30 +400,42 @@ export default function ChatThreadPage() {
             <p className="text-sm text-slate-500 max-w-[220px]">Send a message to start the conversation.</p>
           </div>
         )}
-        {displayMessages.map((msg) => {
-          const isOwn = user ? (String(msg.senderId) === String(user.id) || msg.sender?.id === user.id) : false;
-          return (
-            <div
-              key={msg.id}
-              ref={(el) => setMessageRef(msg.id, el)}
-              className={`w-full flex ${isOwn ? "justify-end" : "justify-start"} ${highlightMessageId === msg.id ? "ring-2 ring-primary-400 ring-inset rounded-2xl animate-pulse" : ""}`}
-            >
-              <div className="w-fit max-w-[85%]">
-                <MessageBubble
-                  message={msg}
-                  isOwn={isOwn}
-                  showSender={chat?.type === "GROUP"}
-                  status={getMessageStatus(msg)}
-                  showAvatar
-                  avatarUrl={getAvatarForMessage(msg)}
-                  onReply={(m) => setReplyingTo(m)}
-                  onEdit={handleEditMessage}
-                  onForward={(m) => setForwardMessage(m)}
-                  onDeleteForMe={handleDeleteForMe}
-                  onDeleteForEveryone={handleDeleteForEveryone}
-                  onOpenMedia={handleOpenMedia}
-                />
+        {displayEntries.map((entry) => {
+          if (entry.type === "message") {
+            const msg = entry.data;
+            const isOwn = user ? (String(msg.senderId) === String(user.id) || msg.sender?.id === user.id) : false;
+            return (
+              <div
+                key={entry.id}
+                ref={(el) => setMessageRef(msg.id, el)}
+                className={`w-full flex ${isOwn ? "justify-end" : "justify-start"} ${highlightMessageId === msg.id ? "ring-2 ring-primary-400 ring-inset rounded-2xl animate-pulse" : ""}`}
+              >
+                <div className="w-fit max-w-[85%]">
+                  <MessageBubble
+                    message={msg}
+                    isOwn={isOwn}
+                    showSender={chat?.type === "GROUP"}
+                    status={getMessageStatus(msg)}
+                    showAvatar
+                    avatarUrl={getAvatarForMessage(msg)}
+                    onReply={(m) => setReplyingTo(m)}
+                    onEdit={handleEditMessage}
+                    onForward={(m) => setForwardMessage(m)}
+                    onDeleteForMe={handleDeleteForMe}
+                    onDeleteForEveryone={handleDeleteForEveryone}
+                    onOpenMedia={handleOpenMedia}
+                  />
+                </div>
               </div>
+            );
+          }
+          return (
+            <div key={entry.id} className="w-full">
+              <CallEntryBubble
+                call={entry.data}
+                currentUserId={user!.id}
+                onCallAgain={handleStartCall}
+              />
             </div>
           );
         })}
