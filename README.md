@@ -409,6 +409,7 @@ Enforce roles (admin/member) in backend where already defined.
 
 
 
+
 Reactions: Add field or relation for reactions (e.g. emoji + user); API to add/remove; Socket.io event for real-time update; display on message bubble.
 
 

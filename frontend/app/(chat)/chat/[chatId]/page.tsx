@@ -1,22 +1,21 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
-import Image from "next/image";
-import { useParams } from "next/navigation";
-import { Video, Phone, Info, MessageCircle, Search, X } from "lucide-react";
-import { useAuthStore } from "@/store/authStore";
-import { useSocket } from "@/hooks/useSocket";
-import { useChat } from "@/hooks/useChats";
-import { useMessages, useMessageSearch } from "@/hooks/useMessages";
-import { useChatStore } from "@/store/chatStore";
-import { useCallStore } from "@/store/callStore";
-import { usePresenceStore } from "@/store/presenceStore";
-import { api } from "@/lib/api";
+import ForwardModal from "@/components/chat/ForwardModal";
 import MessageBubble from "@/components/chat/MessageBubble";
 import MessageInput from "@/components/chat/MessageInput";
-import ForwardModal from "@/components/chat/ForwardModal";
-import type { ChatWithDetails } from "@/types/chat";
-import type { MessageWithSender } from "@/types/chat";
+import { useChat } from "@/hooks/useChats";
+import { useMessages, useMessageSearch } from "@/hooks/useMessages";
+import { useSocket } from "@/hooks/useSocket";
+import { api } from "@/lib/api";
+import { useAuthStore } from "@/store/authStore";
+import { useCallStore } from "@/store/callStore";
+import { useChatStore } from "@/store/chatStore";
+import { usePresenceStore } from "@/store/presenceStore";
+import type { ChatWithDetails, MessageWithSender } from "@/types/chat";
+import { Info, MessageCircle, Phone, Search, Video, X } from "lucide-react";
+import Image from "next/image";
+import { useParams } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 function getChatTitle(chat: ChatWithDetails | undefined, currentUserId: string): string {
   if (!chat) return "Chat";
@@ -360,27 +359,32 @@ export default function ChatThreadPage() {
             <p className="text-sm text-slate-500 max-w-[220px]">Send a message to start the conversation.</p>
           </div>
         )}
-        {displayMessages.map((msg) => (
-          <div
-            key={msg.id}
-            ref={(el) => setMessageRef(msg.id, el)}
-            className={highlightMessageId === msg.id ? "ring-2 ring-primary-400 ring-inset rounded-2xl animate-pulse" : ""}
-          >
-            <MessageBubble
-              message={msg}
-              isOwn={msg.senderId === user.id}
-              showSender={chat?.type === "GROUP"}
-              status={getMessageStatus(msg)}
-              showAvatar
-              avatarUrl={getAvatarForMessage(msg)}
-              onReply={(m) => setReplyingTo(m)}
-              onEdit={handleEditMessage}
-              onForward={(m) => setForwardMessage(m)}
-              onDeleteForMe={handleDeleteForMe}
-              onDeleteForEveryone={handleDeleteForEveryone}
-            />
-          </div>
-        ))}
+        {displayMessages.map((msg) => {
+          const isOwn = user ? (String(msg.senderId) === String(user.id) || msg.sender?.id === user.id) : false;
+          return (
+            <div
+              key={msg.id}
+              ref={(el) => setMessageRef(msg.id, el)}
+              className={`w-full flex ${isOwn ? "justify-end" : "justify-start"} ${highlightMessageId === msg.id ? "ring-2 ring-primary-400 ring-inset rounded-2xl animate-pulse" : ""}`}
+            >
+              <div className="w-fit max-w-[85%]">
+                <MessageBubble
+                message={msg}
+                isOwn={isOwn}
+                showSender={chat?.type === "GROUP"}
+                status={getMessageStatus(msg)}
+                showAvatar
+                avatarUrl={getAvatarForMessage(msg)}
+                onReply={(m) => setReplyingTo(m)}
+                onEdit={handleEditMessage}
+                onForward={(m) => setForwardMessage(m)}
+                onDeleteForMe={handleDeleteForMe}
+                onDeleteForEveryone={handleDeleteForEveryone}
+                />
+              </div>
+            </div>
+          );
+        })}
         <div ref={bottomRef} />
       </div>
 

@@ -59,7 +59,7 @@ export default function MessageBubble({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
-      className={`flex gap-2.5 mb-3 group/bubble ${isOwn ? "justify-end flex-row-reverse" : "justify-start"}`}
+      className={`w-full flex gap-2.5 mb-3 group/bubble ${isOwn ? "justify-end flex-row-reverse" : "justify-start"}`}
     >
       {showAvatar && (
         <div className="w-9 h-9 rounded-full bg-slate-200/90 flex-shrink-0 overflow-hidden flex items-center justify-center ring-2 ring-white/80 shadow-inner">
