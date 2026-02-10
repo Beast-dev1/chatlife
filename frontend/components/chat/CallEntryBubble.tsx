@@ -39,35 +39,39 @@ export default function CallEntryBubble({
 
   return (
     <div className={`w-full flex ${isOwn ? "justify-end" : "justify-start"}`}>
-      <div className="w-fit max-w-[85%]">
+      <div className="min-w-[220px] max-w-[85%] w-fit">
         <div
-          className={`rounded-2xl px-4 py-3 border shadow-soft transition-shadow duration-200 ${
+          className={`rounded-2xl px-4 py-2 border shadow-soft transition-shadow duration-200 ${
             isOwn ? "rounded-br-md" : "rounded-bl-md"
           } bg-white text-slate-800 border-slate-200/70`}
         >
-          <div className="flex flex-col items-center gap-1.5">
+          <div className="flex flex-row items-center gap-3">
             <div
-              className={`flex items-center justify-center w-10 h-10 rounded-full shrink-0 ${
+              className={`flex items-center justify-center w-9 h-9 rounded-full shrink-0 ${
                 isMissed ? "bg-red-500/20" : "bg-slate-200/80"
               }`}
             >
               <Icon
-                className={`w-5 h-5 ${
+                className={`w-4 h-4 ${
                   isMissed ? "text-red-500" : "text-slate-600"
                 }`}
               />
             </div>
-            <span className="text-sm font-medium text-slate-800">{label}</span>
-            {!isMissed && call.duration != null && (
-              <span className="text-xs text-slate-500">
-                {formatDuration(call.duration)}
-              </span>
-            )}
-            <span className="text-xs text-slate-500">{timeStr}</span>
+            <div className="flex flex-col min-w-0 flex-1 gap-0.5 py-0.5">
+              <span className="text-sm font-medium text-slate-800 leading-tight">{label}</span>
+              <div className="flex items-center gap-2 flex-wrap">
+                {!isMissed && call.duration != null && (
+                  <span className="text-xs text-slate-500">
+                    {formatDuration(call.duration)}
+                  </span>
+                )}
+                <span className="text-xs text-slate-500">{timeStr}</span>
+              </div>
+            </div>
             <button
               type="button"
               onClick={() => onCallAgain(type)}
-              className="mt-1 text-sm font-medium text-primary-600 hover:text-primary-500 hover:underline"
+              className="shrink-0 text-sm font-medium text-primary-600 hover:text-primary-500 hover:underline py-1"
             >
               {buttonLabel}
             </button>
