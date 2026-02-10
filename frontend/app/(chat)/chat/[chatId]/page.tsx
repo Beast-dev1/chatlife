@@ -239,7 +239,9 @@ export default function ChatThreadPage() {
                 </span>
               ) : otherLastSeen ? (
                 formatLastSeen(otherLastSeen)
-              ) : null
+              ) : (
+                <span className="text-slate-500 font-medium">Offline</span>
+              )
             ) : chat?.type === "GROUP" && isConnected ? (
               `${chat.members.length} members`
             ) : null}

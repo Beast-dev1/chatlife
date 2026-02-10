@@ -13,7 +13,7 @@ import type { MessageWithSender } from "@/types/chat";
 import { showNewMessageToast } from "./chat/NewMessageToast";
 
 export default function SocketSync() {
-  const { socket, isConnected } = useSocket();
+  const { socket } = useSocket();
   const queryClient = useQueryClient();
   const userId = useAuthStore((s) => s.user?.id);
   const appendMessage = useChatStore((s) => s.appendMessage);
@@ -32,7 +32,7 @@ export default function SocketSync() {
   const activeChatId = useChatStore((s) => s.activeChatId);
 
   useEffect(() => {
-    if (!socket || !isConnected || !userId) return;
+    if (!socket || !userId) return;
 
     const onUserOnline = (payload: { userId: string }) => {
       if (payload.userId && payload.userId !== userId) setUserOnline(payload.userId);
@@ -42,6 +42,13 @@ export default function SocketSync() {
       if (payload.userId && payload.userId !== userId) {
         setUserOffline(payload.userId, payload.lastSeen ?? new Date().toISOString());
       }
+    };
+
+    const onPresenceInitial = (payload: { onlineUserIds?: string[] }) => {
+      const ids = payload?.onlineUserIds ?? [];
+      ids.forEach((id) => {
+        if (id && id !== userId) setUserOnline(id);
+      });
     };
 
     const onUserTyping = (payload: { chatId: string; userId: string }) => {
@@ -129,6 +136,7 @@ export default function SocketSync() {
 
     socket.on("user_online", onUserOnline);
     socket.on("user_offline", onUserOffline);
+    socket.on("presence_initial", onPresenceInitial);
     socket.on("user_typing", onUserTyping);
     socket.on("user_stopped_typing", onUserStoppedTyping);
     socket.on("new_message", onNewMessage);
@@ -140,6 +148,7 @@ export default function SocketSync() {
     return () => {
       socket.off("user_online", onUserOnline);
       socket.off("user_offline", onUserOffline);
+      socket.off("presence_initial", onPresenceInitial);
       socket.off("user_typing", onUserTyping);
       socket.off("user_stopped_typing", onUserStoppedTyping);
       socket.off("new_message", onNewMessage);
@@ -151,7 +160,6 @@ export default function SocketSync() {
     };
   }, [
     socket,
-    isConnected,
     userId,
     appendMessage,
     updateChatFromNewMessage,

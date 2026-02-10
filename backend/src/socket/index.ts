@@ -7,6 +7,9 @@ import { getRedisClients } from "../config/redis";
 import {
   userRoom,
   getRelevantUserIds,
+  getOnlineUserIdsRelevantTo,
+  addOnlineUser,
+  removeOnlineUser,
   PRESENCE_ONLINE_KEY,
 } from "../utils/presence";
 
@@ -45,14 +48,17 @@ export function attachSocketHandlers(io: Server) {
     const userRoomId = userRoom(userId);
     void socket.join(userRoomId);
 
-    // Set user online (Redis) and notify relevant users
+    // Set user online (Redis + in-memory) and notify relevant users
+    addOnlineUser(userId);
     void (async () => {
       try {
         const { pubClient } = await getRedisClients();
         await pubClient.sAdd(PRESENCE_ONLINE_KEY, userId);
       } catch {
-        // Redis not available, skip online set
+        // Redis not available, in-memory set already updated
       }
+
+      // Notify others that this user is online (best-effort; don't block presence_initial)
       try {
         const relevantIds = await getRelevantUserIds(userId);
         const payload = { userId };
@@ -60,11 +66,21 @@ export function attachSocketHandlers(io: Server) {
           io.to(userRoom(id)).emit("user_online", payload);
         }
       } catch (err) {
-        console.error("Presence getRelevantUserIds:", err);
+        console.error("Presence getRelevantUserIds (user_online):", err);
+      }
+
+      // Always send presence_initial to connecting client so they see who's online
+      try {
+        const onlineRelevant = await getOnlineUserIdsRelevantTo(userId);
+        socket.emit("presence_initial", { onlineUserIds: onlineRelevant });
+      } catch (err) {
+        console.error("Presence getOnlineUserIdsRelevantTo:", err);
+        socket.emit("presence_initial", { onlineUserIds: [] });
       }
     })();
 
     socket.on("disconnect", async () => {
+      removeOnlineUser(userId);
       try {
         const { pubClient } = await getRedisClients();
         await pubClient.sRem(PRESENCE_ONLINE_KEY, userId);
@@ -79,14 +95,10 @@ export function attachSocketHandlers(io: Server) {
       } catch (err) {
         console.error("Presence update lastSeen:", err);
       }
-      try {
-        const relevantIds = await getRelevantUserIds(userId);
-        const payload = { userId, lastSeen: lastSeen.toISOString() };
-        for (const id of relevantIds) {
-          io.to(userRoom(id)).emit("user_offline", payload);
-        }
-      } catch (err) {
-        console.error("Presence disconnect getRelevantUserIds:", err);
+      const relevantIds = await getRelevantUserIds(userId);
+      const payload = { userId, lastSeen: lastSeen.toISOString() };
+      for (const id of relevantIds) {
+        io.to(userRoom(id)).emit("user_offline", payload);
       }
     });
 

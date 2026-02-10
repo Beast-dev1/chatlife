@@ -49,6 +49,21 @@ function formatJoinedDate(iso: string): string {
   return `${day} ${date}${suffix} ${month} ${year}`;
 }
 
+function formatLastSeen(iso: string): string {
+  const d = new Date(iso);
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  const mins = Math.floor(diffMs / 60000);
+  const hours = Math.floor(diffMs / 3600000);
+  if (diffMs < 60000) return "Last seen just now";
+  if (mins === 1) return "Last seen 1 min ago";
+  if (diffMs < 3600000) return `Last seen ${mins} min ago`;
+  if (hours === 1) return "Last seen 1 hr ago";
+  if (diffMs < 86400000) return `Last seen ${hours} hr ago`;
+  if (diffMs < 172800000) return "Last seen yesterday";
+  return `Last seen ${d.toLocaleDateString()}`;
+}
+
 function DirectChatPanel({
   chatId,
   chat,
@@ -62,12 +77,14 @@ function DirectChatPanel({
   const activeCall = useCallStore((s) => s.activeCall);
   const incomingCall = useCallStore((s) => s.incomingCall);
   const isOnline = usePresenceStore((s) => s.isOnline);
+  const getLastSeen = usePresenceStore((s) => s.getLastSeen);
 
   const name = getDisplayName(chat, user.id);
   const avatarUrl = getAvatarUrl(chat, user.id);
   const otherMember = chat?.members?.find((m) => m.userId !== user.id);
   const otherUserId = otherMember?.userId;
   const activeNow = otherUserId ? isOnline(otherUserId) : false;
+  const lastSeenIso = otherUserId ? getLastSeen(otherUserId) : undefined;
   const joinedAt = otherMember?.joinedAt ?? "";
 
   const canCall =
@@ -120,7 +137,7 @@ function DirectChatPanel({
           <h2 className="text-lg font-bold text-slate-800 uppercase tracking-wide">{name}</h2>
           <p className={`flex items-center gap-1.5 mt-2 text-sm font-semibold ${activeNow ? "text-green-500" : "text-slate-500"}`}>
             <span className={`w-2 h-2 rounded-full ${activeNow ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" : "bg-slate-400"}`} />
-            {activeNow ? "Active Now" : "Offline"}
+            {activeNow ? "Active Now" : lastSeenIso ? formatLastSeen(lastSeenIso) : "Offline"}
           </p>
         </motion.div>
 
