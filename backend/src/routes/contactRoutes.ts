@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   listContacts,
+  listContactRequests,
   createContact,
   updateContact,
   deleteContact,
@@ -13,6 +14,7 @@ const router = Router();
 router.use(authMiddleware);
 
 router.get("/", asyncHandler(listContacts));
+router.get("/requests", asyncHandler(listContactRequests));
 router.post("/", asyncHandler(createContact));
 router.put("/:id", asyncHandler(updateContact));
 router.delete("/:id", asyncHandler(deleteContact));

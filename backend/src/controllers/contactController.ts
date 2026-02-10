@@ -12,22 +12,28 @@ import {
 
 const prisma = new PrismaClient();
 
+const contactUserSelect = {
+  id: true,
+  username: true,
+  email: true,
+  avatarUrl: true,
+  status: true,
+} as const;
+
 export async function listContacts(req: AuthRequest, res: Response) {
   if (!req.user) throw new AppError("Unauthorized", 401);
   const userId = req.user.id;
 
   const contacts = await prisma.contact.findMany({
-    where: { userId },
+    where: {
+      OR: [
+        { userId },
+        { contactUserId: userId, status: "ACCEPTED" },
+      ],
+    },
     include: {
-      contact: {
-        select: {
-          id: true,
-          username: true,
-          email: true,
-          avatarUrl: true,
-          status: true,
-        },
-      },
+      contact: { select: contactUserSelect },
+      user: { select: contactUserSelect },
     },
     orderBy: { updatedAt: "desc" },
   });
@@ -59,19 +65,26 @@ export async function createContact(req: AuthRequest, res: Response) {
   const contact = await prisma.contact.create({
     data: { userId, contactUserId, status: "PENDING" },
     include: {
-      contact: {
-        select: {
-          id: true,
-          username: true,
-          email: true,
-          avatarUrl: true,
-          status: true,
-        },
-      },
+      contact: { select: contactUserSelect },
     },
   });
 
   res.status(201).json(contact);
+}
+
+export async function listContactRequests(req: AuthRequest, res: Response) {
+  if (!req.user) throw new AppError("Unauthorized", 401);
+  const userId = req.user.id;
+
+  const requests = await prisma.contact.findMany({
+    where: { contactUserId: userId, status: "PENDING" },
+    include: {
+      user: { select: contactUserSelect },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  res.json(requests);
 }
 
 export async function updateContact(req: AuthRequest, res: Response) {
@@ -83,28 +96,34 @@ export async function updateContact(req: AuthRequest, res: Response) {
   const data: UpdateContactInput = parsed.data;
 
   const contact = await prisma.contact.findFirst({
-    where: { id: contactId, userId: req.user.id },
+    where: {
+      id: contactId,
+      OR: [
+        { userId: req.user.id },
+        { contactUserId: req.user.id },
+      ],
+    },
   });
   if (!contact) throw new AppError("Contact not found", 404);
+
+  if (contact.contactUserId === req.user.id) {
+    if (data.status !== "ACCEPTED" && data.status !== "BLOCKED") {
+      throw new AppError("Can only accept or decline an incoming request", 400);
+    }
+  }
 
   const updated = await prisma.contact.update({
     where: { id: contactId },
     data: { status: data.status },
     include: {
-      contact: {
-        select: {
-          id: true,
-          username: true,
-          email: true,
-          avatarUrl: true,
-          status: true,
-        },
-      },
+      contact: { select: contactUserSelect },
+      user: { select: contactUserSelect },
     },
   });
 
   res.json(updated);
 }
+
 
 export async function deleteContact(req: AuthRequest, res: Response) {
   if (!req.user) throw new AppError("Unauthorized", 401);

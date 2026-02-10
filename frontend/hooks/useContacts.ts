@@ -2,14 +2,27 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import type { ContactWithUser, SearchUser } from "@/types/chat";
+import type {
+  ContactWithUser,
+  IncomingRequestWithUser,
+  SearchUser,
+} from "@/types/chat";
 
 const CONTACTS_QUERY_KEY = ["contacts"];
+const CONTACT_REQUESTS_QUERY_KEY = ["contacts", "requests"];
 
 export function useContacts() {
   return useQuery({
     queryKey: CONTACTS_QUERY_KEY,
     queryFn: () => api.get<ContactWithUser[]>("/api/contacts"),
+  });
+}
+
+export function useContactRequests() {
+  return useQuery({
+    queryKey: CONTACT_REQUESTS_QUERY_KEY,
+    queryFn: () =>
+      api.get<IncomingRequestWithUser[]>("/api/contacts/requests"),
   });
 }
 
@@ -39,6 +52,7 @@ export function useUpdateContact() {
       api.put<ContactWithUser>(`/api/contacts/${id}`, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: CONTACTS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: CONTACT_REQUESTS_QUERY_KEY });
     },
   });
 }

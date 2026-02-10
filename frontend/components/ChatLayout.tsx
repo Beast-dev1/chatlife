@@ -6,6 +6,7 @@ import Link from "next/link";
 import { MessageCircle, LogOut, User, Users, Settings } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useChatStore } from "@/store/chatStore";
+import { useContactRequests } from "@/hooks/useContacts";
 import SocketSync from "./SocketSync";
 import CallProvider from "./chat/CallProvider";
 import ChatListSidebar from "./chat/ChatListSidebar";
@@ -22,6 +23,8 @@ export default function ChatLayout({
   const pathname = usePathname();
   const { user, isInitialized, init, logout } = useAuthStore();
   const rightSidebarOpen = useChatStore((s) => s.rightSidebarOpen);
+  const { data: contactRequests = [] } = useContactRequests();
+  const pendingRequestsCount = contactRequests.length;
 
   const isChatRoute = pathname.startsWith("/chat") || pathname === "/calls";
   const chatIdMatch = pathname.match(/^\/chat\/([^/]+)$/);
@@ -103,7 +106,7 @@ export default function ChatLayout({
           </Link>
           <Link
             href="/contacts"
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 relative ${
               pathname === "/contacts"
                 ? "bg-primary-500 text-white shadow-sm"
                 : "text-slate-600 hover:bg-slate-100/80"
@@ -111,6 +114,17 @@ export default function ChatLayout({
           >
             <Users className="w-5 h-5" />
             <span>Contacts</span>
+            {pendingRequestsCount > 0 && (
+              <span
+                className={`absolute right-3 top-1/2 -translate-y-1/2 min-w-[1.25rem] h-5 px-1.5 flex items-center justify-center rounded-full text-xs font-semibold ${
+                  pathname === "/contacts"
+                    ? "bg-white/20 text-white"
+                    : "bg-primary-500 text-white"
+                }`}
+              >
+                {pendingRequestsCount > 99 ? "99+" : pendingRequestsCount}
+              </span>
+            )}
           </Link>
           <Link
             href="/profile"

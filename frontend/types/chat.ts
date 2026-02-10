@@ -90,6 +90,30 @@ export interface ContactWithUser {
     avatarUrl: string | null;
     status: string | null;
   };
+  /** Present when this row is "received" (contactUserId = me); the requester */
+  user?: {
+    id: string;
+    username: string;
+    email: string;
+    avatarUrl: string | null;
+    status: string | null;
+  };
+}
+
+export interface IncomingRequestWithUser {
+  id: string;
+  userId: string;
+  contactUserId: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  user: {
+    id: string;
+    username: string;
+    email: string;
+    avatarUrl: string | null;
+    status: string | null;
+  };
 }
 
 export interface SearchUser {

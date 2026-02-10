@@ -3,23 +3,33 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Users, Search, UserPlus, MessageCircle, Loader2 } from "lucide-react";
-import { useContacts, useSearchUsers, useAddContact } from "@/hooks/useContacts";
+import { Users, Search, UserPlus, MessageCircle, Loader2, UserCheck, UserX } from "lucide-react";
+import { useContacts, useContactRequests, useSearchUsers, useAddContact, useUpdateContact } from "@/hooks/useContacts";
 import { useCreateChat } from "@/hooks/useChats";
 import { useRouter } from "next/navigation";
-import type { ContactWithUser, SearchUser } from "@/types/chat";
+import { useAuthStore } from "@/store/authStore";
+import type { ContactWithUser, IncomingRequestWithUser, SearchUser } from "@/types/chat";
 
 export default function ContactsPage() {
   const router = useRouter();
+  const user = useAuthStore((s) => s.user);
   const [searchQ, setSearchQ] = useState("");
   const { data: contacts, isLoading } = useContacts();
+  const { data: requests = [] } = useContactRequests();
   const { data: searchResults } = useSearchUsers(searchQ);
   const addContact = useAddContact();
+  const updateContact = useUpdateContact();
   const createChat = useCreateChat();
 
   const showSearch = searchQ.length >= 1;
   const searchUsers: SearchUser[] = searchResults ?? [];
-  const contactUserIds = new Set(contacts?.map((c) => c.contactUserId) ?? []);
+  const contactUserIds = new Set(
+    contacts?.map((c) => (c.userId === user?.id ? c.contactUserId : c.userId)) ?? []
+  );
+
+  const getOtherUser = (c: ContactWithUser) => c.contact ?? c.user!;
+  const getOtherUserId = (c: ContactWithUser) =>
+    c.userId === user?.id ? c.contactUserId : c.userId;
 
   const handleMessage = async (userId: string) => {
     try {
@@ -66,6 +76,80 @@ export default function ContactsPage() {
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-4 py-4 min-h-0">
         <AnimatePresence mode="wait">
+          {!showSearch && requests.length > 0 && (
+            <motion.section
+              key="requests"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25 }}
+              className="mb-6"
+            >
+              <h2 className="text-sm font-medium text-slate-500 px-2 mb-3 flex items-center gap-2">
+                <UserPlus className="w-4 h-4" />
+                Connection requests
+                <span className="ml-1.5 px-2 py-0.5 rounded-full bg-primary-500/15 text-primary-600 text-xs font-semibold">
+                  {requests.length}
+                </span>
+              </h2>
+              <div className="space-y-2">
+                {(requests as IncomingRequestWithUser[]).map((req, i) => (
+                  <motion.div
+                    key={req.id}
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.04, duration: 0.25 }}
+                    className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-white/90 border border-slate-200/60 shadow-soft hover:shadow-glow hover:border-slate-200 transition-all duration-200"
+                  >
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center flex-shrink-0 overflow-hidden border border-slate-200/60">
+                        {req.user.avatarUrl ? (
+                          <Image src={req.user.avatarUrl} alt="" width={44} height={44} className="w-full h-full object-cover" unoptimized />
+                        ) : (
+                          <span className="text-base font-semibold text-slate-500">{req.user.username.slice(0, 1).toUpperCase()}</span>
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-medium text-slate-800 truncate">{req.user.username}</p>
+                        <p className="text-xs text-slate-500 truncate">{req.user.email}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => updateContact.mutate({ id: req.id, status: "BLOCKED" })}
+                        disabled={updateContact.isPending && updateContact.variables?.id === req.id}
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-100 border border-slate-200/80 text-sm font-medium transition-all duration-200 disabled:opacity-50"
+                        aria-label="Decline"
+                      >
+                        {updateContact.isPending && updateContact.variables?.id === req.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <UserX className="w-4 h-4" />
+                        )}
+                        Decline
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => updateContact.mutate({ id: req.id, status: "ACCEPTED" })}
+                        disabled={updateContact.isPending && updateContact.variables?.id === req.id}
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 text-white text-sm font-medium shadow-soft hover:shadow-glow disabled:opacity-50 transition-all duration-200"
+                        aria-label="Accept"
+                      >
+                        {updateContact.isPending && updateContact.variables?.id === req.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <UserCheck className="w-4 h-4" />
+                        )}
+                        Accept
+                      </button>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.section>
+          )}
+
           {showSearch && (
             <motion.section
               key="search"
@@ -164,45 +248,62 @@ export default function ContactsPage() {
             )}
             {contacts && contacts.length > 0 && (
               <div className="space-y-2">
-                {contacts.map((c: ContactWithUser, i: number) => (
-                  <motion.div
-                    key={c.id}
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.03, duration: 0.25 }}
-                    className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-white/90 border border-slate-200/60 shadow-soft hover:shadow-glow hover:border-slate-200 transition-all duration-200 group"
-                  >
-                    <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center flex-shrink-0 overflow-hidden border border-slate-200/60">
-                        {c.contact.avatarUrl ? (
-                          <Image src={c.contact.avatarUrl} alt="" width={44} height={44} className="w-full h-full object-cover" unoptimized />
-                        ) : (
-                          <span className="text-base font-semibold text-slate-500">{c.contact.username.slice(0, 1).toUpperCase()}</span>
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="font-medium text-slate-800 truncate">{c.contact.username}</p>
-                        <p className="text-xs text-slate-500 capitalize">{c.status}</p>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleMessage(c.contactUserId)}
-                      disabled={createChat.isPending}
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-slate-600 hover:bg-primary-500 hover:text-white text-sm font-medium transition-all duration-200 opacity-0 group-hover:opacity-100 focus:opacity-100 disabled:opacity-50"
-                      aria-label="Message"
+                {contacts.map((c: ContactWithUser, i: number) => {
+                  const other = getOtherUser(c);
+                  const otherId = getOtherUserId(c);
+                  const isAccepted = c.status === "ACCEPTED";
+                  const isPendingOutgoing = c.status === "PENDING" && c.userId === user?.id;
+                  return (
+                    <motion.div
+                      key={c.id}
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.03, duration: 0.25 }}
+                      className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-white/90 border border-slate-200/60 shadow-soft hover:shadow-glow hover:border-slate-200 transition-all duration-200 group"
                     >
-                      {createChat.isPending ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <>
-                          <MessageCircle className="w-4 h-4" />
-                          Message
-                        </>
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center flex-shrink-0 overflow-hidden border border-slate-200/60">
+                          {other.avatarUrl ? (
+                            <Image src={other.avatarUrl} alt="" width={44} height={44} className="w-full h-full object-cover" unoptimized />
+                          ) : (
+                            <span className="text-base font-semibold text-slate-500">{other.username.slice(0, 1).toUpperCase()}</span>
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-slate-800 truncate">{other.username}</p>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            {isPendingOutgoing && (
+                              <span className="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200/80">
+                                Pending
+                              </span>
+                            )}
+                            {isAccepted && (
+                              <span className="text-xs text-slate-500">Connected</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      {isAccepted && (
+                        <button
+                          type="button"
+                          onClick={() => handleMessage(otherId)}
+                          disabled={createChat.isPending}
+                          className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-slate-600 hover:bg-primary-500 hover:text-white text-sm font-medium transition-all duration-200 opacity-0 group-hover:opacity-100 focus:opacity-100 disabled:opacity-50"
+                          aria-label="Message"
+                        >
+                          {createChat.isPending ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <>
+                              <MessageCircle className="w-4 h-4" />
+                              Message
+                            </>
+                          )}
+                        </button>
                       )}
-                    </button>
-                  </motion.div>
-                ))}
+                    </motion.div>
+                  );
+                })}
               </div>
             )}
           </motion.section>

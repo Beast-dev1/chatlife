@@ -1,6 +1,7 @@
 "use client";
 
 import { useChats } from "@/hooks/useChats";
+import { useContactRequests } from "@/hooks/useContacts";
 import { useAuthStore } from "@/store/authStore";
 import type { ChatWithDetails } from "@/types/chat";
 import { AnimatePresence, motion } from "framer-motion";
@@ -43,6 +44,7 @@ export default function ChatListSidebar() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const { data: chats, isLoading, error } = useChats();
+  const { data: contactRequests = [] } = useContactRequests();
   const [searchQuery, setSearchQuery] = useState("");
   const [showCreate, setShowCreate] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -115,10 +117,15 @@ export default function ChatListSidebar() {
                   <Link
                     href="/contacts"
                     onClick={() => setShowMenu(false)}
-                    className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                    className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors relative"
                   >
                     <Users className="w-4 h-4 text-slate-400" />
                     Contacts
+                    {contactRequests.length > 0 && (
+                      <span className="ml-auto min-w-[1.25rem] h-5 px-1.5 flex items-center justify-center rounded-full bg-primary-500 text-white text-xs font-semibold">
+                        {contactRequests.length > 99 ? "99+" : contactRequests.length}
+                      </span>
+                    )}
                   </Link>
                   <Link
                     href="/settings"
