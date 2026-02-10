@@ -376,7 +376,7 @@ export default function ChatThreadPage() {
       )}
 
       {/* Messages area */}
-      <div className="flex-1 overflow-y-auto px-4 py-5 flex flex-col gap-0 min-h-0 bg-[linear-gradient(180deg,_#f8fafc_0%,_#f1f5f9_30%,_#eef2f7_100%)]">
+      <div className="flex-1 overflow-y-auto px-4 py-5 flex flex-col gap-2 min-h-0 bg-[linear-gradient(180deg,_#f8fafc_0%,_#f1f5f9_30%,_#eef2f7_100%)]">
         {messagesLoading && displayMessages.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 gap-4">
             <div className="flex gap-1.5">
