@@ -20,6 +20,7 @@ export default function MessageBubble({
   onForward,
   onDeleteForMe,
   onDeleteForEveryone,
+  onOpenMedia,
 }: {
   message: MessageWithSender;
   isOwn: boolean;
@@ -33,6 +34,7 @@ export default function MessageBubble({
   onForward?: (message: MessageWithSender) => void;
   onDeleteForMe?: (message: MessageWithSender) => void;
   onDeleteForEveryone?: (message: MessageWithSender) => void;
+  onOpenMedia?: (message: MessageWithSender) => void;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -48,6 +50,7 @@ export default function MessageBubble({
     return () => document.removeEventListener("click", close);
   }, [menuOpen]);
   const isImage = message.type === "IMAGE" && message.fileUrl;
+  const isVideo = message.type === "VIDEO" && message.fileUrl;
   const isFile = message.type === "FILE" && message.fileUrl;
   const timeStr = new Date(message.createdAt).toLocaleTimeString([], {
     hour: "2-digit",
@@ -214,11 +217,11 @@ export default function MessageBubble({
             </p>
           )}
           {isImage && (
-            <a
-              href={message.fileUrl!}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block rounded-lg overflow-hidden"
+            <button
+              type="button"
+              onClick={() => onOpenMedia?.(message)}
+              className="block rounded-lg overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 text-left"
+              aria-label="Open image"
             >
               <Image
                 src={message.fileUrl!}
@@ -228,7 +231,23 @@ export default function MessageBubble({
                 className="max-w-full max-h-64 object-contain"
                 unoptimized
               />
-            </a>
+            </button>
+          )}
+          {isVideo && (
+            <button
+              type="button"
+              onClick={() => onOpenMedia?.(message)}
+              className="block rounded-lg overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 text-left w-full max-w-[280px]"
+              aria-label="Open video"
+            >
+              <video
+                src={message.fileUrl!}
+                muted
+                playsInline
+                className="max-w-full max-h-64 w-full object-contain rounded-lg bg-slate-900"
+                preload="metadata"
+              />
+            </button>
           )}
           {isFile && (
             <a
@@ -243,7 +262,7 @@ export default function MessageBubble({
           {message.type === "TEXT" && message.content && (
             <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
           )}
-          {message.type !== "TEXT" && !isImage && !isFile && message.content && (
+          {message.type !== "TEXT" && !isImage && !isVideo && !isFile && message.content && (
             <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
           )}
           </>

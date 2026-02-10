@@ -1,6 +1,7 @@
 "use client";
 
 import ForwardModal from "@/components/chat/ForwardModal";
+import MediaViewer from "@/components/chat/MediaViewer";
 import MessageBubble from "@/components/chat/MessageBubble";
 import MessageInput from "@/components/chat/MessageInput";
 import { useChat } from "@/hooks/useChats";
@@ -60,6 +61,7 @@ export default function ChatThreadPage() {
   const [highlightMessageId, setHighlightMessageId] = useState<string | null>(null);
   const [replyingTo, setReplyingTo] = useState<MessageWithSender | null>(null);
   const [forwardMessage, setForwardMessage] = useState<MessageWithSender | null>(null);
+  const [openMediaIndex, setOpenMediaIndex] = useState<number | null>(null);
   const { data: searchData, isFetching: searchFetching } = useMessageSearch(searchQuery, chatId);
   const searchResults = searchData?.messages ?? [];
 
@@ -81,6 +83,14 @@ export default function ChatThreadPage() {
           : "Several people are typing…";
 
   const displayMessages: MessageWithSender[] = messagesByChat[chatId] ?? [];
+  const mediaMessages = displayMessages.filter(
+    (m) => (m.type === "IMAGE" || m.type === "VIDEO") && m.fileUrl
+  );
+
+  const handleOpenMedia = useCallback((message: MessageWithSender) => {
+    const index = mediaMessages.findIndex((m) => m.id === message.id);
+    if (index >= 0) setOpenMediaIndex(index);
+  }, [mediaMessages]);
 
   function getMessageStatus(msg: MessageWithSender): "sent" | "delivered" | "read" | undefined {
     if (msg.senderId !== user?.id) return undefined;
@@ -324,7 +334,13 @@ export default function ChatThreadPage() {
                       {msg.sender.username} · {new Date(msg.createdAt).toLocaleString()}
                     </span>
                     <span className="text-sm text-slate-800 truncate">
-                      {msg.type === "TEXT" ? (msg.content ?? "") : msg.type === "IMAGE" ? "📷 Photo" : "📎 File"}
+                      {msg.type === "TEXT"
+                        ? (msg.content ?? "")
+                        : msg.type === "IMAGE"
+                          ? "📷 Photo"
+                          : msg.type === "VIDEO"
+                            ? "🎬 Video"
+                            : "📎 File"}
                     </span>
                   </button>
                 </li>
@@ -369,17 +385,18 @@ export default function ChatThreadPage() {
             >
               <div className="w-fit max-w-[85%]">
                 <MessageBubble
-                message={msg}
-                isOwn={isOwn}
-                showSender={chat?.type === "GROUP"}
-                status={getMessageStatus(msg)}
-                showAvatar
-                avatarUrl={getAvatarForMessage(msg)}
-                onReply={(m) => setReplyingTo(m)}
-                onEdit={handleEditMessage}
-                onForward={(m) => setForwardMessage(m)}
-                onDeleteForMe={handleDeleteForMe}
-                onDeleteForEveryone={handleDeleteForEveryone}
+                  message={msg}
+                  isOwn={isOwn}
+                  showSender={chat?.type === "GROUP"}
+                  status={getMessageStatus(msg)}
+                  showAvatar
+                  avatarUrl={getAvatarForMessage(msg)}
+                  onReply={(m) => setReplyingTo(m)}
+                  onEdit={handleEditMessage}
+                  onForward={(m) => setForwardMessage(m)}
+                  onDeleteForMe={handleDeleteForMe}
+                  onDeleteForEveryone={handleDeleteForEveryone}
+                  onOpenMedia={handleOpenMedia}
                 />
               </div>
             </div>
@@ -401,6 +418,14 @@ export default function ChatThreadPage() {
           currentChatId={chatId}
           currentUserId={user.id}
           onClose={() => setForwardMessage(null)}
+        />
+      )}
+
+      {openMediaIndex !== null && mediaMessages.length > 0 && (
+        <MediaViewer
+          mediaMessages={mediaMessages}
+          initialIndex={openMediaIndex}
+          onClose={() => setOpenMediaIndex(null)}
         />
       )}
     </div>
