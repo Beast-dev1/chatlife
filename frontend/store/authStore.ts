@@ -13,6 +13,12 @@ export interface User {
   updatedAt: string;
 }
 
+export type ProfileUpdateData = {
+  avatarUrl?: string | null;
+  status?: string | null;
+  bio?: string | null;
+};
+
 interface AuthState {
   user: User | null;
   isLoading: boolean;
@@ -22,6 +28,7 @@ interface AuthState {
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
   init: () => Promise<void>;
+  updateProfile: (data: ProfileUpdateData) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -115,6 +122,11 @@ export const useAuthStore = create<AuthState>()(
           get().logout();
         });
         await get().refresh();
+      },
+
+      updateProfile: async (data) => {
+        const updated = await api.put<User>("/api/auth/profile", data);
+        set({ user: updated });
       },
     }),
     {
