@@ -340,7 +340,7 @@ export default function MessageBubble({
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); setEmojiPickerOpen(!emojiPickerOpen); }}
-            className={`mt-1 p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 opacity-0 group-hover/bubble:opacity-100 transition-opacity ${isOwn ? "ml-auto" : ""}`}
+            className={`mt-1.5 p-1.5 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 opacity-0 group-hover/bubble:opacity-100 transition-all duration-200 ${isOwn ? "ml-auto" : ""}`}
             aria-label="Add reaction"
           >
             <Smile className="w-4 h-4" />
@@ -353,19 +353,24 @@ export default function MessageBubble({
                 initial={{ opacity: 0, scale: 0.9, y: -10 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: -10 }}
-                transition={{ duration: 0.15 }}
-                className={`absolute ${isOwn ? "right-0" : "left-0"} bottom-full mb-2 p-2 bg-white rounded-xl shadow-lg border border-slate-200 z-10`}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                className={`absolute ${isOwn ? "right-0" : "left-0"} bottom-full mb-2 p-3 bg-white rounded-xl shadow-xl border border-slate-200/80 z-20 backdrop-blur-sm`}
               >
-                <div className="flex gap-1">
+                <div className="mb-2">
+                  <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">React</p>
+                </div>
+                <div className="flex gap-1.5">
                   {QUICK_REACTIONS.map((emoji) => (
-                    <button
+                    <motion.button
                       key={emoji}
                       type="button"
                       onClick={() => handleReaction(emoji)}
-                      className="p-2 hover:bg-slate-100 rounded-lg text-xl transition-colors"
+                      whileHover={{ scale: 1.2, y: -2 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="flex items-center justify-center w-9 h-9 hover:bg-slate-100 rounded-lg text-xl transition-colors duration-150"
                     >
                       {emoji}
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
               </motion.div>
