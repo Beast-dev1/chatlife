@@ -87,7 +87,7 @@ export default function ForwardModal({
                     >
                       <div className="w-10 h-10 rounded-full bg-slate-200 flex-shrink-0 overflow-hidden flex items-center justify-center">
                         {avatar ? (
-                          <Image src={avatar} alt="" width={40} height={40} className="w-full h-full object-cover" unoptimized />
+                          <Image src={avatar} alt="" width={40} height={40} className="w-full h-full object-cover" />
                         ) : (
                           <span className="text-sm font-semibold text-slate-500">{title.slice(0, 1).toUpperCase()}</span>
                         )}

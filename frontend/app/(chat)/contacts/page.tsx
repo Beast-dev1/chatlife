@@ -104,7 +104,7 @@ export default function ContactsPage() {
                     <div className="flex items-center gap-3 min-w-0 flex-1">
                       <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center flex-shrink-0 overflow-hidden border border-slate-200/60">
                         {req.user.avatarUrl ? (
-                          <Image src={req.user.avatarUrl} alt="" width={44} height={44} className="w-full h-full object-cover" unoptimized />
+                          <Image src={req.user.avatarUrl} alt="" width={44} height={44} className="w-full h-full object-cover" />
                         ) : (
                           <span className="text-base font-semibold text-slate-500">{req.user.username.slice(0, 1).toUpperCase()}</span>
                         )}
@@ -180,7 +180,7 @@ export default function ContactsPage() {
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center flex-shrink-0 overflow-hidden border border-slate-200/60">
                         {u.avatarUrl ? (
-                          <Image src={u.avatarUrl} alt="" width={44} height={44} className="w-full h-full object-cover" unoptimized />
+                          <Image src={u.avatarUrl} alt="" width={44} height={44} className="w-full h-full object-cover" />
                         ) : (
                           <span className="text-base font-semibold text-slate-500">{u.username.slice(0, 1).toUpperCase()}</span>
                         )}
@@ -264,7 +264,7 @@ export default function ContactsPage() {
                       <div className="flex items-center gap-3 min-w-0 flex-1">
                         <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center flex-shrink-0 overflow-hidden border border-slate-200/60">
                           {other.avatarUrl ? (
-                            <Image src={other.avatarUrl} alt="" width={44} height={44} className="w-full h-full object-cover" unoptimized />
+                            <Image src={other.avatarUrl} alt="" width={44} height={44} className="w-full h-full object-cover" />
                           ) : (
                             <span className="text-base font-semibold text-slate-500">{other.username.slice(0, 1).toUpperCase()}</span>
                           )}

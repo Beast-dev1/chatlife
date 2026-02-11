@@ -1,11 +1,13 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSocket } from "@/hooks/useSocket";
 import { useCallStore } from "@/store/callStore";
-import IncomingCallModal from "./IncomingCallModal";
-import ActiveCallBar from "./ActiveCallBar";
+
+const IncomingCallModal = dynamic(() => import("./IncomingCallModal"), { ssr: false });
+const ActiveCallBar = dynamic(() => import("./ActiveCallBar"), { ssr: false });
 
 export default function CallProvider() {
   const { socket } = useSocket();

@@ -156,7 +156,7 @@ export default function ProfilePage() {
                     <Loader2 className="w-10 h-10 text-slate-500 animate-spin" />
                   </div>
                 ) : user.avatarUrl ? (
-                  <Image src={uploadDisplayUrl(user.avatarUrl)} alt="" width={96} height={96} className="w-full h-full object-cover" unoptimized />
+                  <Image src={uploadDisplayUrl(user.avatarUrl)} alt="" width={96} height={96} className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center">
                     <User className="w-10 h-10 sm:w-12 sm:h-12 text-slate-500" />

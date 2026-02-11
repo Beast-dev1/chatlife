@@ -53,7 +53,6 @@ export default function IncomingCallModal({
                 alt=""
                 fill
                 className="object-cover"
-                unoptimized
               />
             ) : (
               <span className="text-2xl font-semibold text-slate-400">

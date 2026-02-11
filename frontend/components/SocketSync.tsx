@@ -134,7 +134,7 @@ export default function SocketSync() {
       queryClient.invalidateQueries({ queryKey: messagesQueryKey(payload.chatId) });
     };
 
-    const onReactionAdded = (payload: { messageId: string; reaction: any }) => {
+    const onReactionAdded = (payload: { messageId: string; reaction: { emoji: string; userId: string } }) => {
       // Invalidate queries to refetch messages with updated reactions
       const messages = useChatStore.getState().messagesByChat;
       for (const chatId in messages) {

@@ -127,7 +127,7 @@ function DirectChatPanel({
           <div className="p-1 rounded-full bg-gradient-to-br from-primary-400 via-primary-500 to-primary-600 shadow-soft mb-4">
             <div className="w-28 h-28 rounded-full bg-slate-100 overflow-hidden flex items-center justify-center ring-4 ring-white">
               {avatarUrl ? (
-                <Image src={avatarUrl} alt="" width={112} height={112} className="w-full h-full object-cover" unoptimized />
+                <Image src={avatarUrl} alt="" width={112} height={112} className="w-full h-full object-cover" />
               ) : (
                 <span className="text-4xl font-semibold text-slate-400">
                   {name.slice(0, 1).toUpperCase()}
@@ -311,7 +311,7 @@ function GroupChatPanel({
                 className="w-full h-full text-center text-xs bg-slate-200/80 px-2"
               />
             ) : displayAvatarUrl ? (
-              <Image src={displayAvatarUrl} alt="" width={112} height={112} className="w-full h-full object-cover" unoptimized />
+              <Image src={displayAvatarUrl} alt="" width={112} height={112} className="w-full h-full object-cover" />
             ) : (
               <span className="text-4xl font-semibold text-slate-400">
                 {displayName.slice(0, 1).toUpperCase()}
@@ -413,7 +413,7 @@ function GroupChatPanel({
                   >
                     <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0">
                       {u.avatarUrl ? (
-                        <Image src={u.avatarUrl} alt="" width={32} height={32} className="w-full h-full rounded-full object-cover" unoptimized />
+                        <Image src={u.avatarUrl} alt="" width={32} height={32} className="w-full h-full rounded-full object-cover" />
                       ) : (
                         <span className="text-xs text-slate-500">{u.username.slice(0, 1).toUpperCase()}</span>
                       )}
@@ -436,7 +436,7 @@ function GroupChatPanel({
               >
                 <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0 overflow-hidden">
                   {m.user.avatarUrl ? (
-                    <Image src={m.user.avatarUrl} alt="" width={40} height={40} className="w-full h-full object-cover" unoptimized />
+                    <Image src={m.user.avatarUrl} alt="" width={40} height={40} className="w-full h-full object-cover" />
                   ) : (
                     <span className="text-sm font-semibold text-slate-500">
                       {m.user.username?.slice(0, 1).toUpperCase() ?? "?"}
@@ -532,7 +532,7 @@ export default function ChatInfoSidebar({ chatId }: { chatId: string | null }) {
         <div className="flex items-center gap-1">
           <div className="w-9 h-9 rounded-full bg-slate-100 overflow-hidden flex items-center justify-center ring-2 ring-white shadow-inner">
             {user.avatarUrl ? (
-              <Image src={user.avatarUrl} alt="" width={36} height={36} className="w-full h-full object-cover" unoptimized />
+              <Image src={user.avatarUrl} alt="" width={36} height={36} className="w-full h-full object-cover" />
             ) : (
               <span className="text-sm font-semibold text-slate-500">{user.username?.slice(0, 1).toUpperCase()}</span>
             )}

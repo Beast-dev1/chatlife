@@ -81,7 +81,7 @@ export default function ChatListItem({
       >
         <div className="relative w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-600 flex-shrink-0 overflow-hidden flex items-center justify-center ring-2 ring-white/50 dark:ring-slate-700/50">
           {avatarUrl ? (
-            <Image src={avatarUrl} alt="" width={48} height={48} className="w-full h-full object-cover" unoptimized />
+            <Image src={avatarUrl} alt="" width={48} height={48} className="w-full h-full object-cover" />
           ) : (
             <span className={`text-lg font-semibold ${isActive ? "text-white" : "text-slate-500 dark:text-slate-400"}`}>
               {name.slice(0, 1).toUpperCase()}

@@ -106,7 +106,7 @@ export default function MessageBubble({
       {showAvatar && (
         <div className="w-9 h-9 rounded-full bg-slate-200/90 dark:bg-slate-600/90 flex-shrink-0 overflow-hidden flex items-center justify-center ring-2 ring-white/80 dark:ring-slate-700/80 shadow-inner">
           {avatarUrl ? (
-            <Image src={avatarUrl} alt="" width={36} height={36} className="w-full h-full object-cover" unoptimized />
+            <Image src={avatarUrl} alt="" width={36} height={36} className="w-full h-full object-cover" />
           ) : (
             <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">
               {(message.sender?.username ?? "?").slice(0, 1).toUpperCase()}
@@ -268,7 +268,6 @@ export default function MessageBubble({
                 width={400}
                 height={256}
                 className="max-w-full max-h-64 object-contain"
-                unoptimized
               />
             </button>
           )}

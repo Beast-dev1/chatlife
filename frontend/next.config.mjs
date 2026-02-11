@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+import bundleAnalyzer from "@next/bundle-analyzer";
+
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 let apiOrigin;
 try {
@@ -36,4 +38,8 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
+
+export default withBundleAnalyzer(nextConfig);

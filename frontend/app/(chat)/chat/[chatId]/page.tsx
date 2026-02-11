@@ -1,8 +1,6 @@
 "use client";
 
-import CallEntryBubble from "@/components/chat/CallEntryBubble";
-import ForwardModal from "@/components/chat/ForwardModal";
-import MediaViewer from "@/components/chat/MediaViewer";
+import dynamic from "next/dynamic";
 import MessageBubble from "@/components/chat/MessageBubble";
 import MessageInput from "@/components/chat/MessageInput";
 import { useCalls } from "@/hooks/useCalls";
@@ -20,6 +18,10 @@ import { Info, MessageCircle, Phone, Search, Video, X } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+const MediaViewer = dynamic(() => import("@/components/chat/MediaViewer"), { ssr: false });
+const ForwardModal = dynamic(() => import("@/components/chat/ForwardModal"), { ssr: false });
+const CallEntryBubble = dynamic(() => import("@/components/chat/CallEntryBubble"), { ssr: false });
 
 type ChatTimelineEntry =
   | { type: "message"; id: string; timestamp: string; data: MessageWithSender }
@@ -248,7 +250,7 @@ export default function ChatThreadPage() {
       <header className="flex items-center gap-3 px-5 py-3.5 border-b border-slate-200/70 dark:border-slate-600/70 bg-slate-50/80 dark:bg-slate-800/80 backdrop-blur-md shrink-0">
         <div className="w-11 h-11 rounded-full bg-slate-200/80 dark:bg-slate-600/80 flex-shrink-0 overflow-hidden ring-2 ring-white dark:ring-slate-700 shadow-inner flex items-center justify-center">
           {otherAvatar ? (
-            <Image src={otherAvatar} alt="" width={44} height={44} className="w-full h-full object-cover" unoptimized />
+            <Image src={otherAvatar} alt="" width={44} height={44} className="w-full h-full object-cover" />
           ) : (
           <span className="text-base font-semibold text-slate-500 dark:text-slate-400">
             {title.slice(0, 1).toUpperCase()}

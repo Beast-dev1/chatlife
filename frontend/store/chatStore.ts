@@ -173,6 +173,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       updatedAt: new Date().toISOString(),
       sender,
       reads: [],
+      reactions: [],
       tempId,
     };
     set((s) => {
