@@ -78,21 +78,21 @@ export default function ChatListSidebar() {
   });
 
   return (
-    <aside className="w-80 min-w-[280px] max-w-[360px] bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-r border-slate-200/60 dark:border-slate-600/60 flex flex-col rounded-r-2xl shadow-soft">
+    <aside className="w-80 min-w-[280px] max-w-[360px] glass border-r border-white/10 dark:border-slate-600/60 flex flex-col rounded-r-2xl shadow-surface">
       {/* Header: Logo + User icons */}
       <div className="p-3 border-b border-slate-100/80 dark:border-slate-600/80 flex items-center justify-between">
         <Link href="/chat" className="flex items-center gap-2.5 group">
           <div className="p-2.5 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl shadow-sm group-hover:shadow-glow transition-shadow duration-300">
             <MessageCircle className="w-5 h-5 text-white" />
           </div>
-          <span className="font-semibold text-slate-800 dark:text-slate-100">Let&apos;s Chat</span>
+          <span className="font-semibold text-title text-slate-800 dark:text-slate-100">Let&apos;s Chat</span>
         </Link>
         <div className="flex items-center gap-0.5">
           <div className="relative" ref={menuRef}>
             <button
               type="button"
               onClick={() => setShowMenu(!showMenu)}
-              className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-700 dark:hover:text-slate-200 transition-colors duration-200"
+              className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-700 dark:hover:text-slate-200 transition-colors duration-normal"
               aria-label="More options"
             >
               <MoreHorizontal className="w-5 h-5" />
@@ -104,7 +104,7 @@ export default function ChatListSidebar() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -4, scale: 0.98 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute right-0 top-full mt-1.5 py-1.5 w-48 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-600 shadow-soft-lg z-50 overflow-hidden"
+                  className="absolute right-0 top-full mt-1.5 py-1.5 w-48 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-600 shadow-overlay z-50 overflow-hidden"
                 >
                   <Link
                     href="/profile"
@@ -152,7 +152,7 @@ export default function ChatListSidebar() {
 
       {/* Search bar */}
       <div className="p-3 border-b border-slate-100/80 dark:border-slate-600/80">
-        <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-700/50 border border-slate-200/50 dark:border-slate-600 focus-within:bg-white dark:focus-within:bg-slate-600/50 focus-within:border-primary-300/50 dark:focus-within:border-primary-500/50 focus-within:ring-2 focus-within:ring-primary-500/20 transition-all duration-200">
+        <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-700/50 border border-slate-200/50 dark:border-slate-600 focus-within:bg-white dark:focus-within:bg-slate-600/50 focus-within:border-primary-300/50 dark:focus-within:border-primary-500/50 focus-within:ring-2 focus-within:ring-primary-500/20 transition-all duration-normal">
           <Search className="w-4 h-4 text-slate-400 flex-shrink-0" />
           <input
             type="search"
@@ -171,7 +171,7 @@ export default function ChatListSidebar() {
           onClick={() => setShowCreate(true)}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.98 }}
-          className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-700 dark:hover:text-slate-200 transition-colors duration-200"
+          className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-700 dark:hover:text-slate-200 transition-colors duration-normal"
           aria-label="New chat"
         >
           <Pencil className="w-4 h-4" />

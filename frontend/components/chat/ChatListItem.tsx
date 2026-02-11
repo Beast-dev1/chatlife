@@ -67,13 +67,13 @@ export default function ChatListItem({
     <motion.div
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2, delay: index * 0.03 }}
+      transition={{ duration: 0.2, ease: "easeOut", delay: index * 0.03 }}
     >
       <Link
         href={`/chat/${chat.id}`}
-        className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 ${
+        className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-normal ${
           isActive
-            ? "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-soft"
+            ? "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-surface"
             : isUnread
               ? "bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100"
               : "hover:bg-slate-50 dark:hover:bg-slate-700/50 text-slate-800 dark:text-slate-100"

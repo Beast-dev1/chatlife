@@ -48,31 +48,31 @@ export default function ForwardModal({
   useFocusTrap(containerRef, true, onClose);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={onClose}>
       <div
         ref={containerRef}
         role="dialog"
         aria-modal="true"
         aria-label="Forward to"
-        className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-600 w-full max-w-md max-h-[80vh] flex flex-col"
+        className="bg-popover rounded-2xl shadow-modal border border-border w-full max-w-md max-h-[80vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between">
-          <h2 className="font-semibold text-slate-800">Forward to</h2>
+        <div className="px-4 py-3 border-b border-border flex items-center justify-between">
+          <h2 className="font-semibold text-title text-popover-foreground">Forward to</h2>
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100"
+            className="p-1.5 rounded-xl text-muted-foreground hover:bg-muted transition-colors duration-normal"
             aria-label="Close"
           >
             ×
           </button>
         </div>
-        <div className="overflow-y-auto flex-1 p-2">
+        <div className="overflow-y-auto scrollbar-thin flex-1 p-2">
           {isLoading ? (
-            <p className="text-sm text-slate-500 py-4 text-center">Loading chats…</p>
+            <p className="text-body text-muted-foreground py-4 text-center">Loading chats…</p>
           ) : otherChats.length === 0 ? (
-            <p className="text-sm text-slate-500 py-4 text-center">No other chats</p>
+            <p className="text-body text-muted-foreground py-4 text-center">No other chats</p>
           ) : (
             <ul className="space-y-0.5">
               {otherChats.map((chat) => {
@@ -83,16 +83,16 @@ export default function ForwardModal({
                     <button
                       type="button"
                       onClick={() => handleSelect(chat.id)}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 text-left"
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-muted text-left transition-colors duration-normal"
                     >
-                      <div className="w-10 h-10 rounded-full bg-slate-200 flex-shrink-0 overflow-hidden flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-full bg-muted flex-shrink-0 overflow-hidden flex items-center justify-center">
                         {avatar ? (
                           <Image src={avatar} alt="" width={40} height={40} className="w-full h-full object-cover" />
                         ) : (
-                          <span className="text-sm font-semibold text-slate-500">{title.slice(0, 1).toUpperCase()}</span>
+                          <span className="text-body font-semibold text-muted-foreground">{title.slice(0, 1).toUpperCase()}</span>
                         )}
                       </div>
-                      <span className="font-medium text-slate-800 truncate">{title}</span>
+                      <span className="font-medium text-popover-foreground truncate">{title}</span>
                     </button>
                   </li>
                 );

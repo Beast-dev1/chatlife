@@ -100,7 +100,7 @@ export default function MessageBubble({
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25, ease: "easeOut" }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
       className={`w-full flex gap-2.5 mb-3 group/bubble ${isOwn ? "justify-end flex-row-reverse" : "justify-start"}`}
     >
       {showAvatar && (
@@ -116,10 +116,10 @@ export default function MessageBubble({
       )}
       <div className={`flex flex-col items-${isOwn ? "end" : "start"} max-w-[78%]`}>
         <div
-          className={`relative rounded-2xl px-4 py-2.5 transition-shadow duration-200 ${
+          className={`relative rounded-2xl px-4 py-2.5 transition-shadow duration-normal ${
             isOwn
-              ? "bg-gradient-to-br from-primary-500 to-primary-600 text-white rounded-br-md shadow-soft hover:shadow-glow"
-              : "bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-bl-md border border-slate-200/70 dark:border-slate-600 shadow-soft"
+              ? "bg-gradient-to-br from-primary-500 to-primary-600 text-white rounded-br-md shadow-surface hover:shadow-glow"
+              : "bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-bl-md border border-slate-200/70 dark:border-slate-600 shadow-surface"
           }`}
         >
           {onReply && (
@@ -298,7 +298,7 @@ export default function MessageBubble({
             </a>
           )}
           {message.type === "TEXT" && message.content && (
-            <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+            <p className="text-body whitespace-pre-wrap break-words">{message.content}</p>
           )}
           {message.type !== "TEXT" && !isImage && !isVideo && !isFile && message.content && (
             <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
@@ -339,7 +339,7 @@ export default function MessageBubble({
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); setEmojiPickerOpen(!emojiPickerOpen); }}
-            className={`mt-1.5 p-1.5 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 opacity-0 group-hover/bubble:opacity-100 transition-all duration-200 ${isOwn ? "ml-auto" : ""}`}
+            className={`mt-1.5 p-1.5 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 opacity-0 group-hover/bubble:opacity-100 transition-all duration-normal ${isOwn ? "ml-auto" : ""}`}
             aria-label="Add reaction"
           >
             <Smile className="w-4 h-4" />
@@ -353,7 +353,7 @@ export default function MessageBubble({
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: -10 }}
                 transition={{ duration: 0.2, ease: "easeOut" }}
-                className={`absolute ${isOwn ? "right-0" : "left-0"} bottom-full mb-2 p-3 bg-white rounded-xl shadow-xl border border-slate-200/80 z-20 backdrop-blur-sm`}
+                className={`absolute ${isOwn ? "right-0" : "left-0"} bottom-full mb-2 p-3 bg-white dark:bg-slate-800 rounded-xl shadow-overlay border border-slate-200/80 dark:border-slate-600 z-20 backdrop-blur-sm`}
               >
                 <div className="mb-2">
                   <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">React</p>

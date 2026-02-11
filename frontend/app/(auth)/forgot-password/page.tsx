@@ -55,24 +55,24 @@ export default function ForgotPasswordPage() {
         />
       </div>
 
-      <div className="w-full flex flex-col items-center justify-center bg-white">
+      <div className="w-full flex flex-col items-center justify-center bg-background text-foreground px-4">
         {error && (
-          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm max-w-md w-full md:w-96">
+          <div className="mb-4 p-3 bg-destructive/10 border border-destructive/30 text-destructive rounded-xl text-body max-w-md w-full md:w-96">
             {error}
           </div>
         )}
 
         {success ? (
-          <div className="md:w-96 w-80 flex flex-col items-center justify-center">
-            <h2 className="text-4xl text-gray-900 font-medium">
+          <div className="md:w-96 w-80 flex flex-col items-center justify-center p-6 rounded-2xl glass shadow-surface border border-border">
+            <h2 className="text-display font-semibold text-foreground">
               Check your email
             </h2>
-            <p className="text-sm text-gray-500/90 mt-3 text-center">
+            <p className="text-body text-muted-foreground mt-3 text-center">
               If an account exists with that email, we sent a password reset link.
             </p>
             <Link
               href="/login"
-              className="mt-8 w-full h-11 rounded-full text-white bg-indigo-500 hover:opacity-90 transition-opacity flex items-center justify-center"
+              className="mt-8 w-full h-11 rounded-xl text-white bg-primary-500 hover:bg-primary-600 transition-colors duration-normal flex items-center justify-center shadow-surface focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
             >
               Back to sign in
             </Link>
@@ -80,48 +80,49 @@ export default function ForgotPasswordPage() {
         ) : (
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="md:w-96 w-80 flex flex-col items-center justify-center"
+            className="md:w-96 w-80 flex flex-col items-center justify-center p-6 rounded-2xl glass shadow-surface border border-border"
           >
-            <h2 className="text-4xl text-gray-900 font-medium">
+            <h2 className="text-display font-semibold text-foreground">
               Forgot password?
             </h2>
-            <p className="text-sm text-gray-500/90 mt-3">
+            <p className="text-body text-muted-foreground mt-3">
               Enter your email and we&apos;ll send you a reset link
             </p>
 
             <div className="flex items-center gap-4 w-full my-6">
-              <div className="w-full h-px bg-gray-300"></div>
-              <p className="text-nowrap text-sm text-gray-500 font-medium">
+              <div className="w-full h-px bg-border" />
+              <p className="text-nowrap text-caption font-medium text-muted-foreground">
                 Your email
               </p>
-              <div className="w-full h-px bg-gray-300"></div>
+              <div className="w-full h-px bg-border" />
             </div>
 
-            <div className="flex items-center w-full bg-transparent border border-gray-300/60 h-12 rounded-full overflow-hidden pl-6 gap-2 focus-within:border-indigo-500 transition-colors">
+            <div className="flex items-center w-full bg-transparent border border-input h-12 rounded-xl overflow-hidden pl-6 gap-2 focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-500/20 transition-all duration-normal">
               <svg
                 width="16"
                 height="11"
                 viewBox="0 0 16 11"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
+                className="text-muted-foreground shrink-0"
               >
                 <path
                   fillRule="evenodd"
                   clipRule="evenodd"
                   d="M0 .55.571 0H15.43l.57.55v9.9l-.571.55H.57L0 10.45zm1.143 1.138V9.9h13.714V1.69l-6.503 4.8h-.697zM13.749 1.1H2.25L8 5.356z"
-                  fill="#6B7280"
+                  fill="currentColor"
                 />
               </svg>
               <input
                 {...register("email")}
                 type="email"
                 placeholder="Email id"
-                className="bg-transparent text-gray-500/80 placeholder-gray-500/80 outline-none text-sm w-full h-full"
+                className="bg-transparent text-foreground placeholder-muted-foreground outline-none text-body w-full h-full"
                 required
               />
             </div>
             {errors.email && (
-              <p className="mt-1 text-sm text-red-600 w-full text-left md:w-96">
+              <p className="mt-1 text-caption text-destructive w-full text-left md:w-96">
                 {errors.email.message}
               </p>
             )}
@@ -129,13 +130,13 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="mt-8 w-full h-11 rounded-full text-white bg-indigo-500 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+              className="mt-8 w-full h-11 rounded-xl text-white bg-primary-500 hover:bg-primary-600 transition-colors duration-normal disabled:opacity-50 disabled:cursor-not-allowed shadow-surface focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
             >
               {isLoading ? "Sending..." : "Send reset link"}
             </button>
-            <p className="text-gray-500/90 text-sm mt-4">
+            <p className="text-muted-foreground text-body mt-4">
               Remember your password?{" "}
-              <Link className="text-indigo-400 hover:underline" href="/login">
+              <Link className="text-primary-500 hover:underline" href="/login">
                 Sign in
               </Link>
             </p>

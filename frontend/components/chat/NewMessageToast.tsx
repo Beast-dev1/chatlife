@@ -67,14 +67,14 @@ export default function NewMessageToastContainer() {
           key={t.id}
           type="button"
           onClick={() => goToChat(t.chatId)}
-          className="flex items-center gap-3 p-3 rounded-xl bg-slate-800 border border-slate-600 shadow-xl text-left hover:bg-slate-700 transition-colors"
+          className="flex items-center gap-3 p-3 rounded-xl bg-popover border border-border shadow-overlay text-left hover:bg-muted/80 transition-colors duration-normal"
         >
-          <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
-            <MessageCircle className="w-5 h-5 text-emerald-400" />
+          <div className="w-10 h-10 rounded-full bg-primary-500/20 flex items-center justify-center flex-shrink-0">
+            <MessageCircle className="w-5 h-5 text-primary-500" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-white truncate">{t.senderName}</p>
-            <p className="text-xs text-slate-400 truncate">{t.preview || "New message"}</p>
+            <p className="text-body font-medium text-popover-foreground truncate">{t.senderName}</p>
+            <p className="text-caption text-muted-foreground truncate">{t.preview || "New message"}</p>
           </div>
         </button>
       ))}

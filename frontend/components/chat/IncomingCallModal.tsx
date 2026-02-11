@@ -40,13 +40,13 @@ export default function IncomingCallModal({
   useFocusTrap(containerRef, true, clearIncomingCall);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-      <div ref={containerRef} className="mx-4 w-full max-w-sm rounded-2xl bg-slate-800 p-6 shadow-xl border border-slate-700" role="dialog" aria-modal="true" aria-label="Incoming call">
-        <p className="text-center text-sm text-slate-400 mb-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <div ref={containerRef} className="w-full max-w-sm rounded-2xl bg-popover p-6 shadow-modal border border-border" role="dialog" aria-modal="true" aria-label="Incoming call">
+        <p className="text-center text-body text-muted-foreground mb-4">
           Incoming {callType === "video" ? "video" : "audio"} call
         </p>
         <div className="flex flex-col items-center gap-4">
-          <div className="w-20 h-20 rounded-full bg-slate-700 flex items-center justify-center overflow-hidden relative">
+          <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center overflow-hidden relative">
             {caller.avatarUrl ? (
               <Image
                 src={caller.avatarUrl}
@@ -55,17 +55,17 @@ export default function IncomingCallModal({
                 className="object-cover"
               />
             ) : (
-              <span className="text-2xl font-semibold text-slate-400">
+              <span className="text-2xl font-semibold text-muted-foreground">
                 {caller.username?.charAt(0)?.toUpperCase() ?? "?"}
               </span>
             )}
           </div>
-          <p className="text-lg font-medium text-white">{caller.username}</p>
+          <p className="text-title font-medium text-popover-foreground">{caller.username}</p>
           <div className="flex items-center gap-3 mt-2">
             <button
               type="button"
               onClick={handleReject}
-              className="flex items-center justify-center w-14 h-14 rounded-full bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
+              className="flex items-center justify-center w-14 h-14 rounded-full bg-destructive/20 text-destructive hover:bg-destructive/30 transition-colors duration-normal"
               aria-label="Reject call"
             >
               <Phone className="w-7 h-7 rotate-[135deg]" />
@@ -73,7 +73,7 @@ export default function IncomingCallModal({
             <button
               type="button"
               onClick={handleAccept}
-              className="flex items-center justify-center w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 transition-colors"
+              className="flex items-center justify-center w-14 h-14 rounded-full bg-primary-500/20 text-primary-500 hover:bg-primary-500/30 transition-colors duration-normal"
               aria-label="Accept call"
             >
               {callType === "video" ? (

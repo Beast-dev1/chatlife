@@ -9,6 +9,12 @@ const config: Config = {
   ],
   theme: {
   	extend: {
+  		fontSize: {
+  			display: ['2.25rem', { lineHeight: '2.5rem', letterSpacing: '-0.025em' }],
+  			title: ['1.25rem', { lineHeight: '1.75rem', letterSpacing: '-0.01em' }],
+  			body: ['0.875rem', { lineHeight: '1.5rem' }],
+  			caption: ['0.75rem', { lineHeight: '1.25rem' }]
+  		},
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
@@ -62,8 +68,11 @@ const config: Config = {
   			}
   		},
   		boxShadow: {
-  			soft: '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
-  			'soft-lg': '0 10px 40px -10px rgba(0, 0, 0, 0.1), 0 2px 10px -2px rgba(0, 0, 0, 0.04)',
+  			surface: 'var(--shadow-surface)',
+  			overlay: 'var(--shadow-overlay)',
+  			modal: 'var(--shadow-modal)',
+  			soft: 'var(--shadow-surface)',
+  			'soft-lg': 'var(--shadow-overlay)',
   			glow: '0 0 20px -5px rgba(99, 102, 241, 0.3)',
   			'glow-green': '0 0 20px -5px rgba(34, 197, 94, 0.3)',
   			inner: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)'
@@ -107,9 +116,17 @@ const config: Config = {
   			xs: '2px'
   		},
   		borderRadius: {
-  			lg: 'var(--radius)',
-  			md: 'calc(var(--radius) - 2px)',
-  			sm: 'calc(var(--radius) - 4px)'
+  			sm: 'var(--radius-sm)',
+  			md: 'var(--radius-md)',
+  			lg: 'var(--radius-lg)',
+  			xl: 'var(--radius-xl)',
+  			'2xl': 'var(--radius-2xl)',
+  			DEFAULT: 'var(--radius-md)'
+  		},
+  		transitionDuration: {
+  			fast: '150ms',
+  			normal: '200ms',
+  			slow: '300ms'
   		}
   	}
   },

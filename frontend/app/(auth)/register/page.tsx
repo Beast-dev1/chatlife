@@ -75,113 +75,116 @@ export default function RegisterPage() {
         />
       </div>
 
-      <div className="w-full flex flex-col items-center justify-center bg-white overflow-hidden py-8">
+      <div className="w-full flex flex-col items-center justify-center bg-background text-foreground overflow-hidden py-8 px-4">
         {error && (
-          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm max-w-md w-full md:w-96">
+          <div className="mb-4 p-3 bg-destructive/10 border border-destructive/30 text-destructive rounded-xl text-body max-w-md w-full md:w-96">
             {error}
           </div>
         )}
 
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="md:w-96 w-80 flex flex-col items-center justify-center"
+          className="md:w-96 w-80 flex flex-col items-center justify-center p-6 rounded-2xl glass shadow-surface border border-border"
         >
-          <h2 className="text-4xl text-gray-900 font-medium">Create Account</h2>
-          <p className="text-sm text-gray-500/90 mt-3">
+          <h2 className="text-display font-semibold text-foreground">Create Account</h2>
+          <p className="text-body text-muted-foreground mt-3">
             Join us! Create your account to get started
           </p>
 
           <div className="flex items-center gap-4 w-full my-6">
-            <div className="w-full h-px bg-gray-300"></div>
-            <p className="text-nowrap text-sm text-gray-500 font-medium">
+            <div className="w-full h-px bg-border" />
+            <p className="text-nowrap text-caption font-medium text-muted-foreground">
               Sign up with email
             </p>
-            <div className="w-full h-px bg-gray-300"></div>
+            <div className="w-full h-px bg-border" />
           </div>
 
           {/* Username Field */}
-          <div className="flex items-center w-full bg-transparent border border-gray-300/60 h-12 rounded-full overflow-hidden pl-6 gap-2 focus-within:border-indigo-500 transition-colors">
+          <div className="flex items-center w-full bg-transparent border border-input h-12 rounded-xl overflow-hidden pl-6 gap-2 focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-500/20 transition-all duration-normal">
             <svg
               width="16"
               height="16"
               viewBox="0 0 16 16"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
+              className="text-muted-foreground shrink-0"
             >
               <path
                 d="M8 8a4 4 0 100-8 4 4 0 000 8zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
-                fill="#6B7280"
+                fill="currentColor"
               />
             </svg>
             <input
               {...register("username")}
               type="text"
               placeholder="Username"
-              className="bg-transparent text-gray-500/80 placeholder-gray-500/80 outline-none text-sm w-full h-full"
+              className="bg-transparent text-foreground placeholder-muted-foreground outline-none text-body w-full h-full"
               required
             />
           </div>
           {errors.username && (
-            <p className="mt-1 text-sm text-red-600 w-full text-left md:w-96">
+            <p className="mt-1 text-caption text-destructive w-full text-left md:w-96">
               {errors.username.message}
             </p>
           )}
 
           {/* Email Field */}
-          <div className="flex items-center mt-6 w-full bg-transparent border border-gray-300/60 h-12 rounded-full overflow-hidden pl-6 gap-2 focus-within:border-indigo-500 transition-colors">
+          <div className="flex items-center mt-6 w-full bg-transparent border border-input h-12 rounded-xl overflow-hidden pl-6 gap-2 focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-500/20 transition-all duration-normal">
             <svg
               width="16"
               height="11"
               viewBox="0 0 16 11"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
+              className="text-muted-foreground shrink-0"
             >
               <path
                 fillRule="evenodd"
                 clipRule="evenodd"
                 d="M0 .55.571 0H15.43l.57.55v9.9l-.571.55H.57L0 10.45zm1.143 1.138V9.9h13.714V1.69l-6.503 4.8h-.697zM13.749 1.1H2.25L8 5.356z"
-                fill="#6B7280"
+                fill="currentColor"
               />
             </svg>
             <input
               {...register("email")}
               type="email"
               placeholder="Email id"
-              className="bg-transparent text-gray-500/80 placeholder-gray-500/80 outline-none text-sm w-full h-full"
+              className="bg-transparent text-foreground placeholder-muted-foreground outline-none text-body w-full h-full"
               required
             />
           </div>
           {errors.email && (
-            <p className="mt-1 text-sm text-red-600 w-full text-left md:w-96">
+            <p className="mt-1 text-caption text-destructive w-full text-left md:w-96">
               {errors.email.message}
             </p>
           )}
 
           {/* Password Field */}
-          <div className="flex items-center mt-6 w-full bg-transparent border border-gray-300/60 h-12 rounded-full overflow-hidden pl-6 gap-2 focus-within:border-indigo-500 transition-colors">
+          <div className="flex items-center mt-6 w-full bg-transparent border border-input h-12 rounded-xl overflow-hidden pl-6 gap-2 focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-500/20 transition-all duration-normal">
             <svg
               width="13"
               height="17"
               viewBox="0 0 13 17"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
+              className="text-muted-foreground shrink-0"
             >
               <path
                 d="M13 8.5c0-.938-.729-1.7-1.625-1.7h-.812V4.25C10.563 1.907 8.74 0 6.5 0S2.438 1.907 2.438 4.25V6.8h-.813C.729 6.8 0 7.562 0 8.5v6.8c0 .938.729 1.7 1.625 1.7h9.75c.896 0 1.625-.762 1.625-1.7zM4.063 4.25c0-1.406 1.093-2.55 2.437-2.55s2.438 1.144 2.438 2.55V6.8H4.061z"
-                fill="#6B7280"
+                fill="currentColor"
               />
             </svg>
             <input
               {...register("password")}
               type={showPassword ? "text" : "password"}
               placeholder="Password"
-              className="bg-transparent text-gray-500/80 placeholder-gray-500/80 outline-none text-sm w-full h-full"
+              className="bg-transparent text-foreground placeholder-muted-foreground outline-none text-body w-full h-full"
               required
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="pr-4 text-gray-500 hover:text-gray-700 transition-colors"
+              className="pr-4 text-muted-foreground hover:text-foreground transition-colors duration-normal"
             >
               {showPassword ? (
                 <svg
@@ -217,36 +220,37 @@ export default function RegisterPage() {
             </button>
           </div>
           {errors.password && (
-            <p className="mt-1 text-sm text-red-600 w-full text-left md:w-96">
+            <p className="mt-1 text-caption text-destructive w-full text-left md:w-96">
               {errors.password.message}
             </p>
           )}
 
           {/* Confirm Password Field */}
-          <div className="flex items-center mt-6 w-full bg-transparent border border-gray-300/60 h-12 rounded-full overflow-hidden pl-6 gap-2 focus-within:border-indigo-500 transition-colors">
+          <div className="flex items-center mt-6 w-full bg-transparent border border-input h-12 rounded-xl overflow-hidden pl-6 gap-2 focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-500/20 transition-all duration-normal">
             <svg
               width="13"
               height="17"
               viewBox="0 0 13 17"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
+              className="text-muted-foreground shrink-0"
             >
               <path
                 d="M13 8.5c0-.938-.729-1.7-1.625-1.7h-.812V4.25C10.563 1.907 8.74 0 6.5 0S2.438 1.907 2.438 4.25V6.8h-.813C.729 6.8 0 7.562 0 8.5v6.8c0 .938.729 1.7 1.625 1.7h9.75c.896 0 1.625-.762 1.625-1.7zM4.063 4.25c0-1.406 1.093-2.55 2.437-2.55s2.438 1.144 2.438 2.55V6.8H4.061z"
-                fill="#6B7280"
+                fill="currentColor"
               />
             </svg>
             <input
               {...register("confirmPassword")}
               type={showConfirmPassword ? "text" : "password"}
               placeholder="Confirm Password"
-              className="bg-transparent text-gray-500/80 placeholder-gray-500/80 outline-none text-sm w-full h-full"
+              className="bg-transparent text-foreground placeholder-muted-foreground outline-none text-body w-full h-full"
               required
             />
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="pr-4 text-gray-500 hover:text-gray-700 transition-colors"
+              className="pr-4 text-muted-foreground hover:text-foreground transition-colors duration-normal"
             >
               {showConfirmPassword ? (
                 <svg
@@ -282,7 +286,7 @@ export default function RegisterPage() {
             </button>
           </div>
           {errors.confirmPassword && (
-            <p className="mt-1 text-sm text-red-600 w-full text-left md:w-96">
+            <p className="mt-1 text-caption text-destructive w-full text-left md:w-96">
               {errors.confirmPassword.message}
             </p>
           )}
@@ -290,14 +294,14 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="mt-8 w-full h-11 rounded-full text-white bg-indigo-500 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+            className="mt-8 w-full h-11 rounded-xl text-white bg-primary-500 hover:bg-primary-600 transition-colors duration-normal disabled:opacity-50 disabled:cursor-not-allowed shadow-surface focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
           >
             {isLoading ? "Creating Account..." : "Sign Up"}
           </button>
 
-          <p className="text-gray-500/90 text-sm mt-4">
+          <p className="text-muted-foreground text-body mt-4">
             Already have an account?{" "}
-            <Link className="text-indigo-400 hover:underline" href="/login">
+            <Link className="text-primary-500 hover:underline" href="/login">
               Sign in
             </Link>
           </p>

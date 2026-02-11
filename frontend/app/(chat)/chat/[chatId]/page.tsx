@@ -245,7 +245,7 @@ export default function ChatThreadPage() {
   const otherAvatar = otherMember?.user?.avatarUrl ?? null;
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-slate-800/95 rounded-2xl overflow-hidden shadow-soft border border-slate-200/60 dark:border-slate-600/60">
+    <div className="flex flex-col h-full bg-white dark:bg-slate-800/95 rounded-2xl overflow-hidden shadow-surface border border-slate-200/60 dark:border-slate-600/60">
       {/* Header */}
       <header className="flex items-center gap-3 px-5 py-3.5 border-b border-slate-200/70 dark:border-slate-600/70 bg-slate-50/80 dark:bg-slate-800/80 backdrop-blur-md shrink-0">
         <div className="w-11 h-11 rounded-full bg-slate-200/80 dark:bg-slate-600/80 flex-shrink-0 overflow-hidden ring-2 ring-white dark:ring-slate-700 shadow-inner flex items-center justify-center">
@@ -258,7 +258,7 @@ export default function ChatThreadPage() {
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <h1 className="font-semibold text-slate-800 dark:text-slate-100 truncate text-lg tracking-tight">{title}</h1>
+          <h1 className="font-semibold text-slate-800 dark:text-slate-100 truncate text-title tracking-tight">{title}</h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 min-h-[1.25rem] mt-0.5">
             {typingLabel ? (
               <span className="text-primary-500 font-medium italic">{typingLabel}</span>
@@ -302,7 +302,7 @@ export default function ChatThreadPage() {
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
-              className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-200/80 dark:hover:bg-slate-600/80 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-200"
+              className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-200/80 dark:hover:bg-slate-600/80 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-normal"
               aria-label="Search messages"
             >
               <Search className="w-5 h-5" />
@@ -312,7 +312,7 @@ export default function ChatThreadPage() {
             type="button"
             disabled={!canCall}
             onClick={() => handleStartCall("video")}
-            className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-200/80 dark:hover:bg-slate-600/80 hover:text-slate-800 dark:hover:text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
+            className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-200/80 dark:hover:bg-slate-600/80 hover:text-slate-800 dark:hover:text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-normal"
             aria-label="Video call"
           >
             <Video className="w-5 h-5" />
@@ -321,7 +321,7 @@ export default function ChatThreadPage() {
             type="button"
             disabled={!canCall}
             onClick={() => handleStartCall("audio")}
-            className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-200/80 dark:hover:bg-slate-600/80 hover:text-slate-800 dark:hover:text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
+            className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-200/80 dark:hover:bg-slate-600/80 hover:text-slate-800 dark:hover:text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-normal"
             aria-label="Audio call"
           >
             <Phone className="w-5 h-5" />
@@ -329,7 +329,7 @@ export default function ChatThreadPage() {
           <button
             type="button"
             onClick={toggleRightSidebar}
-            className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-200/80 dark:hover:bg-slate-600/80 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-200"
+            className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-200/80 dark:hover:bg-slate-600/80 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-normal"
             aria-label="Chat info"
           >
             <Info className="w-5 h-5" />
@@ -378,7 +378,7 @@ export default function ChatThreadPage() {
       )}
 
       {/* Messages area */}
-      <div className="flex-1 overflow-y-auto px-4 py-5 flex flex-col gap-2 min-h-0 bg-[linear-gradient(180deg,_#f8fafc_0%,_#f1f5f9_30%,_#eef2f7_100%)] dark:bg-[linear-gradient(180deg,_#1e293b_0%,_#0f172a_30%,_#0c1222_100%)]">
+      <div className="flex-1 overflow-y-auto scrollbar-thin px-4 py-5 flex flex-col gap-2 min-h-0 bg-[linear-gradient(180deg,_#f8fafc_0%,_#f1f5f9_30%,_#eef2f7_100%)] dark:bg-[linear-gradient(180deg,_#1e293b_0%,_#0f172a_30%,_#0c1222_100%)]">
         {messagesLoading && displayMessages.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 gap-4">
             <div className="flex gap-1.5">
