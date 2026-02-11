@@ -48,6 +48,15 @@ export interface MessageReadItem {
   readAt: string;
 }
 
+export interface MessageReaction {
+  id: string;
+  messageId: string;
+  userId: string;
+  emoji: string;
+  createdAt: string;
+  user: UserBrief;
+}
+
 export interface MessageReplyTo {
   id: string;
   content: string | null;
@@ -68,6 +77,7 @@ export interface MessageWithSender {
   updatedAt: string;
   sender: UserBrief;
   reads: MessageReadItem[];
+  reactions: MessageReaction[];
 }
 
 export interface MessagesResponse {

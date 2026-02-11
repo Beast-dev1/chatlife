@@ -15,6 +15,7 @@ import messageRoutes from "./routes/messageRoutes";
 import messageIdRoutes from "./routes/messageIdRoutes";
 import uploadRoutes from "./routes/uploadRoutes";
 import callRoutes from "./routes/callRoutes";
+import reactionRoutes from "./routes/reactionRoutes";
 import path from "path";
 import { errorHandler } from "./middleware/errorHandler";
 import { getRedisClients, closeRedis } from "./config/redis";
@@ -51,6 +52,7 @@ app.use("/api/chats", chatRoutes);
 app.use("/api/contacts", contactRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/messages", messageIdRoutes);
+app.use("/api/messages", reactionRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/calls", callRoutes);
 

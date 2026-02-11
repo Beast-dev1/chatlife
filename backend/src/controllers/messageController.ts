@@ -52,6 +52,13 @@ export async function listMessages(req: AuthRequest, res: Response) {
         select: { id: true, username: true, avatarUrl: true },
       },
       reads: true,
+      reactions: {
+        include: {
+          user: {
+            select: { id: true, username: true, avatarUrl: true },
+          },
+        },
+      },
       replyTo: {
         select: {
           id: true,
@@ -118,6 +125,13 @@ export async function searchMessages(req: AuthRequest, res: Response) {
         select: { id: true, username: true, avatarUrl: true },
       },
       reads: true,
+      reactions: {
+        include: {
+          user: {
+            select: { id: true, username: true, avatarUrl: true },
+          },
+        },
+      },
       replyTo: {
         select: {
           id: true,
@@ -174,6 +188,13 @@ export async function createMessage(req: AuthRequest, res: Response) {
         select: { id: true, username: true, avatarUrl: true },
       },
       reads: true,
+      reactions: {
+        include: {
+          user: {
+            select: { id: true, username: true, avatarUrl: true },
+          },
+        },
+      },
       replyTo: {
         select: {
           id: true,
@@ -220,6 +241,13 @@ export async function updateMessage(req: AuthRequest, res: Response) {
         select: { id: true, username: true, avatarUrl: true },
       },
       reads: true,
+      reactions: {
+        include: {
+          user: {
+            select: { id: true, username: true, avatarUrl: true },
+          },
+        },
+      },
       replyTo: {
         select: {
           id: true,

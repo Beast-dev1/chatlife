@@ -2,12 +2,15 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
-import { MoreHorizontal, Reply, Pencil, Check, X, Forward, Trash2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { MoreHorizontal, Reply, Pencil, Check, X, Forward, Trash2, Smile } from "lucide-react";
 import { uploadDisplayUrl } from "@/lib/utils";
 import type { MessageWithSender } from "@/types/chat";
+import { useAddReaction, useRemoveReaction } from "@/hooks/useReactions";
 
 export type MessageStatus = "sent" | "delivered" | "read";
+
+const QUICK_REACTIONS = ["👍", "❤️", "😂", "😮", "😢", "🙏"];
 
 export default function MessageBubble({
   message,
@@ -16,6 +19,7 @@ export default function MessageBubble({
   status,
   showAvatar = true,
   avatarUrl,
+  currentUserId,
   onReply,
   onEdit,
   onForward,
@@ -30,6 +34,7 @@ export default function MessageBubble({
   status?: MessageStatus;
   showAvatar?: boolean;
   avatarUrl?: string | null;
+  currentUserId?: string;
   onReply?: (message: MessageWithSender) => void;
   onEdit?: (message: MessageWithSender, newContent: string) => void;
   onForward?: (message: MessageWithSender) => void;
@@ -40,7 +45,11 @@ export default function MessageBubble({
   const [menuOpen, setMenuOpen] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editContent, setEditContent] = useState("");
+  const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const emojiPickerRef = useRef<HTMLDivElement>(null);
+  const addReaction = useAddReaction(message.id);
+  const removeReaction = useRemoveReaction(message.id);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -50,6 +59,35 @@ export default function MessageBubble({
     document.addEventListener("click", close);
     return () => document.removeEventListener("click", close);
   }, [menuOpen]);
+
+  useEffect(() => {
+    if (!emojiPickerOpen) return;
+    const close = (e: MouseEvent) => {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(e.target as Node)) setEmojiPickerOpen(false);
+    };
+    document.addEventListener("click", close);
+    return () => document.removeEventListener("click", close);
+  }, [emojiPickerOpen]);
+
+  const handleReaction = (emoji: string) => {
+    if (!currentUserId) return;
+    const existing = message.reactions?.find((r) => r.userId === currentUserId && r.emoji === emoji);
+    if (existing) {
+      removeReaction.mutate(emoji);
+    } else {
+      addReaction.mutate(emoji);
+    }
+    setEmojiPickerOpen(false);
+  };
+
+  // Group reactions by emoji
+  const groupedReactions = (message.reactions || []).reduce((acc, reaction) => {
+    if (!acc[reaction.emoji]) {
+      acc[reaction.emoji] = [];
+    }
+    acc[reaction.emoji].push(reaction);
+    return acc;
+  }, {} as Record<string, typeof message.reactions>);
   const isImage = message.type === "IMAGE" && message.fileUrl;
   const isVideo = message.type === "VIDEO" && message.fileUrl;
   const isFile = message.type === "FILE" && message.fileUrl;
@@ -269,6 +307,72 @@ export default function MessageBubble({
           </>
           )}
         </div>
+
+        {/* Reactions display */}
+        {Object.keys(groupedReactions).length > 0 && (
+          <div className={`flex flex-wrap gap-1 mt-1.5 ${isOwn ? "justify-end" : "justify-start"}`}>
+            {Object.entries(groupedReactions).map(([emoji, reactions]) => {
+              const userReacted = currentUserId && reactions.some((r) => r.userId === currentUserId);
+              return (
+                <motion.button
+                  key={emoji}
+                  type="button"
+                  onClick={() => handleReaction(emoji)}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs transition-colors ${
+                    userReacted
+                      ? "bg-primary-100 border border-primary-300 text-primary-700"
+                      : "bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200"
+                  }`}
+                  title={reactions.map((r) => r.user.username).join(", ")}
+                >
+                  <span>{emoji}</span>
+                  <span className="font-semibold">{reactions.length}</span>
+                </motion.button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Emoji picker button and picker */}
+        <div className="relative">
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); setEmojiPickerOpen(!emojiPickerOpen); }}
+            className={`mt-1 p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 opacity-0 group-hover/bubble:opacity-100 transition-opacity ${isOwn ? "ml-auto" : ""}`}
+            aria-label="Add reaction"
+          >
+            <Smile className="w-4 h-4" />
+          </button>
+          
+          <AnimatePresence>
+            {emojiPickerOpen && (
+              <motion.div
+                ref={emojiPickerRef}
+                initial={{ opacity: 0, scale: 0.9, y: -10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: -10 }}
+                transition={{ duration: 0.15 }}
+                className={`absolute ${isOwn ? "right-0" : "left-0"} bottom-full mb-2 p-2 bg-white rounded-xl shadow-lg border border-slate-200 z-10`}
+              >
+                <div className="flex gap-1">
+                  {QUICK_REACTIONS.map((emoji) => (
+                    <button
+                      key={emoji}
+                      type="button"
+                      onClick={() => handleReaction(emoji)}
+                      className="p-2 hover:bg-slate-100 rounded-lg text-xl transition-colors"
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
         <div className="flex items-center gap-2 mt-1 px-1">
           {isOwn && status && (
             <span

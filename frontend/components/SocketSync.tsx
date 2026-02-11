@@ -134,6 +134,30 @@ export default function SocketSync() {
       queryClient.invalidateQueries({ queryKey: messagesQueryKey(payload.chatId) });
     };
 
+    const onReactionAdded = (payload: { messageId: string; reaction: any }) => {
+      // Invalidate queries to refetch messages with updated reactions
+      const messages = useChatStore.getState().messagesByChat;
+      for (const chatId in messages) {
+        const msg = messages[chatId]?.find((m) => m.id === payload.messageId);
+        if (msg) {
+          queryClient.invalidateQueries({ queryKey: messagesQueryKey(chatId) });
+          break;
+        }
+      }
+    };
+
+    const onReactionRemoved = (payload: { messageId: string; userId: string; emoji: string }) => {
+      // Invalidate queries to refetch messages with updated reactions
+      const messages = useChatStore.getState().messagesByChat;
+      for (const chatId in messages) {
+        const msg = messages[chatId]?.find((m) => m.id === payload.messageId);
+        if (msg) {
+          queryClient.invalidateQueries({ queryKey: messagesQueryKey(chatId) });
+          break;
+        }
+      }
+    };
+
     socket.on("user_online", onUserOnline);
     socket.on("user_offline", onUserOffline);
     socket.on("presence_initial", onPresenceInitial);
@@ -145,6 +169,8 @@ export default function SocketSync() {
     socket.on("message_updated", onMessageUpdated);
     socket.on("message_deleted", onMessageDeleted);
     socket.on("message_deleted_for_me", onMessageDeletedForMe);
+    socket.on("reaction_added", onReactionAdded);
+    socket.on("reaction_removed", onReactionRemoved);
     return () => {
       socket.off("user_online", onUserOnline);
       socket.off("user_offline", onUserOffline);
@@ -157,6 +183,8 @@ export default function SocketSync() {
       socket.off("message_updated", onMessageUpdated);
       socket.off("message_deleted", onMessageDeleted);
       socket.off("message_deleted_for_me", onMessageDeletedForMe);
+      socket.off("reaction_added", onReactionAdded);
+      socket.off("reaction_removed", onReactionRemoved);
     };
   }, [
     socket,

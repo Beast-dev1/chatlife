@@ -418,6 +418,7 @@ export default function ChatThreadPage() {
                     status={getMessageStatus(msg)}
                     showAvatar
                     avatarUrl={getAvatarForMessage(msg)}
+                    currentUserId={user?.id}
                     onReply={(m) => setReplyingTo(m)}
                     onEdit={handleEditMessage}
                     onForward={(m) => setForwardMessage(m)}

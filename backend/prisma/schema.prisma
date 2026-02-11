@@ -62,6 +62,7 @@ model User {
   callLogsAsCallee     CallLog[]             @relation("Callee")
   passwordResetTokens  PasswordResetToken[]
   messageDeletions     MessageDeletion[]
+  messageReactions     MessageReaction[]
 }
 
 model PasswordResetToken {
@@ -125,6 +126,7 @@ model Message {
   replies Message[]   @relation("MessageReplies")
   reads   MessageRead[]
   deletions MessageDeletion[]
+  reactions MessageReaction[]
 
   @@index([chatId, createdAt])
   @@index([senderId])
@@ -152,6 +154,21 @@ model MessageRead {
   message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
 
   @@unique([messageId, userId])
+}
+
+model MessageReaction {
+  id        String   @id @default(cuid())
+  messageId String   @map("message_id")
+  userId    String   @map("user_id")
+  emoji     String   // e.g. "👍", "❤️", "😂"
+  createdAt DateTime @default(now()) @map("created_at")
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId, emoji])
+  @@index([messageId])
+  @@index([userId])
 }
 
 model Contact {
