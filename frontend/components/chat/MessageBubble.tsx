@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { MoreHorizontal, Reply, Pencil, Check, X, Forward, Trash2, Smile } from "lucide-react";
 import { uploadDisplayUrl } from "@/lib/utils";
 import type { MessageWithSender } from "@/types/chat";
@@ -95,12 +95,13 @@ export default function MessageBubble({
     hour: "2-digit",
     minute: "2-digit",
   });
+  const reduceMotion = useReducedMotion();
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
+      initial={reduceMotion ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2, ease: "easeOut" }}
+      transition={reduceMotion ? { duration: 0 } : { duration: 0.2, ease: "easeOut" }}
       className={`w-full flex gap-2.5 mb-3 group/bubble ${isOwn ? "justify-end flex-row-reverse" : "justify-start"}`}
     >
       {showAvatar && (

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { usePresenceStore } from "@/store/presenceStore";
 import type { ChatWithDetails } from "@/types/chat";
 
@@ -62,12 +62,13 @@ export default function ChatListItem({
   const otherUserId = otherMember?.userId;
   const otherOnline = otherUserId ? isOnline(otherUserId) : false;
   const otherLastSeen = otherUserId ? getLastSeen(otherUserId) : undefined;
+  const reduceMotion = useReducedMotion();
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 6 }}
+      initial={reduceMotion ? false : { opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2, ease: "easeOut", delay: index * 0.03 }}
+      transition={reduceMotion ? { duration: 0 } : { duration: 0.2, ease: "easeOut", delay: index * 0.03 }}
     >
       <Link
         href={`/chat/${chat.id}`}
