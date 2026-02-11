@@ -104,11 +104,11 @@ export default function MessageBubble({
       className={`w-full flex gap-2.5 mb-3 group/bubble ${isOwn ? "justify-end flex-row-reverse" : "justify-start"}`}
     >
       {showAvatar && (
-        <div className="w-9 h-9 rounded-full bg-slate-200/90 flex-shrink-0 overflow-hidden flex items-center justify-center ring-2 ring-white/80 shadow-inner">
+        <div className="w-9 h-9 rounded-full bg-slate-200/90 dark:bg-slate-600/90 flex-shrink-0 overflow-hidden flex items-center justify-center ring-2 ring-white/80 dark:ring-slate-700/80 shadow-inner">
           {avatarUrl ? (
             <Image src={avatarUrl} alt="" width={36} height={36} className="w-full h-full object-cover" unoptimized />
           ) : (
-            <span className="text-sm font-semibold text-slate-500">
+            <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">
               {(message.sender?.username ?? "?").slice(0, 1).toUpperCase()}
             </span>
           )}
@@ -119,7 +119,7 @@ export default function MessageBubble({
           className={`relative rounded-2xl px-4 py-2.5 transition-shadow duration-200 ${
             isOwn
               ? "bg-gradient-to-br from-primary-500 to-primary-600 text-white rounded-br-md shadow-soft hover:shadow-glow"
-              : "bg-white text-slate-800 rounded-bl-md border border-slate-200/70 shadow-soft"
+              : "bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-bl-md border border-slate-200/70 dark:border-slate-600 shadow-soft"
           }`}
         >
           {onReply && (
@@ -127,20 +127,20 @@ export default function MessageBubble({
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); setMenuOpen((o) => !o); }}
-                className={`p-1 rounded ${isOwn ? "text-white/80 hover:bg-white/20" : "text-slate-400 hover:bg-slate-200/80"}`}
+                className={`p-1 rounded ${isOwn ? "text-white/80 hover:bg-white/20" : "text-slate-400 dark:text-slate-500 hover:bg-slate-200/80 dark:hover:bg-slate-600/80"}`}
                 aria-label="Message actions"
               >
                 <MoreHorizontal className="w-4 h-4" />
               </button>
               {menuOpen && (
                 <div className={`absolute top-full right-0 mt-0.5 py-1 min-w-[140px] rounded-lg border shadow-lg ${
-                  isOwn ? "bg-primary-600 border-primary-500" : "bg-white border-slate-200"
+                  isOwn ? "bg-primary-600 border-primary-500" : "bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600"
                 }`}>
                   {onReply && (
                     <button
                       type="button"
                       onClick={() => { onReply(message); setMenuOpen(false); }}
-                      className={`w-full flex items-center gap-2 px-3 py-2 text-left text-sm ${isOwn ? "text-white hover:bg-white/20" : "text-slate-700 hover:bg-slate-100"}`}
+                      className={`w-full flex items-center gap-2 px-3 py-2 text-left text-sm ${isOwn ? "text-white hover:bg-white/20" : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-600"}`}
                     >
                       <Reply className="w-4 h-4" />
                       Reply
@@ -154,7 +154,7 @@ export default function MessageBubble({
                         setEditing(true);
                         setMenuOpen(false);
                       }}
-                      className={`w-full flex items-center gap-2 px-3 py-2 text-left text-sm ${isOwn ? "text-white hover:bg-white/20" : "text-slate-700 hover:bg-slate-100"}`}
+                      className={`w-full flex items-center gap-2 px-3 py-2 text-left text-sm ${isOwn ? "text-white hover:bg-white/20" : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-600"}`}
                     >
                       <Pencil className="w-4 h-4" />
                       Edit
@@ -164,7 +164,7 @@ export default function MessageBubble({
                     <button
                       type="button"
                       onClick={() => { onForward(message); setMenuOpen(false); }}
-                      className={`w-full flex items-center gap-2 px-3 py-2 text-left text-sm ${isOwn ? "text-white hover:bg-white/20" : "text-slate-700 hover:bg-slate-100"}`}
+                      className={`w-full flex items-center gap-2 px-3 py-2 text-left text-sm ${isOwn ? "text-white hover:bg-white/20" : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-600"}`}
                     >
                       <Forward className="w-4 h-4" />
                       Forward
@@ -176,7 +176,7 @@ export default function MessageBubble({
                         <button
                           type="button"
                           onClick={() => { onDeleteForMe(message); setMenuOpen(false); }}
-                          className={`w-full flex items-center gap-2 px-3 py-2 text-left text-sm ${isOwn ? "text-red-200 hover:bg-white/20" : "text-red-600 hover:bg-red-50"}`}
+                          className={`w-full flex items-center gap-2 px-3 py-2 text-left text-sm ${isOwn ? "text-red-200 hover:bg-white/20" : "text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30"}`}
                         >
                           <Trash2 className="w-4 h-4" />
                           Delete for me
@@ -186,7 +186,7 @@ export default function MessageBubble({
                         <button
                           type="button"
                           onClick={() => { onDeleteForEveryone(message); setMenuOpen(false); }}
-                          className={`w-full flex items-center gap-2 px-3 py-2 text-left text-sm ${isOwn ? "text-red-200 hover:bg-white/20" : "text-red-600 hover:bg-red-50"}`}
+                          className={`w-full flex items-center gap-2 px-3 py-2 text-left text-sm ${isOwn ? "text-red-200 hover:bg-white/20" : "text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30"}`}
                         >
                           <Trash2 className="w-4 h-4" />
                           Delete for everyone
@@ -205,7 +205,7 @@ export default function MessageBubble({
                 onChange={(e) => setEditContent(e.target.value)}
                 rows={3}
                 className={`w-full rounded-lg px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 ${
-                  isOwn ? "bg-white/20 text-white placeholder-white/60" : "bg-slate-100 text-slate-800"
+                  isOwn ? "bg-white/20 text-white placeholder-white/60" : "bg-slate-100 dark:bg-slate-600 text-slate-800 dark:text-slate-100"
                 }`}
                 placeholder="Edit message…"
               />
@@ -213,7 +213,7 @@ export default function MessageBubble({
                 <button
                   type="button"
                   onClick={() => { setEditing(false); setEditContent(""); }}
-                  className={`p-1.5 rounded text-sm ${isOwn ? "text-white/80 hover:bg-white/20" : "text-slate-500 hover:bg-slate-200"}`}
+                  className={`p-1.5 rounded text-sm ${isOwn ? "text-white/80 hover:bg-white/20" : "text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-500"}`}
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -226,7 +226,7 @@ export default function MessageBubble({
                       setEditing(false);
                     }
                   }}
-                  className={`p-1.5 rounded text-sm ${isOwn ? "text-white hover:bg-white/20" : "text-primary-600 hover:bg-primary-50"}`}
+                  className={`p-1.5 rounded text-sm ${isOwn ? "text-white hover:bg-white/20" : "text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30"}`}
                 >
                   <Check className="w-4 h-4" />
                 </button>

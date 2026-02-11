@@ -75,22 +75,22 @@ export default function ChatListItem({
           isActive
             ? "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-soft"
             : isUnread
-              ? "bg-slate-50 hover:bg-slate-100 text-slate-800"
-              : "hover:bg-slate-50 text-slate-800"
+              ? "bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100"
+              : "hover:bg-slate-50 dark:hover:bg-slate-700/50 text-slate-800 dark:text-slate-100"
         }`}
       >
-        <div className="relative w-12 h-12 rounded-full bg-slate-200 flex-shrink-0 overflow-hidden flex items-center justify-center ring-2 ring-white/50">
+        <div className="relative w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-600 flex-shrink-0 overflow-hidden flex items-center justify-center ring-2 ring-white/50 dark:ring-slate-700/50">
           {avatarUrl ? (
             <Image src={avatarUrl} alt="" width={48} height={48} className="w-full h-full object-cover" unoptimized />
           ) : (
-            <span className={`text-lg font-semibold ${isActive ? "text-white" : "text-slate-500"}`}>
+            <span className={`text-lg font-semibold ${isActive ? "text-white" : "text-slate-500 dark:text-slate-400"}`}>
               {name.slice(0, 1).toUpperCase()}
             </span>
           )}
           {chat.type === "DIRECT" && otherUserId && (
             <span
-              className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 ${isActive ? "border-primary-500" : "border-white"} ${
-                otherOnline ? "bg-green-500" : "bg-slate-400"
+              className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 ${isActive ? "border-primary-500" : "border-white dark:border-slate-800"} ${
+                otherOnline ? "bg-green-500" : "bg-slate-400 dark:bg-slate-500"
               }`}
               title={otherOnline ? "Online" : otherLastSeen ? `Last seen ${otherLastSeen}` : "Offline"}
             />
@@ -100,18 +100,18 @@ export default function ChatListItem({
           <div className="flex items-center justify-between gap-2">
             <span
               className={`truncate font-semibold uppercase tracking-wide text-sm ${
-                isActive ? "text-white" : isUnread ? "text-slate-900" : "text-slate-700"
+                isActive ? "text-white" : isUnread ? "text-slate-900 dark:text-slate-100" : "text-slate-700 dark:text-slate-200"
               }`}
             >
               {name}
             </span>
-            <span className={`text-xs flex-shrink-0 ${isActive ? "text-white/90" : "text-slate-500"}`}>
+            <span className={`text-xs flex-shrink-0 ${isActive ? "text-white/90" : "text-slate-500 dark:text-slate-400"}`}>
               {time}
             </span>
           </div>
           <p
             className={`text-sm truncate ${
-              isActive ? "text-white/90" : isUnread ? "text-slate-600 font-medium" : "text-slate-500"
+              isActive ? "text-white/90" : isUnread ? "text-slate-600 dark:text-slate-300 font-medium" : "text-slate-500 dark:text-slate-400"
             }`}
           >
             {preview}

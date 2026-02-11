@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import Image from "next/image";
 import { Video, Phone } from "lucide-react";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { useCallStore, type IncomingCallPayload } from "@/store/callStore";
 import type { Socket } from "socket.io-client";
 
@@ -35,9 +36,12 @@ export default function IncomingCallModal({
     clearIncomingCall();
   }, [socket, callId, clearIncomingCall]);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(containerRef, true, clearIncomingCall);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-      <div className="mx-4 w-full max-w-sm rounded-2xl bg-slate-800 p-6 shadow-xl border border-slate-700">
+      <div ref={containerRef} className="mx-4 w-full max-w-sm rounded-2xl bg-slate-800 p-6 shadow-xl border border-slate-700" role="dialog" aria-modal="true" aria-label="Incoming call">
         <p className="text-center text-sm text-slate-400 mb-4">
           Incoming {callType === "video" ? "video" : "audio"} call
         </p>

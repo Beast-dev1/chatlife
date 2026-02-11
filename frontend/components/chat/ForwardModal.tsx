@@ -1,7 +1,9 @@
 "use client";
 
+import { useRef } from "react";
 import Image from "next/image";
 import { useChats } from "@/hooks/useChats";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { api } from "@/lib/api";
 import type { ChatWithDetails } from "@/types/chat";
 import type { MessageWithSender } from "@/types/chat";
@@ -42,10 +44,17 @@ export default function ForwardModal({
     }
   };
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(containerRef, true, onClose);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
       <div
-        className="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-md max-h-[80vh] flex flex-col"
+        ref={containerRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Forward to"
+        className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-600 w-full max-w-md max-h-[80vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between">

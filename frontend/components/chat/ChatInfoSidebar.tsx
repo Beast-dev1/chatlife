@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -18,6 +18,7 @@ import { useChat, useUpdateChat, useAddMember, useRemoveMember, useDeleteChat } 
 import { useSearchUsers } from "@/hooks/useContacts";
 import { useSocket } from "@/hooks/useSocket";
 import { useAuthStore } from "@/store/authStore";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { useChatStore } from "@/store/chatStore";
 import { useCallStore } from "@/store/callStore";
 import { usePresenceStore } from "@/store/presenceStore";
@@ -506,16 +507,23 @@ export default function ChatInfoSidebar({ chatId }: { chatId: string | null }) {
   const user = useAuthStore((s) => s.user);
   const { data: chat } = useChat(chatId);
   const setRightSidebarOpen = useChatStore((s) => s.setRightSidebarOpen);
+  const containerRef = useRef<HTMLElement>(null);
+  const closeSidebar = () => setRightSidebarOpen(false);
+  useFocusTrap(containerRef, true, closeSidebar);
 
   if (!chatId || !user) return null;
 
   return (
     <motion.aside
+      ref={containerRef}
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 20 }}
       transition={{ duration: 0.2 }}
-      className="w-80 min-w-[280px] max-w-[360px] bg-white/90 backdrop-blur-sm border-l border-slate-200/60 flex flex-col rounded-l-2xl shadow-soft"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Chat info"
+      className="w-80 min-w-[280px] max-w-[360px] bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-l border-slate-200/60 dark:border-slate-600/60 flex flex-col rounded-l-2xl shadow-soft"
     >
       <div className="p-3 border-b border-slate-100/80 flex items-center justify-between shrink-0">
         <a href="#" className="text-sm font-semibold text-slate-600 hover:text-primary-500 transition-colors duration-200">
@@ -546,7 +554,7 @@ export default function ChatInfoSidebar({ chatId }: { chatId: string | null }) {
       <div className="p-2 border-t border-slate-100 flex justify-end shrink-0">
         <motion.button
           type="button"
-          onClick={() => setRightSidebarOpen(false)}
+          onClick={closeSidebar}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors"

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Send, Loader2, Smile, Paperclip, X } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useChatStore } from "@/store/chatStore";
+import { useSettingsStore } from "@/store/settingsStore";
 import { useSocket } from "@/hooks/useSocket";
 import { uploadFile } from "@/lib/api";
 import type { MessageWithSender } from "@/types/chat";
@@ -35,10 +36,12 @@ export default function MessageInput({
 }) {
   const [text, setText] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
   const user = useAuthStore((s) => s.user);
+  const enterToSend = useSettingsStore((s) => s.enterToSend);
   const { socket } = useSocket();
   const sendMessageOptimistic = useChatStore((s) => s.sendMessageOptimistic);
   const lastTypingEmitRef = useRef<number>(0);
@@ -123,6 +126,7 @@ export default function MessageInput({
     async (file: File) => {
       if (!user || !socket || disabled || uploading) return;
       setUploading(true);
+      setUploadError(null);
       try {
         const { url } = await uploadFile(file);
         const type = IMAGE_TYPES.has(file.type) ? "IMAGE" : "FILE";
@@ -131,7 +135,8 @@ export default function MessageInput({
         emitMessage({ type, fileUrl: url, content, replyToId });
         onCancelReply?.();
       } catch {
-        // error could be shown via toast
+        setUploadError("Failed to upload file. Try again.");
+        setTimeout(() => setUploadError(null), 5000);
       } finally {
         setUploading(false);
       }
@@ -140,9 +145,21 @@ export default function MessageInput({
   );
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
+    if (e.key === "Enter") {
+      if (enterToSend) {
+        if (!e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+        // Shift+Enter: allow default (newline)
+      } else {
+        // Enter to send is off: Enter = newline only
+        if (e.ctrlKey || e.metaKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+        // Plain Enter: allow default (newline)
+      }
     } else {
       emitTypingStart();
       if (typingStopTimerRef.current) {
@@ -187,17 +204,22 @@ export default function MessageInput({
         : "File";
 
   return (
-    <div className="flex flex-col gap-1 px-4 py-3 bg-slate-50/90 backdrop-blur-md border-t border-slate-200/70 rounded-b-2xl">
+    <div className="flex flex-col gap-1 px-4 py-3 bg-slate-50/90 dark:bg-slate-800/90 backdrop-blur-md border-t border-slate-200/70 dark:border-slate-600/70 rounded-b-2xl">
+      {uploadError && (
+        <p role="alert" className="text-sm text-rose-600 dark:text-rose-400 px-1 py-0.5">
+          {uploadError}
+        </p>
+      )}
       {replyingTo && (
-        <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-slate-200/60 border border-slate-200/80">
+        <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-slate-200/60 dark:bg-slate-600/60 border border-slate-200/80 dark:border-slate-500/80">
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-slate-600">Replying to {replyingTo.sender.username}</p>
-            <p className="text-xs text-slate-500 truncate">{replyPreview}</p>
+            <p className="text-xs font-medium text-slate-600 dark:text-slate-300">Replying to {replyingTo.sender.username}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{replyPreview}</p>
           </div>
           <button
             type="button"
             onClick={onCancelReply}
-            className="p-1 rounded text-slate-500 hover:bg-slate-300/80"
+            className="p-1 rounded text-slate-500 dark:text-slate-400 hover:bg-slate-300/80 dark:hover:bg-slate-500/80"
             aria-label="Cancel reply"
           >
             <X className="w-4 h-4" />
@@ -209,10 +231,11 @@ export default function MessageInput({
         type="button"
         onClick={handleFileClick}
         disabled={disabled || uploading}
+        aria-busy={uploading}
+        aria-label="Attach file"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-200/80 hover:text-slate-700 disabled:opacity-50 transition-colors duration-200"
-        aria-label="Attach file"
+        className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-200/80 dark:hover:bg-slate-600/80 hover:text-slate-700 dark:hover:text-slate-200 disabled:opacity-50 transition-colors duration-200"
       >
         {uploading ? (
           <Loader2 className="w-5 h-5 animate-spin" />
@@ -227,10 +250,11 @@ export default function MessageInput({
         onKeyDown={handleKeyDown}
         onFocus={handleFocus}
         onBlur={handleBlur}
-        placeholder="Type a message…"
+        placeholder={enterToSend ? "Type a message…" : "Type a message… (Ctrl+Enter to send)"}
+        aria-description={enterToSend ? "Press Enter to send, Shift+Enter for new line" : "Press Ctrl+Enter to send"}
         rows={1}
         disabled={disabled}
-        className="flex-1 resize-none rounded-xl bg-white border border-slate-200/80 px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400/50 min-h-[44px] max-h-32 disabled:opacity-50 transition-all duration-200 shadow-inner"
+        className="flex-1 resize-none rounded-xl bg-white dark:bg-slate-700 border border-slate-200/80 dark:border-slate-500 px-4 py-2.5 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400/50 min-h-[44px] max-h-32 disabled:opacity-50 transition-all duration-200 shadow-inner"
       />
       <div className="relative">
         <motion.button
@@ -238,7 +262,7 @@ export default function MessageInput({
           onClick={(e) => { e.stopPropagation(); setEmojiPickerOpen(!emojiPickerOpen); }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-200/80 hover:text-slate-700 disabled:opacity-50 transition-colors duration-200"
+          className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-200/80 dark:hover:bg-slate-600/80 hover:text-slate-700 dark:hover:text-slate-200 disabled:opacity-50 transition-colors duration-200"
           aria-label="Emoji"
         >
           <Smile className="w-5 h-5" />
@@ -252,11 +276,11 @@ export default function MessageInput({
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 10 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="absolute bottom-full right-0 mb-3 p-4 bg-white rounded-2xl shadow-2xl border border-slate-200/80 z-50 backdrop-blur-sm"
+              className="absolute bottom-full right-0 mb-3 p-4 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200/80 dark:border-slate-600 z-50 backdrop-blur-sm"
               style={{ maxHeight: "320px", overflowY: "auto" }}
             >
               <div className="mb-2">
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Pick an emoji</p>
+                <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Pick an emoji</p>
               </div>
               <div className="grid grid-cols-6 gap-2 w-[280px]">
                 {MESSAGE_EMOJIS.map((emoji) => (
@@ -266,7 +290,7 @@ export default function MessageInput({
                     onClick={() => insertEmoji(emoji)}
                     whileHover={{ scale: 1.15 }}
                     whileTap={{ scale: 0.95 }}
-                    className="flex items-center justify-center w-10 h-10 hover:bg-slate-100 rounded-xl text-2xl transition-colors duration-150"
+                    className="flex items-center justify-center w-10 h-10 hover:bg-slate-100 dark:hover:bg-slate-600 rounded-xl text-2xl transition-colors duration-150"
                   >
                     {emoji}
                   </motion.button>

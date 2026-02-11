@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import {
   Carousel,
@@ -10,6 +10,7 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { uploadDisplayUrl } from "@/lib/utils";
 import type { MessageWithSender } from "@/types/chat";
 import { Download, X } from "lucide-react";
@@ -32,16 +33,8 @@ export default function MediaViewer({
     api.on("select", () => setCurrentIndex(api.selectedScrollSnap()));
   }, [api]);
 
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    },
-    [onClose]
-  );
-  useEffect(() => {
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [handleKeyDown]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(containerRef, true, onClose);
 
   const currentMessage = mediaMessages[currentIndex];
   const hasMultiple = mediaMessages.length > 1;
@@ -68,6 +61,7 @@ export default function MediaViewer({
 
   return (
     <div
+      ref={containerRef}
       className="fixed inset-0 z-50 flex flex-col bg-black/95"
       role="dialog"
       aria-modal="true"

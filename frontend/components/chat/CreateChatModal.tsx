@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import { X, Users, User } from "lucide-react";
 import { useCreateChat } from "@/hooks/useChats";
 import { useContacts, useSearchUsers } from "@/hooks/useContacts";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 import type { SearchUser } from "@/types/chat";
 
 export default function CreateChatModal({
@@ -53,15 +54,19 @@ export default function CreateChatModal({
     }
   };
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(containerRef, true, onClose);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-      <div className="w-full max-w-md rounded-2xl bg-slate-800 border border-slate-700 shadow-xl">
+      <div ref={containerRef} className="w-full max-w-md rounded-2xl bg-slate-800 border border-slate-700 shadow-xl" role="dialog" aria-modal="true" aria-label="New chat">
         <div className="flex items-center justify-between p-4 border-b border-slate-700">
           <h2 className="text-lg font-semibold text-white">New chat</h2>
           <button
             type="button"
             onClick={onClose}
             className="p-2 rounded-lg text-slate-400 hover:bg-slate-700 hover:text-white"
+            aria-label="Close"
           >
             <X className="w-5 h-5" />
           </button>
@@ -147,6 +152,7 @@ export default function CreateChatModal({
                     type="button"
                     onClick={handleCreate}
                     disabled={selectedIds.length !== 1 || createChat.isPending}
+                    aria-busy={createChat.isPending}
                     className="flex-1 px-4 py-2 rounded-lg bg-emerald-600 text-white disabled:opacity-50"
                   >
                     {createChat.isPending ? "Creating…" : "Create chat"}
@@ -176,6 +182,7 @@ export default function CreateChatModal({
                   type="button"
                   onClick={handleCreate}
                   disabled={createChat.isPending}
+                  aria-busy={createChat.isPending}
                   className="flex-1 px-4 py-2 rounded-lg bg-emerald-600 text-white disabled:opacity-50"
                 >
                   {createChat.isPending ? "Creating…" : "Create group"}
