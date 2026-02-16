@@ -18,6 +18,14 @@ const nextConfig = {
   },
   images: {
     remotePatterns: [
+      // Same-origin uploads (rewritten from /uploads/* to API)
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "3000",
+        pathname: "/uploads/**",
+      },
+      // Direct API uploads
       {
         protocol: "http",
         hostname: "localhost",

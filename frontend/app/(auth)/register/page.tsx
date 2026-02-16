@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { GoogleLogin } from "@react-oauth/google";
 import { useAuthStore } from "@/store/authStore";
 
 const schema = z
@@ -38,8 +39,10 @@ type FormData = z.infer<typeof schema>;
 export default function RegisterPage() {
   const router = useRouter();
   const registerUser = useAuthStore((s) => s.register);
+  const loginWithGoogle = useAuthStore((s) => s.loginWithGoogle);
   const isLoading = useAuthStore((s) => s.isLoading);
   const [error, setError] = useState<string | null>(null);
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -90,6 +93,31 @@ export default function RegisterPage() {
           <p className="text-body text-muted-foreground mt-3">
             Join us! Create your account to get started
           </p>
+
+          {googleClientId && (
+            <div className="w-full mt-6 flex justify-center">
+              <GoogleLogin
+                onSuccess={async (credentialResponse) => {
+                  const token = credentialResponse.credential;
+                  if (!token) return;
+                  setError(null);
+                  try {
+                    await loginWithGoogle(token);
+                    router.push("/chat");
+                    router.refresh();
+                  } catch (e) {
+                    setError(e instanceof Error ? e.message : "Google sign-in failed");
+                  }
+                }}
+                onError={() => setError("Google sign-in was cancelled or failed.")}
+                useOneTap={false}
+                theme="filled_black"
+                size="large"
+                text="continue_with"
+                width="320"
+              />
+            </div>
+          )}
 
           <div className="flex items-center gap-4 w-full my-6">
             <div className="w-full h-px bg-border" />

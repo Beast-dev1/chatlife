@@ -5,6 +5,7 @@ import { PrismaClient } from "@prisma/client";
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../utils/jwt";
 import { AuthRequest } from "../middleware/auth";
 import { AppError } from "../middleware/errorHandler";
+import { OAuth2Client } from "google-auth-library";
 import {
   registerSchema,
   loginSchema,
@@ -12,20 +13,38 @@ import {
   profileSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
+  googleAuthSchema,
   type RegisterInput,
   type LoginInput,
   type ProfileInput,
   type ForgotPasswordInput,
   type ResetPasswordInput,
+  type GoogleAuthInput,
 } from "../validators/auth";
 import { sendPasswordResetEmail } from "../services/emailService";
+
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
 const prisma = new PrismaClient();
 const SALT_ROUNDS = 10;
 
-function excludePassword<T extends { password?: string }>(user: T): Omit<T, "password"> {
+function excludePassword<T extends { password?: string | null }>(user: T): Omit<T, "password"> {
   const { password, ...rest } = user;
   return rest;
+}
+
+/** Derive a unique username from email (e.g. john.doe -> johndoe or johndoe_2 if taken). */
+async function deriveUniqueUsername(email: string): Promise<string> {
+  const base = email.split("@")[0].toLowerCase().replace(/[^a-z0-9]/g, "") || "user";
+  const sanitized = base.slice(0, 30);
+  let username = sanitized;
+  let n = 0;
+  while (true) {
+    const existing = await prisma.user.findUnique({ where: { username } });
+    if (!existing) return username;
+    n += 1;
+    username = `${sanitized.slice(0, 26)}_${n}`;
+  }
 }
 
 export async function register(req: AuthRequest, res: Response) {
@@ -78,13 +97,78 @@ export async function login(req: AuthRequest, res: Response) {
   const user = await prisma.user.findUnique({
     where: { email: email.toLowerCase() },
   });
-  if (!user || !(await bcrypt.compare(password, user.password))) {
+  if (!user) throw new AppError("Invalid email or password", 401);
+  if (!user.password) throw new AppError("This account uses Google sign-in", 401);
+  if (!(await bcrypt.compare(password, user.password))) {
     throw new AppError("Invalid email or password", 401);
   }
 
   const payload = { userId: user.id, email: user.email };
   const accessToken = signAccessToken(payload);
   const refreshToken = signRefreshToken(payload);
+
+  res.json({
+    user: excludePassword(user),
+    accessToken,
+    refreshToken,
+    expiresIn: 900,
+  });
+}
+
+export async function googleAuth(req: AuthRequest, res: Response) {
+  const parsed = googleAuthSchema.safeParse(req.body);
+  if (!parsed.success) throw parsed.error;
+
+  const { idToken }: GoogleAuthInput = parsed.data;
+
+  if (!GOOGLE_CLIENT_ID) {
+    throw new AppError("Google OAuth is not configured", 503);
+  }
+
+  const client = new OAuth2Client(GOOGLE_CLIENT_ID);
+  let payload: { email?: string; sub?: string; name?: string; picture?: string };
+  try {
+    const ticket = await client.verifyIdToken({ idToken, audience: GOOGLE_CLIENT_ID });
+    payload = ticket.getPayload() ?? {};
+  } catch {
+    throw new AppError("Invalid Google token", 401);
+  }
+
+  const email = payload.email?.toLowerCase();
+  const googleId = payload.sub;
+  if (!email || !googleId) {
+    throw new AppError("Invalid Google token: missing email or sub", 401);
+  }
+
+  let user = await prisma.user.findUnique({ where: { googleId } });
+  if (user) {
+    // Existing Google user
+  } else {
+    user = await prisma.user.findUnique({ where: { email } });
+    if (user) {
+      // Existing email user: link Google account
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: { googleId },
+      });
+    } else {
+      // New user: create with derived username and no password
+      const username = await deriveUniqueUsername(email);
+      user = await prisma.user.create({
+        data: {
+          email,
+          username,
+          password: null,
+          googleId,
+          avatarUrl: payload.picture ?? undefined,
+        },
+      });
+    }
+  }
+
+  const tokenPayload = { userId: user.id, email: user.email };
+  const accessToken = signAccessToken(tokenPayload);
+  const refreshToken = signRefreshToken(tokenPayload);
 
   res.json({
     user: excludePassword(user),

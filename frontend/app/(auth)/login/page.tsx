@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { GoogleLogin } from "@react-oauth/google";
 import { useAuthStore } from "@/store/authStore";
 
 const schema = z.object({
@@ -20,7 +21,9 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const login = useAuthStore((s) => s.login);
+  const loginWithGoogle = useAuthStore((s) => s.loginWithGoogle);
   const isLoading = useAuthStore((s) => s.isLoading);
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
@@ -83,6 +86,31 @@ function LoginForm() {
           <p className="text-body text-muted-foreground mt-3">
             Welcome back! Please sign in to continue
           </p>
+
+          {googleClientId && (
+            <div className="w-full mt-6 flex justify-center">
+              <GoogleLogin
+                onSuccess={async (credentialResponse) => {
+                  const token = credentialResponse.credential;
+                  if (!token) return;
+                  setError(null);
+                  try {
+                    await loginWithGoogle(token);
+                    router.push("/chat");
+                    router.refresh();
+                  } catch (e) {
+                    setError(e instanceof Error ? e.message : "Google sign-in failed");
+                  }
+                }}
+                onError={() => setError("Google sign-in was cancelled or failed.")}
+                useOneTap={false}
+                theme="filled_black"
+                size="large"
+                text="continue_with"
+                width="320"
+              />
+            </div>
+          )}
 
           <div className="flex items-center gap-4 w-full my-6">
             <div className="w-full h-px bg-border" />

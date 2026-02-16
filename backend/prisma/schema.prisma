@@ -46,7 +46,8 @@ model User {
   id         String    @id @default(cuid())
   email      String    @unique
   username   String    @unique
-  password   String
+  password   String?
+  googleId   String?   @unique @map("google_id")
   avatarUrl  String?   @map("avatar_url")
   status     String?   // e.g. "Hey there! I am using Let'sChat"
   bio        String?
