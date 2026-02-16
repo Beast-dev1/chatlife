@@ -181,17 +181,16 @@ export default function ChatListSidebar() {
       {/* Chat list */}
       <div className="flex-1 overflow-y-auto p-2 scrollbar-thin">
         {isLoading && (
-          <div className="flex items-center justify-center py-12">
-            <div className="flex gap-1.5">
-              {[0, 1, 2].map((i) => (
-                <motion.div
-                  key={i}
-                  className="w-2 h-2 rounded-full bg-primary-400"
-                  animate={{ y: [0, -6, 0] }}
-                  transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.1 }}
-                />
-              ))}
-            </div>
+          <div className="space-y-1 p-2">
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="flex items-center gap-3 px-3 py-3 rounded-xl">
+                <div className="w-12 h-12 rounded-full bg-muted animate-pulse flex-shrink-0" />
+                <div className="flex-1 min-w-0 space-y-2">
+                  <div className="h-3.5 w-3/4 rounded bg-muted animate-pulse" />
+                  <div className="h-3 w-1/2 rounded bg-muted animate-pulse" />
+                </div>
+              </div>
+            ))}
           </div>
         )}
         {error && (

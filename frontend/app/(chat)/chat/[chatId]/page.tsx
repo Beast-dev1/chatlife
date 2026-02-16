@@ -381,17 +381,38 @@ export default function ChatThreadPage() {
       {/* Messages area */}
       <div className="flex-1 overflow-y-auto scrollbar-thin px-4 py-5 flex flex-col gap-2 min-h-0 bg-gradient-to-b from-muted/30 to-background">
         {messagesLoading && displayMessages.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-16 gap-4">
-            <div className="flex gap-1.5">
-              {[0, 1, 2].map((i) => (
-                <span
-                  key={i}
-                  className="w-2.5 h-2.5 rounded-full bg-primary-400 animate-bounce"
-                  style={{ animationDelay: `${i * 0.12}s` }}
-                />
-              ))}
-            </div>
-            <p className="text-sm text-muted-foreground">Loading messages…</p>
+          <div className="flex flex-col gap-3 py-4">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className={`flex gap-2.5 ${i % 2 === 0 ? "justify-start" : "justify-end"}`}
+              >
+                {i % 2 === 0 && (
+                  <div className="w-9 h-9 rounded-full bg-muted animate-pulse flex-shrink-0" />
+                )}
+                <div
+                  className={`rounded-2xl px-4 py-3 max-w-[70%] space-y-2 ${
+                    i % 2 === 0
+                      ? "rounded-bl-md"
+                      : "rounded-br-md"
+                  }`}
+                >
+                  <div
+                    className={`h-3 rounded bg-muted animate-pulse ${
+                      i % 2 === 0 ? "w-32" : "w-40 ml-auto"
+                    }`}
+                  />
+                  <div
+                    className={`h-3 rounded bg-muted animate-pulse ${
+                      i % 2 === 0 ? "w-48" : "w-56 ml-auto"
+                    }`}
+                  />
+                </div>
+                {i % 2 === 1 && (
+                  <div className="w-9 h-9 rounded-full bg-muted animate-pulse flex-shrink-0" />
+                )}
+              </div>
+            ))}
           </div>
         )}
         {!messagesLoading && displayEntries.length === 0 && (

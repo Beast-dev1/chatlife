@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { MessageCircle, LogOut, User, Users, Settings } from "lucide-react";
+import { Spinner } from "@/components/ui/Spinner";
 import { useAuthStore } from "@/store/authStore";
 import { useChatStore } from "@/store/chatStore";
 import { useContactRequests } from "@/hooks/useContacts";
