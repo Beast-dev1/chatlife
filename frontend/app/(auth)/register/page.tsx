@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { GoogleLogin } from "@react-oauth/google";
+import { AnimatePresence, motion } from "framer-motion";
 import { useAuthStore } from "@/store/authStore";
 
 const schema = z
@@ -79,14 +80,26 @@ export default function RegisterPage() {
       </div>
 
       <div className="w-full flex flex-col items-center justify-center bg-background text-foreground overflow-hidden py-8 px-4">
-        {error && (
-          <div className="mb-4 p-3 bg-destructive/10 border border-destructive/30 text-destructive rounded-xl text-body max-w-md w-full md:w-96">
-            {error}
-          </div>
-        )}
+        <AnimatePresence mode="wait">
+          {error && (
+            <motion.div
+              key="error"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+              className="mb-4 p-3 bg-destructive/10 border border-destructive/30 text-destructive rounded-xl text-body max-w-md w-full md:w-96"
+            >
+              {error}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        <form
+        <motion.form
           onSubmit={handleSubmit(onSubmit)}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
           className="md:w-96 w-80 flex flex-col items-center justify-center p-6 rounded-2xl glass shadow-surface border border-border"
         >
           <h2 className="text-display font-semibold text-foreground">Create Account</h2>
@@ -322,7 +335,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="mt-8 w-full h-11 rounded-xl text-white bg-primary-500 hover:bg-primary-600 transition-colors duration-normal disabled:opacity-50 disabled:cursor-not-allowed shadow-surface focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+            className="mt-8 w-full h-11 rounded-xl text-primary-foreground bg-primary-500 hover:bg-primary-600 active:scale-[0.98] transition-all duration-normal disabled:opacity-50 disabled:cursor-not-allowed shadow-surface focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
           >
             {isLoading ? "Creating Account..." : "Sign Up"}
           </button>
@@ -333,7 +346,7 @@ export default function RegisterPage() {
               Sign in
             </Link>
           </p>
-        </form>
+        </motion.form>
       </div>
     </div>
   );

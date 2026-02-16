@@ -7,6 +7,8 @@ import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { AnimatePresence, motion } from "framer-motion";
+import { MessageCircle } from "lucide-react";
 import { api } from "@/lib/api";
 
 const schema = z
@@ -63,18 +65,23 @@ function ResetPasswordForm() {
   if (!token) {
     return (
       <div className="w-full flex flex-col items-center justify-center bg-background text-foreground px-4">
-        <div className="md:w-96 w-80 flex flex-col items-center justify-center p-6 rounded-2xl glass shadow-surface border border-border">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
+          className="md:w-96 w-80 flex flex-col items-center justify-center p-6 rounded-2xl glass shadow-surface border border-border"
+        >
           <h2 className="text-display font-semibold text-foreground">Invalid link</h2>
           <p className="text-body text-muted-foreground mt-3 text-center">
             This reset link is invalid or has expired. Please request a new one.
           </p>
           <Link
             href="/forgot-password"
-            className="mt-8 w-full h-11 rounded-xl text-white bg-primary-500 hover:bg-primary-600 transition-colors duration-normal flex items-center justify-center shadow-surface focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+            className="mt-8 w-full h-11 rounded-xl text-primary-foreground bg-primary-500 hover:bg-primary-600 active:scale-[0.98] transition-all duration-normal flex items-center justify-center shadow-surface focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
           >
             Request new link
           </Link>
-        </div>
+        </motion.div>
       </div>
     );
   }
@@ -93,14 +100,26 @@ function ResetPasswordForm() {
       </div>
 
       <div className="w-full flex flex-col items-center justify-center bg-background text-foreground px-4">
-        {error && (
-          <div className="mb-4 p-3 bg-destructive/10 border border-destructive/30 text-destructive rounded-xl text-body max-w-md w-full md:w-96">
-            {error}
-          </div>
-        )}
+        <AnimatePresence mode="wait">
+          {error && (
+            <motion.div
+              key="error"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+              className="mb-4 p-3 bg-destructive/10 border border-destructive/30 text-destructive rounded-xl text-body max-w-md w-full md:w-96"
+            >
+              {error}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        <form
+        <motion.form
           onSubmit={handleSubmit(onSubmit)}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
           className="md:w-96 w-80 flex flex-col items-center justify-center p-6 rounded-2xl glass shadow-surface border border-border"
         >
           <h2 className="text-display font-semibold text-foreground">
@@ -177,7 +196,7 @@ function ResetPasswordForm() {
           <button
             type="submit"
             disabled={isLoading}
-            className="mt-8 w-full h-11 rounded-xl text-white bg-primary-500 hover:bg-primary-600 transition-colors duration-normal disabled:opacity-50 disabled:cursor-not-allowed shadow-surface focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+            className="mt-8 w-full h-11 rounded-xl text-primary-foreground bg-primary-500 hover:bg-primary-600 active:scale-[0.98] transition-all duration-normal disabled:opacity-50 disabled:cursor-not-allowed shadow-surface focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
           >
             {isLoading ? "Resetting..." : "Reset password"}
           </button>
@@ -186,7 +205,7 @@ function ResetPasswordForm() {
               Back to sign in
             </Link>
           </p>
-        </form>
+        </motion.form>
       </div>
     </div>
   );
@@ -196,8 +215,11 @@ export default function ResetPasswordPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex h-full w-full items-center justify-center bg-background">
-          <p className="text-muted-foreground">Loading...</p>
+        <div className="flex h-full w-full flex-col items-center justify-center bg-background gap-3">
+          <div className="w-10 h-10 rounded-xl bg-primary-500/20 animate-pulse flex items-center justify-center">
+            <MessageCircle className="w-5 h-5 text-primary-500" />
+          </div>
+          <span className="text-sm font-medium text-muted-foreground">Loading...</span>
         </div>
       }
     >
