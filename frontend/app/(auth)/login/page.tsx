@@ -8,6 +8,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { GoogleLogin } from "@react-oauth/google";
+import { AnimatePresence, motion } from "framer-motion";
+import { MessageCircle } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 
 const schema = z.object({
@@ -67,19 +69,38 @@ function LoginForm() {
       </div>
 
       <div className="w-full flex flex-col items-center justify-center bg-background text-foreground px-4">
-        {error && (
-          <div className="mb-4 p-3 bg-destructive/10 border border-destructive/30 text-destructive rounded-xl text-body max-w-md w-full md:w-96">
-            {error}
-          </div>
-        )}
-        {success && (
-          <div className="mb-4 p-3 bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 rounded-xl text-body max-w-md w-full md:w-96">
-            {success}
-          </div>
-        )}
+        <AnimatePresence mode="wait">
+          {error && (
+            <motion.div
+              key="error"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+              className="mb-4 p-3 bg-destructive/10 border border-destructive/30 text-destructive rounded-xl text-body max-w-md w-full md:w-96"
+            >
+              {error}
+            </motion.div>
+          )}
+          {success && (
+            <motion.div
+              key="success"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+              className="mb-4 p-3 bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 rounded-xl text-body max-w-md w-full md:w-96"
+            >
+              {success}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        <form
+        <motion.form
           onSubmit={handleSubmit(onSubmit)}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
           className="md:w-96 w-80 flex flex-col items-center justify-center p-6 rounded-2xl glass shadow-surface border border-border"
         >
           <h2 className="text-display font-semibold text-foreground">Sign in</h2>
@@ -202,7 +223,7 @@ function LoginForm() {
           <button
             type="submit"
             disabled={isLoading}
-            className="mt-8 w-full h-11 rounded-xl text-white bg-primary-500 hover:bg-primary-600 transition-colors duration-normal disabled:opacity-50 disabled:cursor-not-allowed shadow-surface focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+            className="mt-8 w-full h-11 rounded-xl text-primary-foreground bg-primary-500 hover:bg-primary-600 active:scale-[0.98] transition-all duration-normal disabled:opacity-50 disabled:cursor-not-allowed shadow-surface focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
           >
             {isLoading ? "Signing in..." : "Sign in"}
           </button>
@@ -212,7 +233,7 @@ function LoginForm() {
               Sign up
             </Link>
           </p>
-        </form>
+        </motion.form>
       </div>
     </div>
   );
@@ -221,8 +242,11 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="flex h-full w-full items-center justify-center bg-background">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary-500 border-t-transparent" />
+      <div className="flex h-full w-full flex-col items-center justify-center bg-background gap-3">
+        <div className="w-10 h-10 rounded-xl bg-primary-500/20 animate-pulse flex items-center justify-center">
+          <MessageCircle className="w-5 h-5 text-primary-500" />
+        </div>
+        <span className="text-sm font-medium text-muted-foreground">Loading...</span>
       </div>
     }>
       <LoginForm />
