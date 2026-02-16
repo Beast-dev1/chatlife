@@ -65,7 +65,9 @@ const config: Config = {
   				'3': 'hsl(var(--chart-3))',
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
-  			}
+  			},
+  			chatSent: 'var(--chat-sent)',
+  			chatReceived: 'var(--chat-received)'
   		},
   		boxShadow: {
   			surface: 'var(--shadow-surface)',

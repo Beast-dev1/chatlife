@@ -72,26 +72,26 @@ export default function ChatListItem({
     >
       <Link
         href={`/chat/${chat.id}`}
-        className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-normal ${
+        className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-normal active:opacity-95 ${
           isActive
-            ? "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-surface"
+            ? "bg-gradient-to-r from-primary-500 to-primary-600 text-primary-foreground shadow-surface"
             : isUnread
-              ? "bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100"
-              : "hover:bg-slate-50 dark:hover:bg-slate-700/50 text-slate-800 dark:text-slate-100"
+              ? "bg-muted/80 hover:bg-muted text-foreground"
+              : "hover:bg-muted text-foreground"
         }`}
       >
-        <div className="relative w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-600 flex-shrink-0 overflow-hidden flex items-center justify-center ring-2 ring-white/50 dark:ring-slate-700/50">
+        <div className="relative w-12 h-12 rounded-full bg-muted flex-shrink-0 overflow-hidden flex items-center justify-center ring-2 ring-background/50">
           {avatarUrl ? (
             <Image src={avatarUrl} alt="" width={48} height={48} className="w-full h-full object-cover" />
           ) : (
-            <span className={`text-lg font-semibold ${isActive ? "text-white" : "text-slate-500 dark:text-slate-400"}`}>
+            <span className={`text-lg font-semibold ${isActive ? "text-primary-foreground" : "text-muted-foreground"}`}>
               {name.slice(0, 1).toUpperCase()}
             </span>
           )}
           {chat.type === "DIRECT" && otherUserId && (
             <span
-              className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 ${isActive ? "border-primary-500" : "border-white dark:border-slate-800"} ${
-                otherOnline ? "bg-green-500" : "bg-slate-400 dark:bg-slate-500"
+              className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 ${isActive ? "border-primary-500" : "border-background"} ${
+                otherOnline ? "bg-green-500" : "bg-muted-foreground/60"
               }`}
               title={otherOnline ? "Online" : otherLastSeen ? `Last seen ${otherLastSeen}` : "Offline"}
             />
@@ -101,30 +101,30 @@ export default function ChatListItem({
           <div className="flex items-center justify-between gap-2">
             <span
               className={`truncate font-semibold uppercase tracking-wide text-sm ${
-                isActive ? "text-white" : isUnread ? "text-slate-900 dark:text-slate-100" : "text-slate-700 dark:text-slate-200"
+                isActive ? "text-primary-foreground" : isUnread ? "text-foreground" : "text-foreground"
               }`}
             >
               {name}
             </span>
-            <span className={`text-xs flex-shrink-0 ${isActive ? "text-white/90" : "text-slate-500 dark:text-slate-400"}`}>
+            <span className={`text-xs flex-shrink-0 ${isActive ? "text-primary-foreground/90" : "text-muted-foreground"}`}>
               {time}
             </span>
           </div>
           <p
             className={`text-sm truncate ${
-              isActive ? "text-white/90" : isUnread ? "text-slate-600 dark:text-slate-300 font-medium" : "text-slate-500 dark:text-slate-400"
+              isActive ? "text-primary-foreground/90" : isUnread ? "text-muted-foreground font-medium" : "text-muted-foreground"
             }`}
           >
             {preview}
           </p>
         </div>
         {isUnread && unreadCount > 0 && !isActive && (
-          <span className="min-w-[1.25rem] h-5 px-1.5 rounded-full bg-primary-500 text-white text-xs font-semibold flex items-center justify-center flex-shrink-0 shadow-sm">
+          <span className="min-w-[1.25rem] h-5 px-1.5 rounded-full bg-primary-500 text-primary-foreground text-xs font-semibold flex items-center justify-center flex-shrink-0 shadow-sm">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
         {isActive && isUnread && unreadCount > 0 && (
-          <span className="min-w-[1.25rem] h-5 px-1.5 rounded-full bg-white/25 text-white text-xs font-semibold flex items-center justify-center flex-shrink-0">
+          <span className="min-w-[1.25rem] h-5 px-1.5 rounded-full bg-primary-foreground/25 text-primary-foreground text-xs font-semibold flex items-center justify-center flex-shrink-0">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}

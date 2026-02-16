@@ -245,21 +245,21 @@ export default function ChatThreadPage() {
   const otherAvatar = otherMember?.user?.avatarUrl ?? null;
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-slate-800/95 rounded-2xl overflow-hidden shadow-surface border border-slate-200/60 dark:border-slate-600/60">
+    <div className="flex flex-col h-full bg-card rounded-2xl overflow-hidden shadow-surface border border-border">
       {/* Header */}
-      <header className="flex items-center gap-3 px-5 py-3.5 border-b border-slate-200/70 dark:border-slate-600/70 bg-slate-50/80 dark:bg-slate-800/80 backdrop-blur-md shrink-0">
-        <div className="w-11 h-11 rounded-full bg-slate-200/80 dark:bg-slate-600/80 flex-shrink-0 overflow-hidden ring-2 ring-white dark:ring-slate-700 shadow-inner flex items-center justify-center">
+      <header className="flex items-center gap-3 px-5 py-3.5 border-b border-border bg-muted/80 backdrop-blur-md shrink-0">
+        <div className="w-11 h-11 rounded-full bg-muted flex-shrink-0 overflow-hidden ring-2 ring-background shadow-inner flex items-center justify-center">
           {otherAvatar ? (
             <Image src={otherAvatar} alt="" width={44} height={44} className="w-full h-full object-cover" />
           ) : (
-          <span className="text-base font-semibold text-slate-500 dark:text-slate-400">
+          <span className="text-base font-semibold text-muted-foreground">
             {title.slice(0, 1).toUpperCase()}
           </span>
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <h1 className="font-semibold text-slate-800 dark:text-slate-100 truncate text-title tracking-tight">{title}</h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 min-h-[1.25rem] mt-0.5">
+          <h1 className="font-semibold text-foreground truncate text-title tracking-tight">{title}</h1>
+          <p className="text-xs text-muted-foreground min-h-[1.25rem] mt-0.5">
             {typingLabel ? (
               <span className="text-primary-500 font-medium italic">{typingLabel}</span>
             ) : chat?.type === "DIRECT" && otherUserId && isConnected ? (
@@ -271,7 +271,7 @@ export default function ChatThreadPage() {
               ) : otherLastSeen ? (
                 formatLastSeen(otherLastSeen)
               ) : (
-                <span className="text-slate-500 dark:text-slate-400 font-medium">Offline</span>
+                <span className="text-muted-foreground font-medium">Offline</span>
               )
             ) : chat?.type === "GROUP" && isConnected ? (
               `${chat.members.length} members`
@@ -286,13 +286,13 @@ export default function ChatThreadPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search messages…"
-                className="flex-1 min-w-0 rounded-lg border border-slate-200 dark:border-slate-500 px-2.5 py-1.5 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 bg-white dark:bg-slate-700 focus:outline-none focus:ring-1 focus:ring-primary-400"
+                className="flex-1 min-w-0 rounded-lg border border-input px-2.5 py-1.5 text-sm text-foreground placeholder-muted-foreground bg-background focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-normal"
                 autoFocus
               />
               <button
                 type="button"
                 onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
-                className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-200/80 dark:hover:bg-slate-600/80"
+                className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted transition-colors duration-normal"
                 aria-label="Close search"
               >
                 <X className="w-4 h-4" />
@@ -302,7 +302,7 @@ export default function ChatThreadPage() {
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
-              className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-200/80 dark:hover:bg-slate-600/80 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-normal"
+              className="p-2.5 rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground transition-all duration-normal"
               aria-label="Search messages"
             >
               <Search className="w-5 h-5" />
@@ -312,7 +312,7 @@ export default function ChatThreadPage() {
             type="button"
             disabled={!canCall}
             onClick={() => handleStartCall("video")}
-            className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-200/80 dark:hover:bg-slate-600/80 hover:text-slate-800 dark:hover:text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-normal"
+            className="p-2.5 rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-normal"
             aria-label="Video call"
           >
             <Video className="w-5 h-5" />
@@ -321,7 +321,7 @@ export default function ChatThreadPage() {
             type="button"
             disabled={!canCall}
             onClick={() => handleStartCall("audio")}
-            className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-200/80 dark:hover:bg-slate-600/80 hover:text-slate-800 dark:hover:text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-normal"
+            className="p-2.5 rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-normal"
             aria-label="Audio call"
           >
             <Phone className="w-5 h-5" />
@@ -329,7 +329,7 @@ export default function ChatThreadPage() {
           <button
             type="button"
             onClick={toggleRightSidebar}
-            className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-200/80 dark:hover:bg-slate-600/80 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-normal"
+            className="p-2.5 rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground transition-all duration-normal"
             aria-label="Chat info"
           >
             <Info className="w-5 h-5" />
@@ -339,11 +339,11 @@ export default function ChatThreadPage() {
 
       {/* Search results dropdown */}
       {searchOpen && searchQuery.trim().length >= 1 && (
-        <div className="shrink-0 border-b border-slate-200/70 dark:border-slate-600/70 bg-white dark:bg-slate-800 max-h-48 overflow-y-auto">
+        <div className="shrink-0 border-b border-border bg-card max-h-48 overflow-y-auto">
           {searchFetching ? (
-            <p className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">Searching…</p>
+            <p className="px-4 py-3 text-sm text-muted-foreground">Searching…</p>
           ) : searchResults.length === 0 ? (
-            <p className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">No results</p>
+            <p className="px-4 py-3 text-sm text-muted-foreground">No results</p>
           ) : (
             <ul className="py-1">
               {searchResults.map((msg) => (
@@ -355,12 +355,12 @@ export default function ChatThreadPage() {
                       setSearchOpen(false);
                       setSearchQuery("");
                     }}
-                    className="w-full text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex flex-col gap-0.5"
+                    className="w-full text-left px-4 py-2 hover:bg-muted flex flex-col gap-0.5"
                   >
-                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                    <span className="text-xs text-muted-foreground">
                       {msg.sender.username} · {new Date(msg.createdAt).toLocaleString()}
                     </span>
-                    <span className="text-sm text-slate-800 dark:text-slate-100 truncate">
+                    <span className="text-sm text-foreground truncate">
                       {msg.type === "TEXT"
                         ? (msg.content ?? "")
                         : msg.type === "IMAGE"
@@ -378,7 +378,7 @@ export default function ChatThreadPage() {
       )}
 
       {/* Messages area */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin px-4 py-5 flex flex-col gap-2 min-h-0 bg-[linear-gradient(180deg,_#f8fafc_0%,_#f1f5f9_30%,_#eef2f7_100%)] dark:bg-[linear-gradient(180deg,_#1e293b_0%,_#0f172a_30%,_#0c1222_100%)]">
+      <div className="flex-1 overflow-y-auto scrollbar-thin px-4 py-5 flex flex-col gap-2 min-h-0 bg-gradient-to-b from-muted/30 to-background">
         {messagesLoading && displayMessages.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 gap-4">
             <div className="flex gap-1.5">
@@ -390,16 +390,16 @@ export default function ChatThreadPage() {
                 />
               ))}
             </div>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Loading messages…</p>
+            <p className="text-sm text-muted-foreground">Loading messages…</p>
           </div>
         )}
         {!messagesLoading && displayEntries.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-slate-200/70 dark:bg-slate-600/70 flex items-center justify-center">
-              <MessageCircle className="w-7 h-7 text-slate-400 dark:text-slate-500" />
+            <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center">
+              <MessageCircle className="w-7 h-7 text-muted-foreground" />
             </div>
-            <p className="text-slate-600 dark:text-slate-300 font-medium">No messages yet</p>
-            <p className="text-sm text-slate-500 dark:text-slate-400 max-w-[220px]">Send a message to start the conversation.</p>
+            <p className="text-foreground font-medium">No messages yet</p>
+            <p className="text-sm text-muted-foreground max-w-[220px]">Send a message to start the conversation.</p>
           </div>
         )}
         {displayEntries.map((entry) => {
