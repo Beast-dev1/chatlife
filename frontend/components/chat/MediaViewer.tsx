@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import {
   Carousel,
   CarouselContent,
@@ -60,8 +61,12 @@ export default function MediaViewer({
   if (mediaMessages.length === 0) return null;
 
   return (
-    <div
+    <motion.div
       ref={containerRef}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
       className="fixed inset-0 z-50 flex flex-col bg-black/95"
       role="dialog"
       aria-modal="true"
@@ -132,6 +137,6 @@ export default function MediaViewer({
           )}
         </Carousel>
       </div>
-    </div>
+    </motion.div>
   );
 }

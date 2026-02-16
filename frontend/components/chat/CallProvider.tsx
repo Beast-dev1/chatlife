@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect } from "react";
+import { AnimatePresence } from "framer-motion";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSocket } from "@/hooks/useSocket";
 import { useCallStore } from "@/store/callStore";
@@ -101,7 +102,15 @@ export default function CallProvider() {
 
   return (
     <>
-      {incomingCall && <IncomingCallModal incomingCall={incomingCall} socket={socket} />}
+      <AnimatePresence>
+        {incomingCall && (
+          <IncomingCallModal
+            key="incoming-call"
+            incomingCall={incomingCall}
+            socket={socket}
+          />
+        )}
+      </AnimatePresence>
       {activeCall && <ActiveCallBar activeCall={activeCall} />}
     </>
   );

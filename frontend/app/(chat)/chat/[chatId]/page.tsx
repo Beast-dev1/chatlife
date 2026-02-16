@@ -453,22 +453,28 @@ export default function ChatThreadPage() {
         onCancelReply={() => setReplyingTo(null)}
       />
 
-      {forwardMessage && user && (
-        <ForwardModal
-          message={forwardMessage}
-          currentChatId={chatId}
-          currentUserId={user.id}
-          onClose={() => setForwardMessage(null)}
-        />
-      )}
+      <AnimatePresence>
+        {forwardMessage && user && (
+          <ForwardModal
+            key="forward"
+            message={forwardMessage}
+            currentChatId={chatId}
+            currentUserId={user.id}
+            onClose={() => setForwardMessage(null)}
+          />
+        )}
+      </AnimatePresence>
 
-      {openMediaIndex !== null && mediaMessages.length > 0 && (
-        <MediaViewer
-          mediaMessages={mediaMessages}
-          initialIndex={openMediaIndex}
-          onClose={() => setOpenMediaIndex(null)}
-        />
-      )}
+      <AnimatePresence>
+        {openMediaIndex !== null && mediaMessages.length > 0 && (
+          <MediaViewer
+            key="media-viewer"
+            mediaMessages={mediaMessages}
+            initialIndex={openMediaIndex}
+            onClose={() => setOpenMediaIndex(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
