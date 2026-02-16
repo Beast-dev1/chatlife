@@ -2,6 +2,7 @@
 
 import { useCallback, useRef } from "react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { Video, Phone } from "lucide-react";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { useCallStore, type IncomingCallPayload } from "@/store/callStore";
@@ -40,8 +41,24 @@ export default function IncomingCallModal({
   useFocusTrap(containerRef, true, clearIncomingCall);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div ref={containerRef} className="w-full max-w-sm rounded-2xl bg-popover p-6 shadow-modal border border-border" role="dialog" aria-modal="true" aria-label="Incoming call">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+    >
+      <motion.div
+        ref={containerRef}
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.98 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
+        className="w-full max-w-sm rounded-2xl bg-popover p-6 shadow-modal border border-border"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Incoming call"
+      >
         <p className="text-center text-body text-muted-foreground mb-4">
           Incoming {callType === "video" ? "video" : "audio"} call
         </p>
@@ -84,7 +101,7 @@ export default function IncomingCallModal({
             </button>
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

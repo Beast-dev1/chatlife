@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { useChats } from "@/hooks/useChats";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { api } from "@/lib/api";
@@ -48,9 +49,20 @@ export default function ForwardModal({
   useFocusTrap(containerRef, true, onClose);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={onClose}>
-      <div
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
+      <motion.div
         ref={containerRef}
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.98 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
         role="dialog"
         aria-modal="true"
         aria-label="Forward to"
@@ -100,7 +112,7 @@ export default function ForwardModal({
             </ul>
           )}
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

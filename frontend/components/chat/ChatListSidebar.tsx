@@ -225,15 +225,18 @@ export default function ChatListSidebar() {
         )}
       </div>
 
-      {showCreate && (
-        <CreateChatModal
-          onClose={() => setShowCreate(false)}
-          onCreated={(chatId) => {
-            setShowCreate(false);
-            router.push(`/chat/${chatId}`);
-          }}
-        />
-      )}
+      <AnimatePresence>
+        {showCreate && (
+          <CreateChatModal
+            key="create-chat"
+            onClose={() => setShowCreate(false)}
+            onCreated={(chatId) => {
+              setShowCreate(false);
+              router.push(`/chat/${chatId}`);
+            }}
+          />
+        )}
+      </AnimatePresence>
     </aside>
   );
 }

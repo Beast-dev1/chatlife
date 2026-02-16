@@ -59,8 +59,24 @@ export default function CreateChatModal({
   useFocusTrap(containerRef, true, onClose);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div ref={containerRef} className="w-full max-w-md rounded-2xl bg-popover border border-border shadow-modal" role="dialog" aria-modal="true" aria-label="New chat">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+    >
+      <motion.div
+        ref={containerRef}
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.98 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
+        className="w-full max-w-md rounded-2xl bg-popover border border-border shadow-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label="New chat"
+      >
         <div className="flex items-center justify-between p-4 border-b border-border">
           <h2 className="text-title font-semibold text-popover-foreground">New chat</h2>
           <button
@@ -192,7 +208,7 @@ export default function CreateChatModal({
             </>
           )}
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

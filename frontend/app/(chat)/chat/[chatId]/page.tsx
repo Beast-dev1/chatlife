@@ -18,6 +18,7 @@ import { Info, MessageCircle, Phone, Search, Video, X } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence } from "framer-motion";
 
 const MediaViewer = dynamic(() => import("@/components/chat/MediaViewer"), { ssr: false });
 const ForwardModal = dynamic(() => import("@/components/chat/ForwardModal"), { ssr: false });
