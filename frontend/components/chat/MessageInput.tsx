@@ -306,7 +306,7 @@ export default function MessageInput({
         disabled={!text.trim() || disabled}
         whileHover={text.trim() && !disabled ? { scale: 1.06 } : {}}
         whileTap={text.trim() && !disabled ? { scale: 0.96 } : {}}
-        className="p-3 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground shadow-surface hover:shadow-glow transition-shadow duration-normal"
+        className="p-3 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground shadow-surface hover:shadow-glow transition-all duration-normal focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
         aria-label="Send"
       >
         <Send className="w-5 h-5" />

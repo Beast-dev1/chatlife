@@ -160,7 +160,7 @@ export default function CreateChatModal({
                     type="button"
                     onClick={() => selectedIds.length > 0 && setStep("name")}
                     disabled={selectedIds.length === 0}
-                    className="flex-1 px-4 py-2 rounded-xl bg-primary-500 text-white hover:bg-primary-600 disabled:opacity-50 transition-colors duration-normal"
+                    className="flex-1 px-4 py-2 rounded-xl bg-primary-500 text-primary-foreground hover:bg-primary-600 active:scale-[0.98] disabled:opacity-50 transition-all duration-normal"
                   >
                     Next
                   </button>
@@ -170,7 +170,7 @@ export default function CreateChatModal({
                     onClick={handleCreate}
                     disabled={selectedIds.length !== 1 || createChat.isPending}
                     aria-busy={createChat.isPending}
-                    className="flex-1 px-4 py-2 rounded-xl bg-primary-500 text-white hover:bg-primary-600 disabled:opacity-50 transition-colors duration-normal"
+                    className="flex-1 px-4 py-2 rounded-xl bg-primary-500 text-primary-foreground hover:bg-primary-600 active:scale-[0.98] disabled:opacity-50 transition-all duration-normal focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
                   >
                     {createChat.isPending ? "Creating…" : "Create chat"}
                   </button>
@@ -200,7 +200,7 @@ export default function CreateChatModal({
                   onClick={handleCreate}
                   disabled={createChat.isPending}
                   aria-busy={createChat.isPending}
-                  className="flex-1 px-4 py-2 rounded-xl bg-primary-500 text-white hover:bg-primary-600 disabled:opacity-50 transition-colors duration-normal"
+                  className="flex-1 px-4 py-2 rounded-xl bg-primary-500 text-primary-foreground hover:bg-primary-600 active:scale-[0.98] disabled:opacity-50 transition-all duration-normal focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
                 >
                   {createChat.isPending ? "Creating…" : "Create group"}
                 </button>

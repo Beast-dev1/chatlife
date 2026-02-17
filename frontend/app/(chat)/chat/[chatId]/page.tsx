@@ -391,7 +391,7 @@ export default function ChatThreadPage() {
                   <div className="w-9 h-9 rounded-full bg-muted animate-pulse flex-shrink-0" />
                 )}
                 <div
-                  className={`rounded-2xl px-4 py-3 max-w-[70%] space-y-2 ${
+                  className={`rounded-2xl px-4 py-3 max-w-[70%] space-y-2 bg-muted ${
                     i % 2 === 0
                       ? "rounded-bl-md"
                       : "rounded-br-md"
