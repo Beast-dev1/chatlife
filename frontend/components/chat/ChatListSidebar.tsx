@@ -78,9 +78,9 @@ export default function ChatListSidebar() {
   });
 
   return (
-    <aside className="w-80 min-w-[280px] max-w-[360px] glass border-r border-border flex flex-col rounded-r-2xl shadow-surface">
+    <aside className="w-80 min-w-[280px] max-w-[360px] glass shadow-edge-r flex flex-col rounded-r-2xl shadow-surface">
       {/* Header: Logo + User icons */}
-      <div className="p-3 border-b border-border flex items-center justify-between">
+      <div className="p-3 shadow-edge-b flex items-center justify-between">
         <Link href="/chat" className="flex items-center gap-2.5 group">
           <div className="p-2.5 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl shadow-sm group-hover:shadow-glow transition-shadow duration-300">
             <MessageCircle className="w-5 h-5 text-primary-foreground" />
@@ -104,7 +104,7 @@ export default function ChatListSidebar() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -4, scale: 0.98 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute right-0 top-full mt-1.5 py-1.5 w-48 rounded-2xl bg-popover border border-border shadow-overlay z-50 overflow-hidden"
+                  className="absolute right-0 top-full mt-1.5 py-1.5 w-48 rounded-2xl bg-popover shadow-overlay z-50 overflow-hidden"
                 >
                   <Link
                     href="/profile"
@@ -151,8 +151,8 @@ export default function ChatListSidebar() {
       </div>
 
       {/* Search bar */}
-      <div className="p-3 border-b border-border">
-        <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-muted/80 border border-input focus-within:bg-background focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-500/20 transition-all duration-normal">
+      <div className="p-3 shadow-edge-b">
+        <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-muted/80 shadow-input focus-within:bg-background focus-within:ring-2 focus-within:ring-primary-500/20 transition-all duration-normal">
           <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" />
           <input
             type="search"

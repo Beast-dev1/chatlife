@@ -67,7 +67,7 @@ export default function NewMessageToastContainer() {
           key={t.id}
           type="button"
           onClick={() => goToChat(t.chatId)}
-          className="flex items-center gap-3 p-3 rounded-xl bg-popover border border-border shadow-overlay text-left hover:bg-muted/80 transition-colors duration-normal"
+          className="flex items-center gap-3 p-3 rounded-xl bg-popover shadow-overlay text-left hover:bg-muted/80 transition-colors duration-normal"
         >
           <div className="w-10 h-10 rounded-full bg-primary-500/20 flex items-center justify-center flex-shrink-0">
             <MessageCircle className="w-5 h-5 text-primary-500" />

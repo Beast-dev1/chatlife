@@ -246,9 +246,9 @@ export default function ChatThreadPage() {
   const otherAvatar = otherMember?.user?.avatarUrl ?? null;
 
   return (
-    <div className="flex flex-col h-full bg-card rounded-2xl overflow-hidden shadow-surface border border-border">
+    <div className="flex flex-col h-full bg-card rounded-2xl overflow-hidden shadow-surface">
       {/* Header */}
-      <header className="flex items-center gap-3 px-5 py-3.5 border-b border-border bg-muted/80 backdrop-blur-md shrink-0">
+      <header className="flex items-center gap-3 px-5 py-3.5 shadow-edge-b bg-muted/80 backdrop-blur-md shrink-0">
         <div className="w-11 h-11 rounded-full bg-muted flex-shrink-0 overflow-hidden ring-2 ring-background shadow-inner flex items-center justify-center">
           {otherAvatar ? (
             <Image src={otherAvatar} alt="" width={44} height={44} className="w-full h-full object-cover" />
@@ -287,7 +287,7 @@ export default function ChatThreadPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search messages…"
-                className="flex-1 min-w-0 rounded-lg border border-input px-2.5 py-1.5 text-sm text-foreground placeholder-muted-foreground bg-background focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-normal"
+                className="flex-1 min-w-0 rounded-lg shadow-input px-2.5 py-1.5 text-sm text-foreground placeholder-muted-foreground bg-background focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all duration-normal"
                 autoFocus
               />
               <button
@@ -340,7 +340,7 @@ export default function ChatThreadPage() {
 
       {/* Search results dropdown */}
       {searchOpen && searchQuery.trim().length >= 1 && (
-        <div className="shrink-0 border-b border-border bg-card max-h-48 overflow-y-auto">
+        <div className="shrink-0 shadow-edge-b bg-card max-h-48 overflow-y-auto">
           {searchFetching ? (
             <p className="px-4 py-3 text-sm text-muted-foreground">Searching…</p>
           ) : searchResults.length === 0 ? (

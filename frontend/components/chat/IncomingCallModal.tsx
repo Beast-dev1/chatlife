@@ -54,7 +54,7 @@ export default function IncomingCallModal({
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.98 }}
         transition={{ duration: 0.2, ease: "easeOut" }}
-        className="w-full max-w-sm rounded-2xl bg-popover p-6 shadow-modal border border-border"
+        className="w-full max-w-sm rounded-2xl bg-popover p-6 shadow-modal"
         role="dialog"
         aria-modal="true"
         aria-label="Incoming call"

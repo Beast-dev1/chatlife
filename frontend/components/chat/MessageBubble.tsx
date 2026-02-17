@@ -120,7 +120,7 @@ export default function MessageBubble({
           className={`relative rounded-2xl px-4 py-2.5 transition-shadow duration-normal hover:shadow-overlay ${
             isOwn
               ? "bg-chatSent text-white rounded-br-md shadow-surface"
-              : "bg-chatReceived text-foreground rounded-bl-md border border-border shadow-surface"
+              : "bg-chatReceived text-foreground rounded-bl-md shadow-surface"
           }`}
         >
           {onReply && (
@@ -134,8 +134,8 @@ export default function MessageBubble({
                 <MoreHorizontal className="w-4 h-4" />
               </button>
               {menuOpen && (
-                <div className={`absolute top-full right-0 mt-0.5 py-1 min-w-[140px] rounded-lg border border-border shadow-overlay ${
-                  isOwn ? "bg-primary-600 border-primary-500" : "bg-popover border-border"
+                <div className={`absolute top-full right-0 mt-0.5 py-1 min-w-[140px] rounded-lg shadow-overlay ${
+                  isOwn ? "bg-primary-600" : "bg-popover"
                 }`}>
                   {onReply && (
                     <button
@@ -322,8 +322,8 @@ export default function MessageBubble({
                   whileTap={{ scale: 0.95 }}
                   className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs transition-colors ${
                     userReacted
-                      ? "bg-primary-100 border border-primary-300 text-primary-700 dark:bg-primary-900/50 dark:border-primary-700 dark:text-primary-200"
-                      : "bg-muted border border-border text-foreground hover:bg-muted/80"
+                      ? "bg-primary-100 shadow-input text-primary-700 dark:bg-primary-900/50 dark:text-primary-200"
+                      : "bg-muted shadow-input text-foreground hover:bg-muted/80"
                   }`}
                   title={reactions.map((r) => r.user.username).join(", ")}
                 >
@@ -354,7 +354,7 @@ export default function MessageBubble({
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: -10 }}
                 transition={{ duration: 0.2, ease: "easeOut" }}
-                className={`absolute ${isOwn ? "right-0" : "left-0"} bottom-full mb-2 p-3 bg-popover rounded-xl shadow-overlay border border-border z-20 backdrop-blur-sm`}
+                className={`absolute ${isOwn ? "right-0" : "left-0"} bottom-full mb-2 p-3 bg-popover rounded-xl shadow-overlay z-20 backdrop-blur-sm`}
               >
                 <div className="mb-2">
                   <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">React</p>

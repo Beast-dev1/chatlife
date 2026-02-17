@@ -72,12 +72,12 @@ export default function CreateChatModal({
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.98 }}
         transition={{ duration: 0.2, ease: "easeOut" }}
-        className="w-full max-w-md rounded-2xl bg-popover border border-border shadow-modal"
+        className="w-full max-w-md rounded-2xl bg-popover shadow-modal"
         role="dialog"
         aria-modal="true"
         aria-label="New chat"
       >
-        <div className="flex items-center justify-between p-4 border-b border-border">
+        <div className="flex items-center justify-between p-4 shadow-edge-b">
           <h2 className="text-title font-semibold text-popover-foreground">New chat</h2>
           <button
             type="button"
@@ -98,7 +98,7 @@ export default function CreateChatModal({
                   setStep("select");
                   setSelectedIds([]);
                 }}
-                className="flex-1 flex flex-col items-center gap-2 p-4 rounded-xl border border-input hover:bg-muted/50 text-foreground transition-colors duration-normal"
+                className="flex-1 flex flex-col items-center gap-2 p-4 rounded-xl shadow-input hover:bg-muted/50 text-foreground transition-colors duration-normal"
               >
                 <User className="w-10 h-10 text-primary-500" />
                 <span>1:1 Chat</span>
@@ -110,7 +110,7 @@ export default function CreateChatModal({
                   setStep("select");
                   setSelectedIds([]);
                 }}
-                className="flex-1 flex flex-col items-center gap-2 p-4 rounded-xl border border-input hover:bg-muted/50 text-foreground transition-colors duration-normal"
+                className="flex-1 flex flex-col items-center gap-2 p-4 rounded-xl shadow-input hover:bg-muted/50 text-foreground transition-colors duration-normal"
               >
                 <Users className="w-10 h-10 text-primary-500" />
                 <span>Group</span>
@@ -124,7 +124,7 @@ export default function CreateChatModal({
                 placeholder="Search by username or email"
                 value={searchQ}
                 onChange={(e) => setSearchQ(e.target.value)}
-                className="w-full rounded-xl bg-background border border-input px-3 py-2 text-foreground placeholder-muted-foreground mb-3 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-normal"
+                className="w-full rounded-xl bg-background shadow-input px-3 py-2 text-foreground placeholder-muted-foreground mb-3 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all duration-normal"
               />
               <div className="max-h-48 overflow-y-auto scrollbar-thin space-y-1 mb-4">
                 {candidates.map((u) => (
@@ -151,7 +151,7 @@ export default function CreateChatModal({
                 <button
                   type="button"
                   onClick={() => setStep("type")}
-                  className="px-4 py-2 rounded-xl border border-input text-foreground hover:bg-muted transition-colors duration-normal"
+                  className="px-4 py-2 rounded-xl shadow-input text-foreground hover:bg-muted transition-colors duration-normal"
                 >
                   Back
                 </button>
@@ -185,13 +185,13 @@ export default function CreateChatModal({
                 placeholder="Group name"
                 value={groupName}
                 onChange={(e) => setGroupName(e.target.value)}
-                className="w-full rounded-xl bg-background border border-input px-3 py-2 text-foreground placeholder-muted-foreground mb-4 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-normal"
+                className="w-full rounded-xl bg-background shadow-input px-3 py-2 text-foreground placeholder-muted-foreground mb-4 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all duration-normal"
               />
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setStep("select")}
-                  className="px-4 py-2 rounded-xl border border-input text-foreground hover:bg-muted transition-colors duration-normal"
+                  className="px-4 py-2 rounded-xl shadow-input text-foreground hover:bg-muted transition-colors duration-normal"
                 >
                   Back
                 </button>

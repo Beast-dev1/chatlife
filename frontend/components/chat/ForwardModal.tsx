@@ -66,10 +66,10 @@ export default function ForwardModal({
         role="dialog"
         aria-modal="true"
         aria-label="Forward to"
-        className="bg-popover rounded-2xl shadow-modal border border-border w-full max-w-md max-h-[80vh] flex flex-col"
+        className="bg-popover rounded-2xl shadow-modal w-full max-w-md max-h-[80vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="px-4 py-3 border-b border-border flex items-center justify-between">
+        <div className="px-4 py-3 shadow-edge-b flex items-center justify-between">
           <h2 className="font-semibold text-title text-popover-foreground">Forward to</h2>
           <button
             type="button"

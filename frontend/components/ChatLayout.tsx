@@ -67,7 +67,7 @@ export default function ChatLayout({
     return (
       <div className="h-screen flex app-shell bg-background">
         <ChatListSidebar />
-        <main className="flex-1 flex flex-col overflow-hidden min-w-0 glass rounded-l-2xl shadow-surface border border-border">
+        <main className="flex-1 flex flex-col overflow-hidden min-w-0 glass rounded-l-2xl shadow-surface">
           <NotificationPermission />
           <SocketSync />
           <CallProvider />
@@ -84,8 +84,8 @@ export default function ChatLayout({
   // Original sidebar + main for contacts, profile (modern theme)
   return (
     <div className="h-screen flex app-shell bg-background">
-      <aside className="w-72 glass border-r border-border flex flex-col rounded-r-2xl shadow-surface">
-        <div className="p-4 border-b border-border flex items-center gap-3">
+      <aside className="w-72 glass shadow-edge-r flex flex-col rounded-r-2xl shadow-surface">
+        <div className="p-4 shadow-edge-b flex items-center gap-3">
           <div className="p-2.5 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl shadow-sm">
             <MessageCircle className="w-5 h-5 text-primary-foreground" />
           </div>
@@ -150,7 +150,7 @@ export default function ChatLayout({
           </Link>
         </nav>
 
-        <div className="p-2 border-t border-border">
+        <div className="p-2 shadow-edge-t">
           <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-muted/80 mb-2">
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900/50 dark:to-primary-800/50 flex items-center justify-center ring-2 ring-background shadow-inner">
               <User className="w-5 h-5 text-primary-600 dark:text-primary-400" />
@@ -172,7 +172,7 @@ export default function ChatLayout({
         </div>
       </aside>
 
-      <main className="flex-1 flex flex-col overflow-hidden glass rounded-2xl shadow-surface border border-border">
+      <main className="flex-1 flex flex-col overflow-hidden glass rounded-2xl shadow-surface">
         <NotificationPermission />
         <SocketSync />
         <CallProvider />

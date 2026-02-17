@@ -523,9 +523,9 @@ export default function ChatInfoSidebar({ chatId }: { chatId: string | null }) {
       role="dialog"
       aria-modal="true"
       aria-label="Chat info"
-      className="w-80 min-w-[280px] max-w-[360px] bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-l border-slate-200/60 dark:border-slate-600/60 flex flex-col rounded-l-2xl shadow-soft"
+      className="w-80 min-w-[280px] max-w-[360px] bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-edge-l flex flex-col rounded-l-2xl shadow-soft"
     >
-      <div className="p-3 border-b border-slate-100/80 flex items-center justify-between shrink-0">
+      <div className="p-3 shadow-edge-b flex items-center justify-between shrink-0">
         <a href="#" className="text-sm font-semibold text-slate-600 hover:text-primary-500 transition-colors duration-200">
           {chat?.type === "GROUP" ? "Group info" : "NEED HELP"}
         </a>
@@ -551,7 +551,7 @@ export default function ChatInfoSidebar({ chatId }: { chatId: string | null }) {
         <DirectChatPanel chatId={chatId} chat={chat} user={user} />
       )}
 
-      <div className="p-2 border-t border-slate-100 flex justify-end shrink-0">
+      <div className="p-2 shadow-edge-t flex justify-end shrink-0">
         <motion.button
           type="button"
           onClick={closeSidebar}
