@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 
 const databaseUrl = process.env.DATABASE_URL;
@@ -8,5 +9,6 @@ if (!databaseUrl) {
 }
 
 const pool = new Pool({ connectionString: databaseUrl });
-export const prisma = new PrismaClient();
+const adapter = new PrismaPg(pool);
+export const prisma = new PrismaClient({ adapter });
 export { pool };
