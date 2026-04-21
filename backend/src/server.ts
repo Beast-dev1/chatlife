@@ -109,7 +109,10 @@ async function main() {
       io.adapter(createAdapter(pubClient, subClient));
       console.log("✓ Redis adapter attached for Socket.io");
     } catch (redisErr) {
-      console.warn("⚠ Redis not available, Socket.io running in single-instance mode:", redisErr);
+      const reason = redisErr instanceof Error ? redisErr.message : "unknown Redis connection error";
+      console.warn(
+        `⚠ Redis not available, Socket.io running in single-instance mode (${reason})`
+      );
     }
 
     server.listen(PORT, () => {
