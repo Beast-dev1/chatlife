@@ -1,6 +1,7 @@
 import { createClient, type RedisClientType } from "redis";
 
 const REDIS_URL = process.env.REDIS_URL;
+const NODE_ENV = process.env.NODE_ENV;
 
 let pubClient: RedisClientType | null = null;
 let subClient: RedisClientType | null = null;
@@ -22,7 +23,13 @@ export async function getRedisClients(): Promise<{
   subClient: RedisClientType;
 }> {
   if (!REDIS_URL) {
-    throw new Error("REDIS_URL is not set");
+    throw new Error("REDIS_URL is not set; running without Redis adapter");
+  }
+  if (
+    NODE_ENV === "production" &&
+    (REDIS_URL.includes("127.0.0.1") || REDIS_URL.includes("localhost") || REDIS_URL.includes("::1"))
+  ) {
+    throw new Error("REDIS_URL points to localhost in production; running without Redis adapter");
   }
   if (redisDisabled) {
     throw new Error("Redis is disabled for this process");
@@ -34,8 +41,8 @@ export async function getRedisClients(): Promise<{
   pubClient = createRedisClient(REDIS_URL);
   subClient = pubClient.duplicate();
 
-  pubClient.on("error", (err) => console.error("Redis pub client error:", err));
-  subClient.on("error", (err) => console.error("Redis sub client error:", err));
+  pubClient.on("error", (err) => console.warn("Redis pub client error:", err.message));
+  subClient.on("error", (err) => console.warn("Redis sub client error:", err.message));
 
   try {
     await Promise.all([pubClient.connect(), subClient.connect()]);
