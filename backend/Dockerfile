@@ -15,6 +15,9 @@ RUN npx prisma generate
 # Copy source
 COPY . .
 
+# Build TypeScript output used by npm start
+RUN npm run build
+
 EXPOSE 4000
 
 # Default command - overridden by docker-compose
