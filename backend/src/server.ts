@@ -26,6 +26,16 @@ const server = http.createServer(app);
 const PORT = process.env.PORT || 4000;
 const FRONTEND_URL = process.env.FRONTEND_URL || "*";
 
+function getErrorMessage(err: unknown): string {
+  if (err instanceof Error && err.message.trim()) {
+    return err.message.trim();
+  }
+  if (typeof err === "string" && err.trim()) {
+    return err.trim();
+  }
+  return "unknown Redis connection error";
+}
+
 // Security middleware
 app.use(helmet());
 app.use(
@@ -109,7 +119,7 @@ async function main() {
       io.adapter(createAdapter(pubClient, subClient));
       console.log("✓ Redis adapter attached for Socket.io");
     } catch (redisErr) {
-      const reason = redisErr instanceof Error ? redisErr.message : "unknown Redis connection error";
+      const reason = getErrorMessage(redisErr);
       console.warn(
         `⚠ Redis not available, Socket.io running in single-instance mode (${reason})`
       );

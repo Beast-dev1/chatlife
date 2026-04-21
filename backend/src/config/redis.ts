@@ -7,6 +7,16 @@ let pubClient: RedisClientType | null = null;
 let subClient: RedisClientType | null = null;
 let redisDisabled = false;
 
+function getRedisErrorMessage(err: unknown): string {
+  if (err instanceof Error && err.message.trim()) {
+    return err.message.trim();
+  }
+  if (typeof err === "string" && err.trim()) {
+    return err.trim();
+  }
+  return "unknown Redis error";
+}
+
 function createRedisClient(url: string): RedisClientType {
   return createClient({
     url,
@@ -41,8 +51,8 @@ export async function getRedisClients(): Promise<{
   pubClient = createRedisClient(REDIS_URL);
   subClient = pubClient.duplicate();
 
-  pubClient.on("error", (err) => console.warn("Redis pub client error:", err.message));
-  subClient.on("error", (err) => console.warn("Redis sub client error:", err.message));
+  pubClient.on("error", (err) => console.warn(`Redis pub client error: ${getRedisErrorMessage(err)}`));
+  subClient.on("error", (err) => console.warn(`Redis sub client error: ${getRedisErrorMessage(err)}`));
 
   try {
     await Promise.all([pubClient.connect(), subClient.connect()]);
