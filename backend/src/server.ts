@@ -6,7 +6,7 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { Server as SocketServer } from "socket.io";
 import { createAdapter } from "@socket.io/redis-adapter";
-import { prisma } from "./lib/prisma";
+import { prisma, pool } from "./lib/prisma";
 import authRoutes from "./routes/authRoutes";
 import chatRoutes from "./routes/chatRoutes";
 import contactRoutes from "./routes/contactRoutes";
@@ -71,8 +71,8 @@ app.use("/uploads", express.static(UPLOAD_DIR));
 // Health check - verifies DB connection
 app.get("/api/health", async (_req: Request, res: Response) => {
   try {
-    // Use a simple Prisma query instead of raw SQL for adapter compatibility in production.
-    await prisma.user.count({ take: 1 });
+    // Check raw DB connectivity independent of Prisma model/table state.
+    await pool.query("SELECT 1");
     res.json({
       status: "ok",
       database: "connected",
