@@ -97,7 +97,10 @@ export default function ChatThreadPage() {
           ? `${typingNames[0]} and ${typingNames[1]} are typing…`
           : "Several people are typing…";
 
-  const displayMessages: MessageWithSender[] = messagesByChat[chatId] ?? [];
+  const displayMessages: MessageWithSender[] = useMemo(
+    () => messagesByChat[chatId] ?? [],
+    [messagesByChat, chatId]
+  );
   const callsForChat: CallLogItem[] = useMemo(() => {
     const list = callsData?.pages?.flatMap((p) => p.calls) ?? [];
     return [...list].reverse();

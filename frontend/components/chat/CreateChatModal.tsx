@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { X, Users, User } from "lucide-react";
 import { useCreateChat } from "@/hooks/useChats";
 import { useContacts, useSearchUsers } from "@/hooks/useContacts";

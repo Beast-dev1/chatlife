@@ -251,7 +251,7 @@ export default function MessageInput({
         onFocus={handleFocus}
         onBlur={handleBlur}
         placeholder={enterToSend ? "Type a message…" : "Type a message… (Ctrl+Enter to send)"}
-        aria-description={enterToSend ? "Press Enter to send, Shift+Enter for new line" : "Press Ctrl+Enter to send"}
+        aria-label={enterToSend ? "Message input. Press Enter to send, Shift plus Enter for new line." : "Message input. Press Control plus Enter to send."}
         rows={1}
         disabled={disabled}
         className="flex-1 resize-none rounded-xl bg-background shadow-input px-4 py-2.5 text-body text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary-500/20 min-h-[44px] max-h-32 disabled:opacity-50 transition-all duration-normal"
