@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../lib/prisma";
 import { AuthRequest } from "../middleware/auth";
 import { AppError } from "../middleware/errorHandler";
 import {
@@ -10,8 +10,6 @@ import {
   type UpdateCallInput,
 } from "../validators/call";
 import { requireChatMember } from "../utils/chatMembership";
-
-const prisma = new PrismaClient();
 
 export async function getCallLogAndRequireParticipant(callId: string, userId: string) {
   const call = await prisma.callLog.findUnique({

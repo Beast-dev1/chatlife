@@ -1,7 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../lib/prisma";
 import { AppError } from "../middleware/errorHandler";
-
-const prisma = new PrismaClient();
 
 export async function getChatMemberOrThrow(chatId: string, userId: string) {
   const member = await prisma.chatMember.findUnique({

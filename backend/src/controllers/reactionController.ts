@@ -1,12 +1,10 @@
 import { Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../lib/prisma";
 import { Server as SocketServer } from "socket.io";
 import { AuthRequest } from "../middleware/auth";
 import { AppError } from "../middleware/errorHandler";
 import { addReactionSchema, type AddReactionInput } from "../validators/reaction";
 import { requireChatMember } from "../utils/chatMembership";
-
-const prisma = new PrismaClient();
 
 const CHAT_ROOM_PREFIX = "chat:";
 function roomForChat(chatId: string) {

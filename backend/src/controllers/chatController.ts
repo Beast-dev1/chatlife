@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../lib/prisma";
 import { AuthRequest } from "../middleware/auth";
 import { AppError } from "../middleware/errorHandler";
 import {
@@ -11,8 +11,6 @@ import {
   type AddMemberInput,
 } from "../validators/chat";
 import { requireChatMember, requireChatAdmin, getChatMemberOrThrow } from "../utils/chatMembership";
-
-const prisma = new PrismaClient();
 
 export async function listChats(req: AuthRequest, res: Response) {
   if (!req.user) throw new AppError("Unauthorized", 401);

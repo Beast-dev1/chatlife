@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../lib/prisma";
 import { AuthRequest } from "../middleware/auth";
 import { AppError } from "../middleware/errorHandler";
 import {
@@ -9,8 +9,6 @@ import {
   type CreateContactInput,
   type UpdateContactInput,
 } from "../validators/contact";
-
-const prisma = new PrismaClient();
 
 const contactUserSelect = {
   id: true,

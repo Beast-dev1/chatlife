@@ -1,5 +1,5 @@
 import { Server, Socket } from "socket.io";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../lib/prisma";
 import { verifyAccessToken } from "../utils/jwt";
 import { createMessageSchema } from "../validators/message";
 import { getChatMemberOrThrow } from "../utils/chatMembership";
@@ -12,8 +12,6 @@ import {
   removeOnlineUser,
   PRESENCE_ONLINE_KEY,
 } from "../utils/presence";
-
-const prisma = new PrismaClient();
 
 const CHAT_ROOM_PREFIX = "chat:";
 

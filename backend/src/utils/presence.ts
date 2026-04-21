@@ -1,7 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../lib/prisma";
 import { getRedisClients } from "../config/redis";
-
-const prisma = new PrismaClient();
 
 export const PRESENCE_ONLINE_KEY = "presence:online";
 const USER_ROOM_PREFIX = "user:";

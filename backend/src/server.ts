@@ -6,7 +6,7 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { Server as SocketServer } from "socket.io";
 import { createAdapter } from "@socket.io/redis-adapter";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "./lib/prisma";
 import authRoutes from "./routes/authRoutes";
 import chatRoutes from "./routes/chatRoutes";
 import contactRoutes from "./routes/contactRoutes";
@@ -23,7 +23,6 @@ import { attachSocketHandlers } from "./socket";
 
 const app = express();
 const server = http.createServer(app);
-const prisma = new PrismaClient();
 const PORT = process.env.PORT || 4000;
 const FRONTEND_URL = process.env.FRONTEND_URL || "*";
 

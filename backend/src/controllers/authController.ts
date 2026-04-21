@@ -1,7 +1,7 @@
 import { Response } from "express";
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../lib/prisma";
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../utils/jwt";
 import { AuthRequest } from "../middleware/auth";
 import { AppError } from "../middleware/errorHandler";
@@ -25,7 +25,6 @@ import { sendPasswordResetEmail } from "../services/emailService";
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
-const prisma = new PrismaClient();
 const SALT_ROUNDS = 10;
 
 function excludePassword<T extends { password?: string | null }>(user: T): Omit<T, "password"> {
