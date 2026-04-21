@@ -61,7 +61,9 @@ app.use("/uploads", express.static(UPLOAD_DIR));
 // Health check - verifies DB connection
 app.get("/api/health", async (_req: Request, res: Response) => {
   try {
-    await prisma.$queryRaw`SELECT 1`;
+    // Prisma + adapter-pg can throw a false "Invalid invocation" on tagged $queryRaw in some envs.
+    // Static query string is safe here and avoids that production-only edge case.
+    await prisma.$queryRawUnsafe("SELECT 1");
     res.json({
       status: "ok",
       database: "connected",
@@ -72,7 +74,7 @@ app.get("/api/health", async (_req: Request, res: Response) => {
     res.status(503).json({
       status: "error",
       database: "disconnected",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: error instanceof Error ? `${error.name}: ${error.message}` : "Unknown error",
     });
   }
 });
