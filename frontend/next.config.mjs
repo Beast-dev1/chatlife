@@ -32,6 +32,12 @@ const nextConfig = {
         port: "4000",
         pathname: "/uploads/**",
       },
+      // Google profile images (OAuth avatars)
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+        pathname: "/**",
+      },
       ...(apiOrigin
         ? [
             {
