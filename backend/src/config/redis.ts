@@ -56,11 +56,23 @@ export async function getRedisClients(): Promise<{
 
 export async function closeRedis() {
   if (pubClient) {
-    await pubClient.quit();
+    if (pubClient.isOpen) {
+      try {
+        await pubClient.quit();
+      } catch {
+        // Ignore close errors during Redis fallback/shutdown.
+      }
+    }
     pubClient = null;
   }
   if (subClient) {
-    await subClient.quit();
+    if (subClient.isOpen) {
+      try {
+        await subClient.quit();
+      } catch {
+        // Ignore close errors during Redis fallback/shutdown.
+      }
+    }
     subClient = null;
   }
 }
